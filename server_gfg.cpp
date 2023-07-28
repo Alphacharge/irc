@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/27 19:41:39 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/28 11:15:15 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/07/28 14:14:46 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <iostream>
 #define PORT 8080
 int main(int argc, char const* argv[])
 {
@@ -35,12 +36,12 @@ int main(int argc, char const* argv[])
 	}
 
 	// Forcefully attaching socket to the port 8080
-	// if (setsockopt(server_fd, SOL_SOCKET,
-	// 			SO_REUSEADDR | SO_REUSEPORT, &opt,
-	// 			sizeof(opt))) {
-	// 	perror("setsockopt");
-	// 	exit(EXIT_FAILURE);
-	// }
+	if (setsockopt(server_fd, SOL_SOCKET,
+				SO_REUSEADDR, &opt,
+				sizeof(opt)) < 0) {
+		perror("setsockopt");
+		exit(EXIT_FAILURE);
+	}
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(PORT);
