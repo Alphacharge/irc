@@ -1,5 +1,5 @@
 # NAME file
-NAME := ircServer
+NAME := ircserv
 
 # Compiler and flags
 CC := c++

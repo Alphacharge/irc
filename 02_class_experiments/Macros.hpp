@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/24 13:57:29 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/31 16:25:09 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/07/31 17:51:40 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,4 +24,3 @@
 # define VERBOSE	false
 
 # define ERR_EMPTY_STACK		"Stack is empty !"
-
