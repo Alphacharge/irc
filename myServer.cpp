@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/28 13:41:15 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/31 09:18:19 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/07/31 09:43:08 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
 	// read and display incoming
 	char	buffer[1024] = {0};
 	int		valread = read(new_socket, buffer, 1024);
-	std::cout << buffer << std::endl;
+	std::cout << buffer;
 
 	// reply to client
 	const char* hello = "Hello from server !";
