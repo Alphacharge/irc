@@ -6,12 +6,14 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 10:33:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/31 10:38:38 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/07/31 13:52:12 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <string>
+
+/* coauthored chat gpt lsordo - high level irc command parsing */
 
 bool parseIRCMessage(const std::string& message, std::string& prefix, std::string& command, std::string& params) {
 	size_t pos = 0;

@@ -6,12 +6,13 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/27 19:41:39 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/28 14:14:46 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/07/31 13:50:53 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // Server side C/C++ program to demonstrate Socket
 // programming
+/* dumped form somewhere in the www */
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>

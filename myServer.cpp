@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/28 13:41:15 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/31 09:43:08 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/07/31 13:51:40 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <unistd.h>
 
 #define PORT	8080
-
+/* src chat gpt couathored with lsordo, goal : first experiment with server processes */
 int main(int argc, char** argv) {
 	static_cast<void>(argc);
 	static_cast<void>(argv);
@@ -59,6 +59,7 @@ int main(int argc, char** argv) {
 		std::cerr << strerror(errno) <<std::endl; // todo exception istead of exit
 		exit(EXIT_FAILURE);
 	}
+	while (1) {
 
 	// read and display incoming
 	char	buffer[1024] = {0};
@@ -73,6 +74,7 @@ int main(int argc, char** argv) {
 	};
 	std::cout << "Hello message sent." << std::endl;
 
+	}
 	// close client connection
 	close(new_socket);
 

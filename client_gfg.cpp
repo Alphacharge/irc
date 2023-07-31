@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/27 19:41:53 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/27 19:44:54 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/07/31 13:53:00 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #define PORT 8080
+
+/* dumped from the web - goal: build a simple cleint app to test the server */
 
 int main(int argc, char const* argv[])
 {

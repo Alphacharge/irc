@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/27 19:16:05 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/27 19:33:08 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/07/31 13:50:38 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-
+/* dumped from somewhere in the www */
 static void usage();
 
 int main(int argc, char *argv[])

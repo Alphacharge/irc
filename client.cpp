@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/27 19:16:38 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/27 19:35:50 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/07/31 13:52:51 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+
+/* dumped from the web - goal: build a simple cleint app to test the server */
 
 static void usage();
 
@@ -90,7 +92,7 @@ int main(int argc, char *argv[])
 	}
 
 	std::cout << "Received:" << "\n" << buffer;
-	
+
 	const char*	message = "This is the client, bye-bye...";
 	write(s0, message, strlen(message));
 
