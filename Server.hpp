@@ -6,21 +6,24 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/31 19:46:12 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/01 13:18:36 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <cstring>
-#include <poll.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+# include <iostream>
+# include <vector>
+# include <cstring>
+# include <poll.h>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <fcntl.h>
+# include <unistd.h>
 
-#include "Macros.hpp"
+# include "Client.hpp"
+# include "Macros.hpp"
 
 class	Server {
 	private:
@@ -28,12 +31,10 @@ class	Server {
 		std::string			_serverPassword;
 		int					_serverSocket;
 		int					_optval;
-		int					_clientSocket;
 		struct sockaddr_in	_serverAddress;
-		struct sockaddr_in	_clientAddress;
 		std::vector<pollfd>	_fds;
 		pollfd				_serverPollfd;
-		pollfd				_clientPollfd;
+		std::vector<Client>	_clientVector;
 		Server(void);
 
 	public:
@@ -59,6 +60,11 @@ class	Server {
 				virtual char const* what() const throw();
 		};
 		class PollException : public std::exception {
+			public:
+				virtual char const* what() const throw();
+		};
+
+		class FdException : public std::exception {
 			public:
 				virtual char const* what() const throw();
 		};

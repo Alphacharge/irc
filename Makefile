@@ -17,9 +17,9 @@ INCLUDE_DIR := .
 
 # List of source files
 VPATH := $(SRC_DIR)
-SOURCES := main.cpp Server.cpp
+SOURCES := main.cpp Server.cpp Client.cpp
 # List of header files
-HEADERS := Macros.hpp Server.hpp
+HEADERS := Macros.hpp Server.hpp Client.hpp
 
 # Object files
 OBJ_F := $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(notdir $(SOURCES)))

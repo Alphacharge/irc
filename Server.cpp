@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/07/31 19:51:26 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/01 15:05:17 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,9 @@ Server&	Server::operator=(Server const& rhs) {
 		this->_serverPassword = rhs._serverPassword;
 		this->_serverSocket = rhs._serverSocket;
 		this->_optval = rhs._optval;
-		this->_clientSocket = rhs._clientSocket;
 		this->_serverAddress = rhs._serverAddress;
-		this->_clientAddress = rhs._clientAddress;
 		this->_fds = rhs._fds;
 		this->_serverPollfd = rhs._serverPollfd;
-		this->_clientPollfd = rhs._clientPollfd;
 	}
 	return *this;
 }
@@ -63,9 +60,10 @@ char const* Server::AcceptException::what() const throw() { return ("Error accep
 
 char const* Server::PollException::what() const throw() { return ("Error in poll.");}
 
+char const* Server::FdException::what() const throw() { return ("Error with the connection.");}
+
 /* === FUNCTIONS === */
 void	Server::serverSetup(void) {
-
 	try {
 		this->_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 		if (this->_serverSocket < 0) {throw	Server::SocketException();}
@@ -84,13 +82,24 @@ void	Server::serverSetup(void) {
 			int numReady = poll(&this->_fds[0], this->_fds.size(), -1);
 			if (numReady < 0) {throw PollException();}
 			if (this->_fds[0].revents & POLLIN) {
-				socklen_t	clientAddressLen = sizeof(this->_clientAddress);
-				this->_clientSocket = accept(this->_serverSocket, (struct sockaddr*)&this->_clientAddress, &clientAddressLen); // implicit casting sucks
-				if (this->_clientSocket < 0) {throw AcceptException();}
-				std::cout << "New client connected : " << inet_ntoa(this->_clientAddress.sin_addr) << ":" << ntohs(this->_clientAddress.sin_port) << std::endl;
-				this->_clientPollfd.fd = this->_clientSocket;
-				this->_clientPollfd.events = POLLIN;
-				this->_fds.push_back(this->_clientPollfd);
+				Client		newClient;
+				socklen_t	clientAddressLen = sizeof(newClient.getClientAddress());
+				newClient.setClientSocket(accept(this->_serverSocket, (struct sockaddr*)&newClient.getClientAddress(), &clientAddressLen));
+				if (newClient.getClientSocket() < 0) {throw AcceptException();}
+				this->_clientVector.push_back(newClient);
+				std::cout << "New client connected : " << inet_ntoa(newClient.getClientAddress().sin_addr) << ":" << ntohs(newClient.getClientAddress().sin_port) << std::endl;
+				newClient.setClientPollfd_fd(newClient.getClientSocket());
+				newClient.setClientPollfd_events(POLLIN);
+				this->_fds.push_back(newClient.getClientPollfd());
+			}
+			char	buffer[1024];
+			for (size_t i = 1; i < this->_fds.size(); ++i) {
+				if ((this->_fds[i].revents & POLLIN) && this->_fds[i].fd != this->_fds[0].fd) {
+					bzero(buffer, sizeof(buffer));
+					recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
+					if(*buffer)
+						std::cout << "Incoming from client : " << buffer;
+				}
 			}
 		}
 	}
