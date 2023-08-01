@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/01 15:05:17 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/01 16:23:43 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,9 +96,16 @@ void	Server::serverSetup(void) {
 			for (size_t i = 1; i < this->_fds.size(); ++i) {
 				if ((this->_fds[i].revents & POLLIN) && this->_fds[i].fd != this->_fds[0].fd) {
 					bzero(buffer, sizeof(buffer));
-					recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
-					if(*buffer)
+					size_t ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
+					if(ret > 0)
 						std::cout << "Incoming from client : " << buffer;
+					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret <= 0)
+					{
+						std::cout << "Client disconnected" << std::endl;
+						this->_fds.erase(this->_fds.begin() + i);
+						this->_clientVector.erase(this->_clientVector.begin() + i - 1);
+						--i;
+					}
 				}
 			}
 		}
