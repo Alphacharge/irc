@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/01 17:14:07 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/01 18:45:35 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,20 +83,19 @@ void	Server::serverSetup(void) {
 		std::cerr << e.what() << std::endl;
 	}
 }
-
 void	Server::serverPoll(void) {
 	int numReady = poll(&this->_fds[0], this->_fds.size(), -1);
 	if (numReady < 0) {throw PollException();}
 	if (this->_fds[0].revents & POLLIN) {
-	Client		newClient;
-	socklen_t	clientAddressLen = sizeof(newClient.getClientAddress());
-	newClient.setClientSocket(accept(this->_serverSocket, (struct sockaddr*)&newClient.getClientAddress(), &clientAddressLen));
-	if (newClient.getClientSocket() < 0) {throw AcceptException();}
-	this->_clientVector.push_back(newClient);
-	std::cout << "New client connected : " << inet_ntoa(newClient.getClientAddress().sin_addr) << ":" << ntohs(newClient.getClientAddress().sin_port) << std::endl;
-	newClient.setClientPollfd_fd(newClient.getClientSocket());
-	newClient.setClientPollfd_events(POLLIN);
-	this->_fds.push_back(newClient.getClientPollfd());
+		Client		newClient;
+		socklen_t	clientAddressLen = sizeof(newClient.getClientAddress());
+		newClient.setClientSocket(accept(this->_serverSocket, (struct sockaddr*)&newClient.getClientAddress(), &clientAddressLen));
+		if (newClient.getClientSocket() < 0) {throw AcceptException();}
+		this->_clientVector.push_back(newClient);
+		std::cout << "New client connected : " << inet_ntoa(newClient.getClientAddress().sin_addr) << ":" << ntohs(newClient.getClientAddress().sin_port) << std::endl;
+		newClient.setClientPollfd_fd(newClient.getClientSocket());
+		newClient.setClientPollfd_events(POLLIN);
+		this->_fds.push_back(newClient.getClientPollfd());
 	}
 }
 
