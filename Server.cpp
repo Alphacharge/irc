@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/01 16:49:37 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/01 17:14:07 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,8 +100,37 @@ void	Server::serverPoll(void) {
 	}
 }
 
-void	Server::handleClientMessage(char* buffer) {
+bool	Server::parseMessage(std::string const& message, std::string& prefix, std::string& command, std::string& parameters) {
+	size_t	pos = 0;
+
+	if(!message.empty() && message[pos] == ':') {
+		pos++;
+		size_t	prefixEnd = message.find(' ', pos);
+		if (prefixEnd == std::string::npos) { return false;}
+		prefix = message.substr(pos, prefixEnd - pos);
+		pos = prefixEnd + 1;
+	}
+	size_t	commandEnd = message.find(' ', pos);
+	if (commandEnd == std::string::npos) { return false;}
+	command = message.substr(pos, commandEnd - pos);
+	pos = commandEnd + 1;
+	parameters = message.substr(pos);
+	return true;
+}
+
+void	Server::handleClient(char* buffer) {
 	std::cout << "Incoming from client : " << buffer;
+	std::string	prefix;
+	std::string	command;
+	std::string	parameters;
+	if (parseMessage(buffer, prefix, command, parameters)) {
+		std::cout << "prefix : " << prefix << std::endl;
+		std::cout << "command : " << command << std::endl;
+		std::cout << "parameters : " << parameters << std::endl;
+	}
+	else {
+		std::cerr << "Invalid message format." << std::endl;
+	}
 }
 
 void	Server::serverStart(void) {
@@ -115,7 +144,7 @@ void	Server::serverStart(void) {
 					bzero(buffer, sizeof(buffer));
 					size_t ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
 					if(ret > 0)
-						handleClientMessage(buffer);
+						handleClient(buffer);
 					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret <= 0)
 					{
 						std::cout << "Client disconnected" << std::endl;

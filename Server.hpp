@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/01 16:50:37 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/01 17:00:30 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,5 +71,6 @@ class	Server {
 		void		serverStart(void);
 		void		serverSetup(void);
 		void		serverPoll(void);
-		void		handleClientMessage(char*);
+		bool		parseMessage(std::string const&, std::string&, std::string&, std::string&);
+		void		handleClient(char*);
 };
