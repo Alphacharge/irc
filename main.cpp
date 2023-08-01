@@ -6,12 +6,12 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 16:02:58 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/01 16:25:48 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/01 17:49:37 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
-
+#include <stdlib.h>
 int	main(int argc, char** argv) {
 	if (argc != 3) {
 		std::cerr << "Usage : ./ircserv <port> <password>" << std::endl;
