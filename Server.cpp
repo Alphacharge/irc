@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/01 16:23:43 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/01 16:49:37 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,27 +78,44 @@ void	Server::serverSetup(void) {
 		this->_serverPollfd.fd = this->_serverSocket;
 		this->_serverPollfd.events = POLLIN;
 		this->_fds.push_back(this->_serverPollfd);
+	}
+	catch (std::exception &e) {
+		std::cerr << e.what() << std::endl;
+	}
+}
+
+void	Server::serverPoll(void) {
+	int numReady = poll(&this->_fds[0], this->_fds.size(), -1);
+	if (numReady < 0) {throw PollException();}
+	if (this->_fds[0].revents & POLLIN) {
+	Client		newClient;
+	socklen_t	clientAddressLen = sizeof(newClient.getClientAddress());
+	newClient.setClientSocket(accept(this->_serverSocket, (struct sockaddr*)&newClient.getClientAddress(), &clientAddressLen));
+	if (newClient.getClientSocket() < 0) {throw AcceptException();}
+	this->_clientVector.push_back(newClient);
+	std::cout << "New client connected : " << inet_ntoa(newClient.getClientAddress().sin_addr) << ":" << ntohs(newClient.getClientAddress().sin_port) << std::endl;
+	newClient.setClientPollfd_fd(newClient.getClientSocket());
+	newClient.setClientPollfd_events(POLLIN);
+	this->_fds.push_back(newClient.getClientPollfd());
+	}
+}
+
+void	Server::handleClientMessage(char* buffer) {
+	std::cout << "Incoming from client : " << buffer;
+}
+
+void	Server::serverStart(void) {
+	try {
+		serverSetup();
 		while(true) {
-			int numReady = poll(&this->_fds[0], this->_fds.size(), -1);
-			if (numReady < 0) {throw PollException();}
-			if (this->_fds[0].revents & POLLIN) {
-				Client		newClient;
-				socklen_t	clientAddressLen = sizeof(newClient.getClientAddress());
-				newClient.setClientSocket(accept(this->_serverSocket, (struct sockaddr*)&newClient.getClientAddress(), &clientAddressLen));
-				if (newClient.getClientSocket() < 0) {throw AcceptException();}
-				this->_clientVector.push_back(newClient);
-				std::cout << "New client connected : " << inet_ntoa(newClient.getClientAddress().sin_addr) << ":" << ntohs(newClient.getClientAddress().sin_port) << std::endl;
-				newClient.setClientPollfd_fd(newClient.getClientSocket());
-				newClient.setClientPollfd_events(POLLIN);
-				this->_fds.push_back(newClient.getClientPollfd());
-			}
+			serverPoll();
 			char	buffer[1024];
 			for (size_t i = 1; i < this->_fds.size(); ++i) {
 				if ((this->_fds[i].revents & POLLIN) && this->_fds[i].fd != this->_fds[0].fd) {
 					bzero(buffer, sizeof(buffer));
 					size_t ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
 					if(ret > 0)
-						std::cout << "Incoming from client : " << buffer;
+						handleClientMessage(buffer);
 					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret <= 0)
 					{
 						std::cout << "Client disconnected" << std::endl;

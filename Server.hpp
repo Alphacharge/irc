@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/01 15:51:40 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/01 16:50:37 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,13 @@ class	Server {
 			public:
 				virtual char const* what() const throw();
 		};
-
 		class FdException : public std::exception {
 			public:
 				virtual char const* what() const throw();
 		};
 
+		void		serverStart(void);
 		void		serverSetup(void);
+		void		serverPoll(void);
+		void		handleClientMessage(char*);
 };
