@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 16:24:23 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 16:40:21 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,29 @@
 
 /* === CANONICAL IMPLEMENTATION === */
 Server::Server(void) {
-	if (VERBOSE)
-		std::cout << "Server default constructor called" << std::endl;
+	if (VERBOSE >= 3)
+		std::cout << DGREEN << "Server default constructor called" << WHITE << std::endl;
 }
 
 Server::Server(int port, std::string password) : _serverPort(port), _serverPassword(password) {
-	if (VERBOSE)
-		std::cout << "Server parametric constructor called" << std::endl;
+	if (VERBOSE >= 3)
+		std::cout << DGREEN << "Server parametric constructor called" << WHITE << std::endl;
 }
 
 Server::Server(Server const& src) {
-	if (VERBOSE)
-		std::cout << "Server copy constructor called" << std::endl;
+	if (VERBOSE >= 3)
+		std::cout << YELLOW << "Server copy constructor called" << WHITE << std::endl;
 	*this = src;
 }
 
 Server::~Server(void) {
-	if (VERBOSE)
-		std::cout << "Server destructor called" << std::endl;
+	if (VERBOSE >= 3)
+		std::cout << RED << "Server destructor called" << WHITE << std::endl;
 }
 
 Server&	Server::operator=(Server const& rhs) {
-	if (VERBOSE)
-		std::cout << "Server operator= called" << std::endl;
+	if (VERBOSE >= 3)
+		std::cout << BLUE << "Server assignment operator called" << WHITE << std::endl;
 	if (this != &rhs) {
 		this->_serverPort = rhs._serverPort;
 		this->_serverPassword = rhs._serverPassword;

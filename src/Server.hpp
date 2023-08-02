@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 16:23:10 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 16:38:39 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include "Client.hpp"
 # include "Macros.hpp"
 # include "Messages.hpp"
+# include "Colors.hpp"
 
 typedef struct s_irc {
 	std::string	prefix;
