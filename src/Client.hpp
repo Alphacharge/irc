@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 09:38:50 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 14:22:42 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 14:39:48 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ class Client {
 		int					_clientSocket;
 		struct sockaddr_in	_clientAddress;
 		pollfd				_clientPollfd;
+		std::string			_name;
 
 	public:
 		Client(void);
@@ -36,4 +37,5 @@ class Client {
 		int&				getClientSocket(void);
 		struct sockaddr_in&	getClientAddress(void);
 		pollfd&				getClientPollfd(void);
+		std::string			getName(void);
 };
