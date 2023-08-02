@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/01 17:00:30 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/02 14:08:20 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,16 @@
 # include <arpa/inet.h>
 # include <fcntl.h>
 # include <unistd.h>
+# include <string>
 
 # include "Client.hpp"
 # include "Macros.hpp"
+
+typedef struct s_irc {
+	std::string	prefix;
+	std::string	command;
+	std::string	parameters;
+}		t_ircMessage;
 
 class	Server {
 	private:
@@ -71,6 +78,7 @@ class	Server {
 		void		serverStart(void);
 		void		serverSetup(void);
 		void		serverPoll(void);
-		bool		parseMessage(std::string const&, std::string&, std::string&, std::string&);
+		bool		parseSplit(std::string const&, std::string&, std::string&, std::string&);
+		void		parseClientInput(std::string const&, std::vector<t_ircMessage>&);
 		void		handleClient(char*);
 };

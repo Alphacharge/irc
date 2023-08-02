@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/01 18:45:35 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/02 14:48:47 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void	Server::serverSetup(void) {
 		std::cerr << e.what() << std::endl;
 	}
 }
+
 void	Server::serverPoll(void) {
 	int numReady = poll(&this->_fds[0], this->_fds.size(), -1);
 	if (numReady < 0) {throw PollException();}
@@ -99,7 +100,7 @@ void	Server::serverPoll(void) {
 	}
 }
 
-bool	Server::parseMessage(std::string const& message, std::string& prefix, std::string& command, std::string& parameters) {
+bool	Server::parseSplit(std::string const& message, std::string& prefix, std::string& command, std::string& parameters) {
 	size_t	pos = 0;
 
 	if(!message.empty() && message[pos] == ':') {
@@ -117,18 +118,32 @@ bool	Server::parseMessage(std::string const& message, std::string& prefix, std::
 	return true;
 }
 
+void	Server::parseClientInput(std::string const& message, std::vector<t_ircMessage>& clientInput) {
+	size_t			pos = 0;
+	bool			goOn = true;
+	t_ircMessage	clientCommand;
+
+	while (goOn) {
+		if (!message.empty()) {
+			size_t splitEnd = message.find('\n', pos);
+			std::string inputSplit = message.substr(pos, splitEnd - pos);
+			pos = splitEnd + 1;
+			if (parseSplit(inputSplit, clientCommand.prefix, clientCommand.command, clientCommand.parameters)) {
+				clientInput.push_back(clientCommand);
+			}
+			if (pos >= message.size()) {goOn = false;}
+		}
+	}
+}
+
 void	Server::handleClient(char* buffer) {
 	std::cout << "Incoming from client : " << buffer;
-	std::string	prefix;
-	std::string	command;
-	std::string	parameters;
-	if (parseMessage(buffer, prefix, command, parameters)) {
-		std::cout << "prefix : " << prefix << std::endl;
-		std::cout << "command : " << command << std::endl;
-		std::cout << "parameters : " << parameters << std::endl;
-	}
-	else {
-		std::cerr << "Invalid message format." << std::endl;
+	std::vector<t_ircMessage>	clientInput;
+	parseClientInput(buffer, clientInput);
+	for (std::vector<t_ircMessage>::iterator it = clientInput.begin(); it != clientInput.end(); ++it) {
+		std::cout << "Prefix     : " << it->prefix << std::endl;
+		std::cout << "Command    : " << it->command << std::endl;
+		std::cout << "Parameters : " << it->parameters << std::endl;
 	}
 }
 
