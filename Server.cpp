@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 14:48:47 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/02 15:58:56 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ void	Server::parseClientInput(std::string const& message, std::vector<t_ircMessa
 	}
 }
 
-void	Server::handleClient(char* buffer) {
+void	Server::handleClient(char* buffer, int const& clientFd) {
 	std::cout << "Incoming from client : " << buffer;
 	std::vector<t_ircMessage>	clientInput;
 	parseClientInput(buffer, clientInput);
@@ -144,6 +144,9 @@ void	Server::handleClient(char* buffer) {
 		std::cout << "Prefix     : " << it->prefix << std::endl;
 		std::cout << "Command    : " << it->command << std::endl;
 		std::cout << "Parameters : " << it->parameters << std::endl;
+		// if (it->command == "NICK") {
+		// 	send(clientFd,RPL_WELCOME(it->parameters).c_str(), sizeof(RPL_WELCOME(it->parameters).c_str()), 0);
+		// }
 	}
 }
 
@@ -157,8 +160,9 @@ void	Server::serverStart(void) {
 				if ((this->_fds[i].revents & POLLIN) && this->_fds[i].fd != this->_fds[0].fd) {
 					bzero(buffer, sizeof(buffer));
 					size_t ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
-					if(ret > 0)
-						handleClient(buffer);
+					if(ret > 0) {
+						handleClient(buffer, this->_fds[i].fd);
+					}
 					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret <= 0)
 					{
 						std::cout << "Client disconnected" << std::endl;

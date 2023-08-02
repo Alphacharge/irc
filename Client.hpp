@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 09:38:50 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/01 16:35:55 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/02 15:58:21 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ class Client {
 		int					_clientSocket;
 		struct sockaddr_in	_clientAddress;
 		pollfd				_clientPollfd;
+		std::string			_
 
 	public:
 		Client(void);

@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 14:08:20 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/02 15:45:54 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@
 
 # include "Client.hpp"
 # include "Macros.hpp"
+
+# define RPL_WELCOME(params) (std::string(":Welcome to the Internet Relay Network") + params + "!")
 
 typedef struct s_irc {
 	std::string	prefix;
@@ -80,5 +82,5 @@ class	Server {
 		void		serverPoll(void);
 		bool		parseSplit(std::string const&, std::string&, std::string&, std::string&);
 		void		parseClientInput(std::string const&, std::vector<t_ircMessage>&);
-		void		handleClient(char*);
+		void		handleClient(char*, int const&);
 };
