@@ -6,7 +6,7 @@
 #    By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/02 16:33:15 by rbetz             #+#    #+#              #
-#    Updated: 2023/08/02 14:19:05 by rbetz            ###   ########.fr        #
+#    Updated: 2023/08/02 14:26:15 by rbetz            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ CXXFLAGS	+=	-Wunused -Wunreachable-code -Wshadow -pedantic -Wno-conversion
 ###			###			SOURCES			###			###
 VPATH	:=	src/
 
-SRC_F	:=	ircserv.cpp
+SRC_F	:=	ircserv.cpp Server.cpp Client.cpp Channel.cpp
 # SRC_F	+=	
 
 ###			###			OBJECTS			###			###
