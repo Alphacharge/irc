@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 09:38:50 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 16:17:48 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 16:28:44 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # include <netinet/in.h>
 # include <poll.h>
 # include "Macros.hpp"
+# include "Colors.hpp"
 
 class Client {
 	private:

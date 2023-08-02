@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:01:01 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 16:18:04 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 16:29:51 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,24 +15,24 @@
 /* === CANONICAL IMPLEMENTATION === */
 
 Client::Client(void) {
-	if (VERBOSE)
-		std::cout << "Client default constructor called" << std::endl;
+	if (VERBOSE >= 3)
+		std::cout << DGREEN << "Client default constructor called" << WHITE << std::endl;
 }
 
 Client::Client(Client const& src) {
-	if (VERBOSE)
-		std::cout << "Client copy constructor called" << std::endl;
+	if (VERBOSE >= 3)
+		std::cout << YELLOW << "Client copy constructor called" << WHITE << std::endl;
 	*this = src;
 }
 
 Client::~Client(void) {
-	if (VERBOSE)
-		std::cout << "Client destructor called" << std::endl;
+	if (VERBOSE >= 3)
+		std::cout << RED << "Client destructor called" << WHITE << std::endl;
 }
 
 Client&	Client::operator=(Client const& rhs) {
-	if (VERBOSE)
-		std::cout << "Client operator= called" << std::endl;
+	if (VERBOSE >= 3)
+		std::cout << BLUE << "Client assignment operator called" << WHITE << std::endl;
 	if (this != &rhs) {
 		this->_clientAddress = rhs._clientAddress;
 		this->_clientPollfd = rhs._clientPollfd;
