@@ -6,16 +6,14 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/02 14:33:49 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 16:43:05 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
-// # include <stdexcept>
 # include <iostream>
-// # include <ctime>
 # include <map>
 # include <set>
 # include "Colors.hpp"
