@@ -12,6 +12,6 @@
 
 #pragma once
 
-# define VERBOSE	3 //0 zero output, 1 errors, 2 warnings, 3 debug
+# define VERBOSE	0 //0 zero output, 1 errors, 2 warnings, 3 debug
 
 # define ERR_EMPTY_STACK		"Stack is empty !"

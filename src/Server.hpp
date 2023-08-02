@@ -26,7 +26,9 @@
 # include "Client.hpp"
 # include "Macros.hpp"
 
-# define RPL_WELCOME(params) (std::string(":Welcome to the Internet Relay Network") + params + "!")
+# define RPL_CAP				(std::string("CAP * LS :\n"))
+# define PONG(params)			(std::string(":irc42 PONG irc42 " + params + "\n"))
+# define RPL_WELCOME(params)	(std::string(":Welcome to the Internet Relay Network") + params + "!\n")
 
 typedef struct s_irc {
 	std::string	prefix;
@@ -79,7 +81,7 @@ class	Server {
 
 		void		serverStart(void);
 		void		serverSetup(void);
-		void		serverPoll(void);
+		void		addClient(void);
 		bool		parseSplit(std::string const&, std::string&, std::string&, std::string&);
 		void		parseClientInput(std::string const&, std::vector<t_ircMessage>&);
 		void		handleClient(char*, int const&);
