@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/02 14:04:49 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 14:41:51 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,14 @@ Channel& Channel::operator=(Channel const& other)
 }
 
 /*---------------	Methods			---------------*/
-void	print(void)
+void	Channel::print(void)
 {
 	std::cout << "*--------------------CHANNEL--------------------*" << std::endl;
 	std::cout << "|name:\t\t|" << this->_name << "|" << std::endl;
 	std::cout << "|topic:\t\t|" << this->_topic << "|" << std::endl;
 	std::cout << "|password:\t|" << this->_password << "|" << std::endl;
 	std::cout << "|modes:\t\t|";
-	set::const_iterator it = this->_mode.begin();
+	std::set<t_chmode>::const_iterator it = this->_mode.begin();
 	while (it != this->_mode.end())
 	{
 		std::cout << *it << ",";
@@ -78,19 +78,19 @@ void	print(void)
 	}
 	std::cout << "|" << std::endl;
 	std::cout << "|users:\t\t|";
-	map::const_iterator it = this->_users.begin();
-	while (it != this->_users.end())
+	std::map<std::string, Client>::iterator it2 = this->_users.begin();
+	while (it2 != this->_users.end())
 	{
-		std::cout << *it->second << ",";
-		it++;
+		std::cout << it2->second.getName() << ",";
+		it2++;
 	}
 	std::cout << "|" << std::endl;
 	std::cout << "|operators\t|";
-	map::const_iterator it = this->_operators.begin();
-	while (it != this->_operators.end())
+	std::map<std::string, Client>::iterator it3 = this->_operators.begin();
+	while (it3 != this->_operators.end())
 	{
-		std::cout << *it->second << ",";
-		it++;
+		std::cout << it3->second.getName() << ",";
+		it3++;
 	}
 	std::cout << "|" << std::endl;
 	std::cout << "*-----------------------------------------------*" << std::endl;

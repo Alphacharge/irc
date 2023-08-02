@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/02 14:06:43 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 14:33:49 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ class Channel {
 	std::string						_name; //begin with & or #, max 200 chars, not contain any spaces (' '), a control G (^G or ASCII 7), or a comma (',' which is used as a list item)
 	std::string						_topic;
 	std::string						_password;
-	std::set<ChannelMode>			_mode;
+	std::set<t_chmode>				_mode;
 	std::map<std::string, Client>	_users;
 	std::map<std::string, Client>	_operators;
 };
