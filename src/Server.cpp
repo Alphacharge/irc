@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 14:23:26 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 16:24:23 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ void	Server::parseClientInput(std::string const& message, std::vector<t_ircMessa
 }
 
 void	Server::handleClient(char* buffer, int const& clientFd) {
+	(void)clientFd;
 	std::cout << "Incoming from client : " << buffer;
 	std::vector<t_ircMessage>	clientInput;
 	parseClientInput(buffer, clientInput);
@@ -144,9 +145,9 @@ void	Server::handleClient(char* buffer, int const& clientFd) {
 		std::cout << "Prefix     : " << it->prefix << std::endl;
 		std::cout << "Command    : " << it->command << std::endl;
 		std::cout << "Parameters : " << it->parameters << std::endl;
-		if (it->command == "NICK") {
-			send(clientFd,RPL_WELCOME(it->parameters).c_str(), sizeof(RPL_WELCOME(it->parameters).c_str()), 0);
-		}
+		// if (it->command == "NICK") {
+		// 	send(clientFd,RPL_WELCOME(it->parameters).c_str(), sizeof(RPL_WELCOME(it->parameters).c_str()), 0);
+		// }
 	}
 }
 

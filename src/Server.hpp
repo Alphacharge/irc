@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 15:45:54 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/02 16:23:10 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,7 @@
 
 # include "Client.hpp"
 # include "Macros.hpp"
-
-# define RPL_WELCOME(params) (std::string(":Welcome to the Internet Relay Network") + params + "!")
+# include "Messages.hpp"
 
 typedef struct s_irc {
 	std::string	prefix;
