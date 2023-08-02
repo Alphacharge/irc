@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:01:01 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 14:39:43 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 16:18:04 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,3 +74,6 @@ std::string	Client::getName(void) {
 	return this->_name;
 }
 
+std::string	Client::getNick(void) {
+	return this->_nick;
+}
