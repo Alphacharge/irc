@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:01:01 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 14:39:43 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 18:26:27 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void Client::setClientPollfd_events(short const& event) {
 	this->_clientPollfd.events = event;
 }
 
-int&					Client::getClientSocket(void) {
+int&				Client::getClientSocket(void) {
 	return this->_clientSocket;
 }
 
@@ -72,5 +72,13 @@ pollfd&				Client::getClientPollfd(void) {
 
 std::string	Client::getName(void) {
 	return this->_name;
+}
+
+std::string&	Client::getBuffer(void) {
+	return this->_buffer;
+}
+
+void	Client::appendBuffer(std::string const& str) {
+	this->_buffer.append(str);
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 09:38:50 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 14:39:48 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 18:27:10 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ class Client {
 		struct sockaddr_in	_clientAddress;
 		pollfd				_clientPollfd;
 		std::string			_name;
+		std::string			_buffer;
 
 	public:
 		Client(void);
@@ -33,9 +34,11 @@ class Client {
 		void	setClientAddress(struct sockaddr_in const&);
 		void	setClientPollfd_fd(int const&);
 		void	setClientPollfd_events(short const&);
+		void	appendBuffer(std::string const&);
 
 		int&				getClientSocket(void);
 		struct sockaddr_in&	getClientAddress(void);
 		pollfd&				getClientPollfd(void);
 		std::string			getName(void);
+		std::string&		getBuffer(void);
 };

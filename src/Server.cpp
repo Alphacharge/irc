@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 14:23:26 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 19:10:23 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ void	Server::parseClientInput(std::string const& message, std::vector<t_ircMessa
 	}
 }
 
-void	Server::handleClient(char* buffer, int const& clientFd) {
+void	Server::handleClient(char* buffer) {
 	std::cout << "Incoming from client : " << buffer;
 	std::vector<t_ircMessage>	clientInput;
 	parseClientInput(buffer, clientInput);
@@ -144,9 +144,19 @@ void	Server::handleClient(char* buffer, int const& clientFd) {
 		std::cout << "Prefix     : " << it->prefix << std::endl;
 		std::cout << "Command    : " << it->command << std::endl;
 		std::cout << "Parameters : " << it->parameters << std::endl;
-		if (it->command == "NICK") {
-			send(clientFd,RPL_WELCOME(it->parameters).c_str(), sizeof(RPL_WELCOME(it->parameters).c_str()), 0);
-		}
+		// if (it->command == "NICK") {
+		// 	send(clientFd,RPL_WELCOME(it->parameters).c_str(), sizeof(RPL_WELCOME(it->parameters).c_str()), 0);
+		// }
+	}
+}
+
+void	Server::handleClient(char* buffer, std::vector<Client>::iterator& clientIterator) {
+
+	std::istringstream	iss(buffer);
+	std::string			tmpBuffer;
+	while (getline(iss, tmpBuffer, '\n')) {
+		if (tmpBuffer.end())
+		clientIterator->appendBuffer(tmpBuffer);
 	}
 }
 
@@ -155,15 +165,16 @@ void	Server::serverStart(void) {
 		serverSetup();
 		while(true) {
 			serverPoll();
-			char	buffer[1024];
 			for (size_t i = 1; i < this->_fds.size(); ++i) {
-				if ((this->_fds[i].revents & POLLIN) && this->_fds[i].fd != this->_fds[0].fd) {
+				char	buffer[1024];
+				std::vector<Client>::iterator clientIterator = this->_clientVector.begin() + i - 1;
+				if ((this->_fds[i].revents & POLLIN)) {
 					bzero(buffer, sizeof(buffer));
 					size_t ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
 					if(ret > 0) {
-						handleClient(buffer, this->_fds[i].fd);
+						handleClient(buffer, clientIterator);
 					}
-					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret <= 0)
+					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
 					{
 						std::cout << "Client disconnected" << std::endl;
 						this->_fds.erase(this->_fds.begin() + i);
