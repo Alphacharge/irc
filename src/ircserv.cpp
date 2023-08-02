@@ -6,17 +6,21 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/02 16:33:15 by rbetz             #+#    #+#             */
-/*   Updated: 2023/07/25 14:21:25 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/02 14:21:14 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int main(int argc, char** argv)
-{
-	if (argc < 2)
-		throw TooFewArgsException();
-	else if (argc > 2)
-		throw TooManyArgsException();
-	else
+#include "Server.hpp"
+#include <stdlib.h>
+
+int	main(int argc, char** argv) {
+	if (argc != 3) {
+		std::cerr << "Usage : ./ircserv <port> <password>" << std::endl;
 		return 1;
+	}
+	int port = atoi(argv[1]);
+	std::string	password = static_cast<std::string>(argv[2]);
+	Server	ircServer(port, password);
+	ircServer.serverStart();
 	return 0;
 }
