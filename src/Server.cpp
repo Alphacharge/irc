@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 16:40:21 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/03 07:32:38 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ Server::Server(Server const& src) {
 Server::~Server(void) {
 	if (VERBOSE >= 3)
 		std::cout << RED << "Server destructor called" << WHITE << std::endl;
+	this->_fds.clear();
+	this->_clientVector.clear();
 }
 
 Server&	Server::operator=(Server const& rhs) {
@@ -85,7 +87,7 @@ void	Server::serverSetup(void) {
 }
 
 void	Server::serverPoll(void) {
-	int numReady = poll(&this->_fds[0], this->_fds.size(), -1);
+	int	numReady = poll(&this->_fds[0], this->_fds.size(), -1);
 	if (numReady < 0) {throw PollException();}
 	if (this->_fds[0].revents & POLLIN) {
 		Client		newClient;
