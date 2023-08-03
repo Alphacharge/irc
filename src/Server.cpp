@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 16:09:53 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/03 17:03:05 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,26 +102,6 @@ void	Server::addClient(void) {
 	this->_fds.push_back(newClient.getClientPollfd());
 }
 
-/*
-bool	Server::parseSplit(std::string const& message, std::string& prefix, std::string& command, std::string& parameters) {
-	size_t	pos = 0;
-
-	if(!message.empty() && message[pos] == ':') {
-		pos++;
-		size_t	prefixEnd = message.find(' ', pos);
-		if (prefixEnd == std::string::npos) { return false;}
-		prefix = message.substr(pos, prefixEnd - pos);
-		pos = prefixEnd + 1;
-	}
-	size_t	commandEnd = message.find(' ', pos);
-	if (commandEnd == std::string::npos) { return false;}
-	command = message.substr(pos, commandEnd - pos);
-	pos = commandEnd + 1;
-	parameters = message.substr(pos);
-	return true;
-}
-*/
-
 bool	Server::inputParse(std::string const& message, t_ircMessage& clientCommand) {
 	size_t	pos = 0;
 	if(!message.empty() && message[pos] == ':') {
@@ -153,11 +133,14 @@ void	Server::handleClient(char* buffer, std::vector<Client>::iterator& clientIte
 	tmpBuffer.clear();
 	while (getline(iss, tmpBuffer)) {
 		clientIterator->appendBuffer(tmpBuffer);
-			if (inputParse(clientIterator->getBuffer(), clientCommand)) {
-				commands.push_back(clientCommand);
-				tmpBuffer.clear();
-				clientIterator->getBuffer().clear();
-			}
+		if (inputParse(clientIterator->getBuffer(), clientCommand)) {
+			commands.push_back(clientCommand);
+			tmpBuffer.clear();
+			clientIterator->getBuffer().clear();
+		}
+		if (!iss.eof() && clientIterator->getBuffer().find(0, strlen(clientIterator->getBuffer().c_str()), '\n')) {
+			clientIterator->getBuffer().clear();
+		}
 	}
 }
 
