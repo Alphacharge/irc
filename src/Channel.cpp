@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/03 12:05:02 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/03 15:51:09 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,22 +106,4 @@ void		Channel::setOperator(Client &client) {
 
 void		Channel::setUser(Client &client) {
 	this->_users[client.getNick()] = client;
-}
-
-/*Channel name can't contain more than 200chars, spaces, commas, ^D or miss a & or # at the beginning*/
-bool	isValidChannelName(std::string const &name)
-{
-	if (name.empty())
-		return false;
-	if (name.length() > 200)
-		return false;
-	if (name.find(' ', 0) != name.npos)
-		return false;
-	if (name.find(',', 0) != name.npos)
-		return false;
-	if (name.find('\a', 0) != name.npos)
-		return false;
-	if (name.length() > 0 && (name[0] == '&' || name[0] == '#'))
-		return false;
-	return false;
 }

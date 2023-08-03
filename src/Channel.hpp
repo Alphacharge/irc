@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/03 12:11:15 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/03 15:49:53 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,3 @@ class Channel {
 	std::map<std::string, Client>	_operators;
 };
 #endif
-
-bool	isValidChannelName(std::string const &name);
