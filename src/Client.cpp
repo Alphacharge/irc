@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:01:01 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 16:29:51 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/03 10:40:08 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ void Client::setClientPollfd_fd(int const& fd) {
 
 void Client::setClientPollfd_events(short const& event) {
 	this->_clientPollfd.events = event;
+	this->_clientPollfd.revents = 0;
 }
 
 int&					Client::getClientSocket(void) {
