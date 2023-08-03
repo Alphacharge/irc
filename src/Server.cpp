@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 19:10:23 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/03 15:44:34 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ void	Server::serverPoll(void) {
 	}
 }
 
+/*
 bool	Server::parseSplit(std::string const& message, std::string& prefix, std::string& command, std::string& parameters) {
 	size_t	pos = 0;
 
@@ -117,46 +118,44 @@ bool	Server::parseSplit(std::string const& message, std::string& prefix, std::st
 	parameters = message.substr(pos);
 	return true;
 }
+*/
 
-void	Server::parseClientInput(std::string const& message, std::vector<t_ircMessage>& clientInput) {
-	size_t			pos = 0;
-	bool			goOn = true;
-	t_ircMessage	clientCommand;
-
-	while (goOn) {
-		if (!message.empty()) {
-			size_t splitEnd = message.find('\n', pos);
-			std::string inputSplit = message.substr(pos, splitEnd - pos);
-			pos = splitEnd + 1;
-			if (parseSplit(inputSplit, clientCommand.prefix, clientCommand.command, clientCommand.parameters)) {
-				clientInput.push_back(clientCommand);
-			}
-			if (pos >= message.size()) {goOn = false;}
-		}
+bool	Server::inputParse(std::string const& message, t_ircMessage& clientCommand) {
+	size_t	pos = 0;
+	if(!message.empty() && message[pos] == ':') {
+		pos++;
+		size_t	prefixEnd = message.find(' ', pos);
+		if (prefixEnd == std::string::npos) { return false;}
+		clientCommand.prefix = message.substr(pos, prefixEnd - pos);
+		pos = prefixEnd + 1;
 	}
+	size_t	commandEnd = message.find(' ', pos);
+	if (commandEnd == std::string::npos) { return false;}
+	clientCommand.command = message.substr(pos, commandEnd - pos);
+	pos = commandEnd + 1;
+	clientCommand.parameters = message.substr(pos, message.size() - 2);
+	/* trim final CR-LF */
+	if (!clientCommand.parameters.empty())
+		clientCommand.parameters.substr(0,clientCommand.parameters.size()-2);
+	else
+		clientCommand.command.substr(0, clientCommand.command.size() - 2);
+	return true;
 }
 
-void	Server::handleClient(char* buffer) {
-	std::cout << "Incoming from client : " << buffer;
-	std::vector<t_ircMessage>	clientInput;
-	parseClientInput(buffer, clientInput);
-	for (std::vector<t_ircMessage>::iterator it = clientInput.begin(); it != clientInput.end(); ++it) {
-		std::cout << "Prefix     : " << it->prefix << std::endl;
-		std::cout << "Command    : " << it->command << std::endl;
-		std::cout << "Parameters : " << it->parameters << std::endl;
-		// if (it->command == "NICK") {
-		// 	send(clientFd,RPL_WELCOME(it->parameters).c_str(), sizeof(RPL_WELCOME(it->parameters).c_str()), 0);
-		// }
-	}
-}
+void	Server::handleClient(char* buffer, std::vector<Client>::iterator& clientIterator, std::vector<t_ircMessage>& commands) {
 
-void	Server::handleClient(char* buffer, std::vector<Client>::iterator& clientIterator) {
+	std::istringstream			iss(buffer);
+	std::string					tmpBuffer;
+	t_ircMessage				clientCommand;
 
-	std::istringstream	iss(buffer);
-	std::string			tmpBuffer;
-	while (getline(iss, tmpBuffer, '\n')) {
-		if (tmpBuffer.end())
+	tmpBuffer.clear();
+	while (getline(iss, tmpBuffer)) {
 		clientIterator->appendBuffer(tmpBuffer);
+			if (inputParse(clientIterator->getBuffer(), clientCommand)) {
+				commands.push_back(clientCommand);
+				tmpBuffer.clear();
+				clientIterator->getBuffer().clear();
+			}
 	}
 }
 
@@ -167,12 +166,20 @@ void	Server::serverStart(void) {
 			serverPoll();
 			for (size_t i = 1; i < this->_fds.size(); ++i) {
 				char	buffer[1024];
-				std::vector<Client>::iterator clientIterator = this->_clientVector.begin() + i - 1;
+				std::vector<t_ircMessage>	commands; // contains all valid client messages
+				std::vector<Client>::iterator	clientIterator = this->_clientVector.begin() + i - 1;
 				if ((this->_fds[i].revents & POLLIN)) {
 					bzero(buffer, sizeof(buffer));
 					size_t ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
 					if(ret > 0) {
-						handleClient(buffer, clientIterator);
+						handleClient(buffer, clientIterator, commands);
+						/* simulates commands implementation */
+						for (std::vector<t_ircMessage>::iterator it = commands.begin(); it != commands.end(); ++it) {
+							std::cout << "Prefix     : " << it->prefix << std::endl;
+							std::cout << "Command    : " << it->command << std::endl;
+							std::cout << "Parameters : " << it->parameters << std::endl;
+						}
+						commands.clear();
 					}
 					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
 					{

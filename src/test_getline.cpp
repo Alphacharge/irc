@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/03 07:45:57 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 08:03:15 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/03 12:35:49 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int main(void) {
 			std::cout << std::endl << "got a : ^D" << std::endl;
 			std::cin.clear();
 		}
-		std::cout << "retyping : " << line << std::endl;}
+		std::cout << line << std::endl;}
 	std::cout << "exited loop" << std::endl;
 	return 0;
 }

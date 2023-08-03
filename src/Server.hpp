@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 18:45:34 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/03 14:05:36 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include <unistd.h>
 # include <string>
 # include <sstream>
-
+# include <algorithm>
 # include "Client.hpp"
 # include "Macros.hpp"
 
@@ -81,7 +81,6 @@ class	Server {
 		void		serverStart(void);
 		void		serverSetup(void);
 		void		serverPoll(void);
-		bool		parseSplit(std::string const&, std::string&, std::string&, std::string&);
-		void		parseClientInput(std::string const&, std::vector<t_ircMessage>&);
-		void		handleClient(char*, std::vector<Client>::iterator&);
+		bool		inputParse(std::string const&, t_ircMessage&);
+		void		handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
 };
