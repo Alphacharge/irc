@@ -15,3 +15,11 @@
 # define VERBOSE	0 //0 zero output, 1 errors, 2 warnings, 3 debug
 
 # define ERR_EMPTY_STACK		"Stack is empty !"
+
+// Client status codes
+# define CONNECTED		1
+# define CAP			2
+# define AUTHENTICATED	3
+# define NICK			4
+# define USER			5
+# define REGISTERED		6

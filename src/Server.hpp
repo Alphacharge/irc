@@ -22,13 +22,19 @@
 # include <fcntl.h>
 # include <unistd.h>
 # include <string>
+# include <string.h>
 
 # include "Client.hpp"
 # include "Macros.hpp"
 
 # define RPL_CAP				(std::string("CAP * LS :\n"))
 # define PONG(params)			(std::string(":irc42 PONG irc42 " + params + "\n"))
-# define RPL_WELCOME(params)	(std::string(":Welcome to the Internet Relay Network") + params + "!\n")
+# define RPL_WELCOME(params)	(std::string(":irc42 001 " + params + " :Welcome to the Internet Relay Network!\n"))
+
+# define ERR_NONICKNAMEGIVEN		(std::string(":irc42 431 :No nickname given!\n"))
+// # define ERR_NICKNAMEINUSE(params)	(std::string(":irc42 433 " + params + " :Nickname is already in use\n"))
+// # define ERR_NEEDMOREPARAMS(params)	(std::string(":irc42 461 " + params + " :Not enough parameters\n"))
+# define ERR_ALREADYREGISTERED		(std::string(":irc42 462 :Already registered\n"))
 
 typedef struct s_irc {
 	std::string	prefix;
@@ -84,5 +90,7 @@ class	Server {
 		void		addClient(void);
 		bool		parseSplit(std::string const&, std::string&, std::string&, std::string&);
 		void		parseClientInput(std::string const&, std::vector<t_ircMessage>&);
-		void		handleClient(char*, int const&);
+		void		handleClient(char*, Client& client);
+
+		void		sendMessage(Client& client, std::string message);
 };

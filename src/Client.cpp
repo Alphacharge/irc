@@ -17,6 +17,7 @@
 Client::Client(void) {
 	if (VERBOSE)
 		std::cout << "Client default constructor called" << std::endl;
+	_status = 0;
 }
 
 Client::Client(Client const& src) {
@@ -58,7 +59,20 @@ void Client::setClientPollfd_events(short const& event) {
 	this->_clientPollfd.events = event;
 }
 
-int&					Client::getClientSocket(void) {
+void	Client::setNick(std::string nick) {
+	_nick = nick;
+}
+
+void	Client::setUsername(std::string username) {
+	_username = username;
+}
+
+void	Client::setStatus(int status)
+{
+	_status = status;
+}
+
+int&	Client::getClientSocket(void) {
 	return this->_clientSocket;
 }
 
@@ -66,11 +80,18 @@ struct sockaddr_in&	Client::getClientAddress(void) {
 	return this->_clientAddress;
 }
 
-pollfd&				Client::getClientPollfd(void) {
+pollfd&	Client::getClientPollfd(void) {
 	return this->_clientPollfd;
 }
 
-std::string	Client::getName(void) {
-	return this->_name;
+std::string&	Client::getNick(void) {
+	return this->_nick;
 }
 
+std::string&	Client::getUsername(void) {
+	return (_username);
+}
+
+int	Client::getStatus(void) {
+	return (_status);
+}

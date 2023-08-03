@@ -91,17 +91,12 @@ void	Server::addClient(void) {
 	newClient.setClientSocket(accept(this->_serverSocket, (struct sockaddr*)&newClient.getClientAddress(), &clientAddressLen));
 	if (newClient.getClientSocket() < 0) {throw AcceptException();}
 
-	this->_clientVector.push_back(newClient);
 	std::cout << "New client connected : " << inet_ntoa(newClient.getClientAddress().sin_addr) << ":" << ntohs(newClient.getClientAddress().sin_port) << std::endl;
 	newClient.setClientPollfd_fd(newClient.getClientSocket());
 	newClient.setClientPollfd_events(POLLIN);
+	newClient.setStatus(CONNECTED);
+	this->_clientVector.push_back(newClient);
 	this->_fds.push_back(newClient.getClientPollfd());
-
-	//might have to use fcntl on mac? not sure if needed
-	// int	flags = fcntl(newClient.getClientSocket(), F_GETFL, 0);
-
-	// if (fcntl(newClient.getClientSocket(), F_SETFL, flags | O_NONBLOCK) == -1)
-	// 	std::cerr << "Setting socket to nonblock failed\n";
 }
 
 bool	Server::parseSplit(std::string const& message, std::string& prefix, std::string& command, std::string& parameters) {
@@ -140,26 +135,74 @@ void	Server::parseClientInput(std::string const& message, std::vector<t_ircMessa
 	}
 }
 
-void	Server::handleClient(char* buffer, int const& clientFd) {
+void	Server::sendMessage(Client& client, std::string message)
+{
+	size_t	bytesSent = 0;
+
+	//loop might not be needed?
+	// while (bytesSent < message.length())
+	// {
+		bytesSent += send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
+	// }
+}
+
+void	Server::handleClient(char* buffer, Client& client) {
 	std::vector<t_ircMessage>	clientInput;
 
 	std::cout << "Incoming from client : " << buffer;
 	parseClientInput(buffer, clientInput);
 
 	for (std::vector<t_ircMessage>::iterator it = clientInput.begin(); it != clientInput.end(); ++it) {
-		std::cout << "-----------\n";
+		std::cout << "------------\n";
+		std::cout << "Status     : " << client.getStatus() << std::endl;
 		std::cout << "Prefix     : " << it->prefix << std::endl;
 		std::cout << "Command    : " << it->command << std::endl;
-		std::cout << "Parameters : " << it->parameters << std::endl;
+		std::cout << "Parameters : " << it->parameters  << std::endl;
 
-		//if CAP LS is received, the server will suspend registration until CAP END is received
-		if (it->command == "CAP")
-			send(clientFd, RPL_CAP.c_str(), RPL_CAP.size(), 0);
+		//if CAP LS is received, the server must suspend registration until CAP END is received
+		//check for CAP END missing
+		//also while registration is not done, only a few commands should be accessible to the client
+		if (it->command == "CAP" && strncmp(it->parameters.c_str(), "LS", 2) == 0) {
+			client.setStatus(CAP);
+			sendMessage(client, RPL_CAP);
+		}
+		if (it->command == "CAP" && it->parameters == "END")
+			client.setStatus(CONNECTED);
 		if (it->command == "PING")
-			send(clientFd, PONG(it->parameters).c_str(), PONG(it->parameters).size(), 0);
+			sendMessage(client, PONG(it->parameters));
 		if (it->command == "NICK") {
-			//save client name
-			send(clientFd, RPL_WELCOME(it->parameters).c_str(), sizeof(RPL_WELCOME(it->parameters).c_str()), 0);
+			//check if it is in use and send back error
+			//check if all characters are valid and send back error
+			if (it->parameters.empty())
+				sendMessage(client, ERR_NONICKNAMEGIVEN);
+//REMOVE this once ^M is gone
+			client.setNick(it->parameters.substr(0, it->parameters.length() - 1));
+			client.setStatus(NICK);
+std::cout << "DEBUG: set nick '" << client.getNick() << "'\n";
+			if (client.getStatus() == USER)
+			{
+				client.setStatus(REGISTERED);
+				sendMessage(client, RPL_WELCOME(client.getNick()));
+			}
+		}
+		if (it->command == "USER") {
+			size_t	length = it->parameters.find(" ");
+
+			if (client.getStatus() == REGISTERED)
+				sendMessage(client, ERR_ALREADYREGISTERED);
+			if (length == 0)
+				client.setUsername("unknown");
+			else
+			{
+				client.setUsername(it->parameters.substr(0, length));
+			}
+			if (client.getStatus() == NICK)
+			{
+				client.setStatus(REGISTERED);
+				sendMessage(client, RPL_WELCOME(client.getNick()));
+			}
+			else
+				client.setStatus(USER);
 		}
 	}
 }
@@ -188,7 +231,7 @@ void	Server::serverStart(void) {
 
 					ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
 					if(ret > 0)
-						handleClient(buffer, this->_fds[i].fd);
+						handleClient(buffer, this->_clientVector[i - 1]);
 					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret <= 0)
 					{
 						std::cout << "Client disconnected" << std::endl;

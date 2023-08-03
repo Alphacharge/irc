@@ -81,7 +81,7 @@ void	Channel::print(void)
 	std::map<std::string, Client>::iterator it2 = this->_users.begin();
 	while (it2 != this->_users.end())
 	{
-		std::cout << it2->second.getName() << ",";
+		std::cout << it2->second.getNick() << ",";
 		it2++;
 	}
 	std::cout << "|" << std::endl;
@@ -89,7 +89,7 @@ void	Channel::print(void)
 	std::map<std::string, Client>::iterator it3 = this->_operators.begin();
 	while (it3 != this->_operators.end())
 	{
-		std::cout << it3->second.getName() << ",";
+		std::cout << it3->second.getNick() << ",";
 		it3++;
 	}
 	std::cout << "|" << std::endl;
