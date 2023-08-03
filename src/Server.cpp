@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 12:13:49 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/03 16:09:53 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ void	Server::addClient(void) {
 	this->_fds.push_back(newClient.getClientPollfd());
 }
 
+/*
 bool	Server::parseSplit(std::string const& message, std::string& prefix, std::string& command, std::string& parameters) {
 	size_t	pos = 0;
 
@@ -119,95 +120,44 @@ bool	Server::parseSplit(std::string const& message, std::string& prefix, std::st
 	parameters = message.substr(pos);
 	return true;
 }
+*/
 
-void	Server::parseClientInput(std::string const& message, std::vector<t_ircMessage>& clientInput) {
-	size_t			pos = 0;
-	bool			goOn = true;
-	t_ircMessage	clientCommand;
-
-	while (goOn) {
-		if (!message.empty()) {
-			size_t splitEnd = message.find('\n', pos);
-			std::string inputSplit = message.substr(pos, splitEnd - pos);
-			pos = splitEnd + 1;
-			if (parseSplit(inputSplit, clientCommand.prefix, clientCommand.command, clientCommand.parameters)) {
-				clientInput.push_back(clientCommand);
-			}
-			if (pos >= message.size()) {goOn = false;}
-		}
+bool	Server::inputParse(std::string const& message, t_ircMessage& clientCommand) {
+	size_t	pos = 0;
+	if(!message.empty() && message[pos] == ':') {
+		pos++;
+		size_t	prefixEnd = message.find(' ', pos);
+		if (prefixEnd == std::string::npos) { return false;}
+		clientCommand.prefix = message.substr(pos, prefixEnd - pos);
+		pos = prefixEnd + 1;
 	}
+	size_t	commandEnd = message.find(' ', pos);
+	if (commandEnd == std::string::npos) { return false;}
+	clientCommand.command = message.substr(pos, commandEnd - pos);
+	pos = commandEnd + 1;
+	clientCommand.parameters = message.substr(pos, message.size() - 2);
+	/* trim final CR-LF */
+	if (!clientCommand.parameters.empty())
+		clientCommand.parameters.substr(0,clientCommand.parameters.size()-2);
+	else
+		clientCommand.command.substr(0, clientCommand.command.size() - 2);
+	return true;
 }
 
-void	Server::sendMessage(Client& client, std::string message)
-{
-	size_t	bytesSent = 0;
+void	Server::handleClient(char* buffer, std::vector<Client>::iterator& clientIterator, std::vector<t_ircMessage>& commands) {
 
-	//loop might not be needed?
-	// while (bytesSent < message.length())
-	// {
-		bytesSent += send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
-	// }
-}
+	std::istringstream			iss(buffer);
+	std::string					tmpBuffer;
+	t_ircMessage				clientCommand;
 
-void	Server::handleClient(char* buffer, Client& client) {
-	std::vector<t_ircMessage>	clientInput;
-
-	std::cout << "Incoming from client : " << buffer;
-	parseClientInput(buffer, clientInput);
-
-	for (std::vector<t_ircMessage>::iterator it = clientInput.begin(); it != clientInput.end(); ++it) {
-		std::cout << "------------\n";
-		std::cout << "Status     : " << client.getStatus() << std::endl;
-		std::cout << "Prefix     : " << it->prefix << std::endl;
-		std::cout << "Command    : " << it->command << std::endl;
-		std::cout << "Parameters : " << it->parameters  << std::endl;
-
-		//if CAP LS is received, the server must suspend registration until CAP END is received
-		//check for CAP END missing
-		//also while registration is not done, only a few commands should be accessible to the client
-		if (it->command == "CAP" && strncmp(it->parameters.c_str(), "LS", 2) == 0) {
-			client.setStatus(CAP);
-			sendMessage(client, RPL_CAP);
-		}
-		if (it->command == "CAP" && strncmp(it->parameters.c_str(), "END", 3) == 0)
-			client.setStatus(CONNECTED);
-		if (it->command == "PING")
-			sendMessage(client, PONG(it->parameters));
-		if (it->command == "NICK") {
-			//check if it is in use and send back error
-			//check if all characters are valid and send back error
-			if (it->parameters.empty())
-				sendMessage(client, ERR_NONICKNAMEGIVEN);
-//REMOVE this once ^M is gone
-			client.setNick(it->parameters.substr(0, it->parameters.length() - 1));
-			client.setStatus(NICK);
-std::cout << "DEBUG: set nick '" << client.getNick() << "'\n";
-			if (client.getStatus() == USER)
-			{
-				client.setStatus(REGISTERED);
-				sendMessage(client, RPL_WELCOME(client));
+	tmpBuffer.clear();
+	while (getline(iss, tmpBuffer)) {
+		clientIterator->appendBuffer(tmpBuffer);
+			if (inputParse(clientIterator->getBuffer(), clientCommand)) {
+				commands.push_back(clientCommand);
+				tmpBuffer.clear();
+				clientIterator->getBuffer().clear();
 			}
-		}
-		if (it->command == "USER") {
-			size_t	length = it->parameters.find(" ");
-
-			if (client.getStatus() == REGISTERED)
-				sendMessage(client, ERR_ALREADYREGISTERED);
-			if (length == 0)
-				client.setUsername("unknown");
-			else
-			{
-				client.setUsername(it->parameters.substr(0, length));
-			}
-			if (client.getStatus() == NICK)
-			{
-std::cout << "DEBUG: set username '" << client.getUsername() << "'\n";
-				client.setStatus(REGISTERED);
-				sendMessage(client, RPL_WELCOME(client));
-			}
-			else
-				client.setStatus(USER);
-		}
 	}
 }
 
@@ -230,13 +180,22 @@ void	Server::serverStart(void) {
 
 			//check clients
 			for (size_t i = 1; i < this->_fds.size(); ++i) {
+				std::vector<t_ircMessage>	commands; // contains all valid client messages
+				std::vector<Client>::iterator	clientIterator = this->_clientVector.begin() + i - 1;
 				if ((this->_fds[i].revents & POLLIN)) {
 					bzero(buffer, sizeof(buffer));
-
-					ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
-					if(ret > 0)
-						handleClient(buffer, this->_clientVector[i - 1]);
-					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret <= 0)
+					recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
+					if(ret > 0) {
+						handleClient(buffer, clientIterator, commands);
+						/* simulates commands implementation */
+						for (std::vector<t_ircMessage>::iterator it = commands.begin(); it != commands.end(); ++it) {
+							std::cout << "Prefix     : " << it->prefix << std::endl;
+							std::cout << "Command    : " << it->command << std::endl;
+							std::cout << "Parameters : " << it->parameters << std::endl;
+						}
+						commands.clear();
+					}
+					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
 					{
 						std::cout << "Client disconnected" << std::endl;
 						close(this->_fds[i].fd);

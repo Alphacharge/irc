@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:01:01 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 10:40:08 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/03 15:59:21 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,14 @@ std::string&	Client::getNick(void) {
 
 std::string&	Client::getUsername(void) {
 	return (_username);
+}
+
+std::string&	Client::getBuffer(void) {
+	return this->_buffer;
+}
+
+void	Client::appendBuffer(std::string const& str) {
+	this->_buffer.append(str);
 }
 
 int	Client::getStatus(void) {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 09:38:50 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 16:28:44 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/03 15:56:39 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ class Client {
 		std::string			_nick;
 		std::string			_username;
 		int					_status;	//string? int? makro?
+		std::string			_buffer;
 
 	public:
 		Client(void);
@@ -39,6 +40,7 @@ class Client {
 		void	setNick(std::string);
 		void	setUsername(std::string);
 		void	setStatus(int);
+		void	appendBuffer(std::string const&);
 
 		int&				getClientSocket(void);
 		struct sockaddr_in&	getClientAddress(void);
@@ -47,4 +49,5 @@ class Client {
 		std::string&		getNick(void);
 		std::string&		getUsername(void);
 		int					getStatus(void);
+		std::string&		getBuffer(void);
 };
