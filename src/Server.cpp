@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 17:24:03 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/03 17:52:07 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,10 +121,14 @@ bool	Server::inputParse(std::string const& message, t_ircMessage& clientCommand)
 	pos = commandEnd + 1;
 	clientCommand.parameters = message.substr(pos, message.size() - 2);
 	/* trim final CR-LF */
-	if (!clientCommand.parameters.empty())
-		clientCommand.parameters = clientCommand.parameters.substr(0,clientCommand.parameters.size() - 1);
-	else
-		clientCommand.command = clientCommand.command.substr(0, clientCommand.command.size() - 1);
+	if (!clientCommand.parameters.empty()) {
+		if (clientCommand.parameters[clientCommand.parameters.size() - 1] == '\r')
+			clientCommand.parameters = clientCommand.parameters.substr(0,clientCommand.parameters.size() - 1);
+	}
+	else {
+		if (clientCommand.command[clientCommand.command.size() - 1] == '\r')
+			clientCommand.command = clientCommand.command.substr(0,clientCommand.command.size() - 1);
+	}
 	return true;
 }
 
@@ -142,7 +146,7 @@ void	Server::handleClient(char* buffer, std::vector<Client>::iterator& clientIte
 			tmpBuffer.clear();
 			clientIterator->getBuffer().clear();
 		}
-		if (!iss.eof() && clientIterator->getBuffer().find(0, strlen(clientIterator->getBuffer().c_str()), '\n')) {
+		if (!iss.eof() && clientIterator->getBuffer().find(0, clientIterator->getBuffer().length(), '\n')) {
 			clientIterator->getBuffer().clear();
 		}
 	}
