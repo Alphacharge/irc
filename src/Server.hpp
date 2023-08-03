@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/02 16:38:39 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/03 12:16:33 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 # include <iostream>
 # include <vector>
+# include <map>
+# include <list>
 # include <cstring>
 # include <poll.h>
 # include <sys/socket.h>
@@ -24,6 +26,7 @@
 # include <string>
 
 # include "Client.hpp"
+# include "Channel.hpp"
 # include "Macros.hpp"
 # include "Messages.hpp"
 # include "Colors.hpp"
@@ -34,8 +37,13 @@ typedef struct s_irc {
 	std::string	parameters;
 }		t_ircMessage;
 
+class Client;
+class Channel;
+
+
 class	Server {
 	private:
+		//Server
 		int					_serverPort;
 		std::string			_serverPassword;
 		int					_serverSocket;
@@ -43,7 +51,12 @@ class	Server {
 		struct sockaddr_in	_serverAddress;
 		std::vector<pollfd>	_fds;
 		pollfd				_serverPollfd;
+		//Client
 		std::vector<Client>	_clientVector;
+		//Channels
+		std::list<Channel>	_channel_list;
+		//Functions
+		std::map<std::string, void (Server::*)(Client&, std::string&)>	_commandMap;
 		Server(void);
 
 	public:
@@ -83,4 +96,7 @@ class	Server {
 		bool		parseSplit(std::string const&, std::string&, std::string&, std::string&);
 		void		parseClientInput(std::string const&, std::vector<t_ircMessage>&);
 		void		handleClient(char*, int const&);
+
+		//Commands
+		void		join(Client &client, std::string& channel);
 };

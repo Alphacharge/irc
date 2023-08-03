@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 07:32:38 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/03 12:13:49 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ Server::Server(void) {
 Server::Server(int port, std::string password) : _serverPort(port), _serverPassword(password) {
 	if (VERBOSE >= 3)
 		std::cout << DGREEN << "Server parametric constructor called" << WHITE << std::endl;
+	this->_commandMap["join"] = &Server::join;
 }
 
 Server::Server(Server const& src) {
@@ -76,10 +77,10 @@ void	Server::serverSetup(void) {
 		this->_serverAddress.sin_port = htons(this->_serverPort);
 		if (bind(this->_serverSocket, (struct sockaddr*)&this->_serverAddress, sizeof(this->_serverAddress)) < 0) {throw Server::BindException();}
 		if (listen(this->_serverSocket, 5) < 0) {throw Server::ListenException();}
-		std::cout << "Server started and listening on port " << this->_serverPort << std::endl;
 		this->_serverPollfd.fd = this->_serverSocket;
 		this->_serverPollfd.events = POLLIN;
 		this->_fds.push_back(this->_serverPollfd);
+		std::cout << "Server startup completed. Listening on port " << this->_serverPort << std::endl;
 	}
 	catch (std::exception &e) {
 		std::cerr << e.what() << std::endl;
@@ -160,7 +161,7 @@ void	Server::serverStart(void) {
 			serverPoll();
 			char	buffer[1024];
 			for (size_t i = 1; i < this->_fds.size(); ++i) {
-				if ((this->_fds[i].revents & POLLIN) && this->_fds[i].fd != this->_fds[0].fd) {
+				if ((this->_fds[i].revents & POLLIN)) {
 					bzero(buffer, sizeof(buffer));
 					size_t ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
 					if(ret > 0) {
@@ -179,5 +180,19 @@ void	Server::serverStart(void) {
 	}
 	catch (std::exception &e) {
 		std::cerr << e.what() << std::endl;
+	}
+}
+
+void	Server::join(Client &client, std::string& channel){
+	std::list<Channel>::iterator it = this->_channel_list.begin();
+	while (it != this->_channel_list.end() && it->getName() != channel)
+		it++;
+	if (it == this->_channel_list.end())
+	{
+		Channel newCH(channel);
+		newCH.setOperator(client);
+		this->_channel_list.push_back(newCH);
+	} else {
+		it->setUser(client);
 	}
 }
