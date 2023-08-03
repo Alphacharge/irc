@@ -87,20 +87,19 @@ void	Server::serverSetup(void) {
 	}
 }
 
-void	Server::serverPoll(void) {
-	int	numReady = poll(&this->_fds[0], this->_fds.size(), -1);
-	if (numReady < 0) {throw PollException();}
-	if (this->_fds[0].revents & POLLIN) {
-		Client		newClient;
-		socklen_t	clientAddressLen = sizeof(newClient.getClientAddress());
-		newClient.setClientSocket(accept(this->_serverSocket, (struct sockaddr*)&newClient.getClientAddress(), &clientAddressLen));
-		if (newClient.getClientSocket() < 0) {throw AcceptException();}
-		this->_clientVector.push_back(newClient);
-		std::cout << "New client connected : " << inet_ntoa(newClient.getClientAddress().sin_addr) << ":" << ntohs(newClient.getClientAddress().sin_port) << std::endl;
-		newClient.setClientPollfd_fd(newClient.getClientSocket());
-		newClient.setClientPollfd_events(POLLIN);
-		this->_fds.push_back(newClient.getClientPollfd());
-	}
+void	Server::addClient(void) {
+	Client		newClient;
+	socklen_t	clientAddressLen = sizeof(newClient.getClientAddress());
+
+	newClient.setClientSocket(accept(this->_serverSocket, (struct sockaddr*)&newClient.getClientAddress(), &clientAddressLen));
+	if (newClient.getClientSocket() < 0) {throw AcceptException();}
+
+	std::cout << "New client connected : " << inet_ntoa(newClient.getClientAddress().sin_addr) << ":" << ntohs(newClient.getClientAddress().sin_port) << std::endl;
+	newClient.setClientPollfd_fd(newClient.getClientSocket());
+	newClient.setClientPollfd_events(POLLIN);
+	newClient.setStatus(CONNECTED);
+	this->_clientVector.push_back(newClient);
+	this->_fds.push_back(newClient.getClientPollfd());
 }
 
 bool	Server::parseSplit(std::string const& message, std::string& prefix, std::string& command, std::string& parameters) {
@@ -139,37 +138,108 @@ void	Server::parseClientInput(std::string const& message, std::vector<t_ircMessa
 	}
 }
 
-void	Server::handleClient(char* buffer, int const& clientFd) {
-	(void)clientFd;
-	std::cout << "Incoming from client : " << buffer;
+void	Server::sendMessage(Client& client, std::string message)
+{
+	size_t	bytesSent = 0;
+
+	//loop might not be needed?
+	// while (bytesSent < message.length())
+	// {
+		bytesSent += send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
+	// }
+}
+
+void	Server::handleClient(char* buffer, Client& client) {
 	std::vector<t_ircMessage>	clientInput;
+
+	std::cout << "Incoming from client : " << buffer;
 	parseClientInput(buffer, clientInput);
+
 	for (std::vector<t_ircMessage>::iterator it = clientInput.begin(); it != clientInput.end(); ++it) {
+		std::cout << "------------\n";
+		std::cout << "Status     : " << client.getStatus() << std::endl;
 		std::cout << "Prefix     : " << it->prefix << std::endl;
 		std::cout << "Command    : " << it->command << std::endl;
-		std::cout << "Parameters : " << it->parameters << std::endl;
-		// if (it->command == "NICK") {
-		// 	send(clientFd,RPL_WELCOME(it->parameters).c_str(), sizeof(RPL_WELCOME(it->parameters).c_str()), 0);
-		// }
+		std::cout << "Parameters : " << it->parameters  << std::endl;
+
+		//if CAP LS is received, the server must suspend registration until CAP END is received
+		//check for CAP END missing
+		//also while registration is not done, only a few commands should be accessible to the client
+		if (it->command == "CAP" && strncmp(it->parameters.c_str(), "LS", 2) == 0) {
+			client.setStatus(CAP);
+			sendMessage(client, RPL_CAP);
+		}
+		if (it->command == "CAP" && strncmp(it->parameters.c_str(), "END", 3) == 0)
+			client.setStatus(CONNECTED);
+		if (it->command == "PING")
+			sendMessage(client, PONG(it->parameters));
+		if (it->command == "NICK") {
+			//check if it is in use and send back error
+			//check if all characters are valid and send back error
+			if (it->parameters.empty())
+				sendMessage(client, ERR_NONICKNAMEGIVEN);
+//REMOVE this once ^M is gone
+			client.setNick(it->parameters.substr(0, it->parameters.length() - 1));
+			client.setStatus(NICK);
+std::cout << "DEBUG: set nick '" << client.getNick() << "'\n";
+			if (client.getStatus() == USER)
+			{
+				client.setStatus(REGISTERED);
+				sendMessage(client, RPL_WELCOME(client));
+			}
+		}
+		if (it->command == "USER") {
+			size_t	length = it->parameters.find(" ");
+
+			if (client.getStatus() == REGISTERED)
+				sendMessage(client, ERR_ALREADYREGISTERED);
+			if (length == 0)
+				client.setUsername("unknown");
+			else
+			{
+				client.setUsername(it->parameters.substr(0, length));
+			}
+			if (client.getStatus() == NICK)
+			{
+std::cout << "DEBUG: set username '" << client.getUsername() << "'\n";
+				client.setStatus(REGISTERED);
+				sendMessage(client, RPL_WELCOME(client));
+			}
+			else
+				client.setStatus(USER);
+		}
 	}
 }
 
+/*Starts up the server and waits in poll until an event is registered.*/
 void	Server::serverStart(void) {
+	char	buffer[1024];
+	int		ret;
+
 	try {
 		serverSetup();
-		while(true) {
-			serverPoll();
-			char	buffer[1024];
+		while (true)
+		{
+			ret = poll(this->_fds.data(), this->_fds.size(), -1);
+			if (ret == -1)
+				throw PollException();
+
+			//check server
+			if (this->_fds[0].revents & POLLIN)
+				addClient();
+
+			//check clients
 			for (size_t i = 1; i < this->_fds.size(); ++i) {
 				if ((this->_fds[i].revents & POLLIN)) {
 					bzero(buffer, sizeof(buffer));
-					size_t ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
-					if(ret > 0) {
-						handleClient(buffer, this->_fds[i].fd);
-					}
+
+					ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
+					if(ret > 0)
+						handleClient(buffer, this->_clientVector[i - 1]);
 					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret <= 0)
 					{
 						std::cout << "Client disconnected" << std::endl;
+						close(this->_fds[i].fd);
 						this->_fds.erase(this->_fds.begin() + i);
 						this->_clientVector.erase(this->_clientVector.begin() + i - 1);
 						--i;

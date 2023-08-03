@@ -22,8 +22,9 @@ class Client {
 		int					_clientSocket;
 		struct sockaddr_in	_clientAddress;
 		pollfd				_clientPollfd;
-		std::string			_name;
 		std::string			_nick;
+		std::string			_username;
+		int					_status;	//string? int? makro?
 
 	public:
 		Client(void);
@@ -35,10 +36,15 @@ class Client {
 		void	setClientAddress(struct sockaddr_in const&);
 		void	setClientPollfd_fd(int const&);
 		void	setClientPollfd_events(short const&);
+		void	setNick(std::string);
+		void	setUsername(std::string);
+		void	setStatus(int);
 
 		int&				getClientSocket(void);
 		struct sockaddr_in&	getClientAddress(void);
 		pollfd&				getClientPollfd(void);
-		std::string			getName(void);
-		std::string			getNick(void);
+
+		std::string&		getNick(void);
+		std::string&		getUsername(void);
+		int					getStatus(void);
 };

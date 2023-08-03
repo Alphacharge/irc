@@ -32,3 +32,9 @@ ircserv
 *.exe
 *.out
 *.app
+
+# Config
+.vscode
+
+# Notes
+notes_fkernbac

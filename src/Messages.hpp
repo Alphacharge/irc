@@ -14,7 +14,7 @@
 #ifndef MESSAGES_HPP
 # define MESSAGES_HPP
 
-# define RPL_WELCOME(client, serverAddress) (":Welcome to the Internet Relay Network " + client.getNick() + "!" + client.getName() + "@" + serverAddress.sin_addr.s_addr)
+# define RPL_WELCOME(client) (std::string(":irc42 001 :Welcome to the Internet Relay Network " + client.getNick() + "!\n"))
 // # define RPL_YOURHOST() ()
 // # define RPL_CREATED() ()
 // # define RPL_MYINFO() ()
@@ -309,9 +309,9 @@
 // # define ERR_NOOPERMOTD() ()
 // # define ERR_TOOMANYAWAY() ()
 // # define ERR_EVENTNICKCHANGE() ()
-// # define ERR_NONICKNAMEGIVEN() ()
+# define ERR_NONICKNAMEGIVEN		(std::string(":irc42 431 :No nickname given!\n"))
 // # define ERR_ERRONEUSNICKNAME() ()
-// # define ERR_NICKNAMEINUSE() ()
+// # define ERR_NICKNAMEINUSE(params)	(std::string(":irc42 433 " + params + " :Nickname is already in use\n"))
 // # define ERR_SERVICENAMEINUSE() ()
 // # define ERR_NORULES() ()
 // # define ERR_SERVICECONFUSED() ()
@@ -340,8 +340,8 @@
 // # define ERR_ACCEPTNOT() ()
 // # define ERR_NOHIDING() ()
 // # define ERR_NOTFORHALFOPS() ()
-// # define ERR_NEEDMOREPARAMS() ()
-// # define ERR_ALREADYREGISTERED() ()
+// # define ERR_NEEDMOREPARAMS(params)	(std::string(":irc42 461 " + params + " :Not enough parameters\n"))
+# define ERR_ALREADYREGISTERED		(std::string(":irc42 462 :Already registered\n"))
 // # define ERR_NOPERMFORHOST() ()
 // # define ERR_PASSWDMISMATCH() ()
 // # define ERR_YOUREBANNEDCREEP() ()
@@ -515,4 +515,8 @@
 // # define ERR_NOLANGUAGE() ()
 // # define ERR_TEXTTOOSHORT() ()
 // # define ERR_NUMERIC_ERR() ()
+
+# define PONG(params)			(std::string(":irc42 PONG irc42 " + params + "\n"))
+# define RPL_CAP				(std::string("CAP * LS :\n"))
+
 #endif

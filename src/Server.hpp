@@ -24,6 +24,7 @@
 # include <fcntl.h>
 # include <unistd.h>
 # include <string>
+# include <string.h>
 
 # include "Client.hpp"
 # include "Channel.hpp"
@@ -92,11 +93,14 @@ class	Server {
 
 		void		serverStart(void);
 		void		serverSetup(void);
-		void		serverPoll(void);
+		void		addClient(void);
 		bool		parseSplit(std::string const&, std::string&, std::string&, std::string&);
 		void		parseClientInput(std::string const&, std::vector<t_ircMessage>&);
-		void		handleClient(char*, int const&);
+		void		handleClient(char*, Client& client);
 
 		//Commands
 		void		join(Client &client, std::string& channel);
+
+		//Helper functions
+		void		sendMessage(Client& client, std::string message);
 };

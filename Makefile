@@ -26,7 +26,7 @@ CXXFLAGS	+=	-g #-fsanitize=address
 VPATH	:=	src/
 
 SRC_F	:=	ircserv.cpp Server.cpp Client.cpp Channel.cpp
-# SRC_F	+=	
+# SRC_F	+=
 
 ###			###			OBJECTS			###			###
 OBJ_D	:=	./obj
@@ -45,7 +45,7 @@ LSAN_D	:=	./lib/LeakSanitizer
 LSAN_F	:=	$(LSAN_D)/liblsan.a
 LSAN_U	:=	https://www.github.com/mhahnFr/LeakSanitizer
 
-LIB		:=	
+LIB		:=
 
 #Linux/Mac Compability for Leaksanitizer
 ifeq ($(OS), Darwin)
