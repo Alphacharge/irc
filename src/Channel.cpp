@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/02 16:42:49 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/03 12:05:02 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,18 @@ void	Channel::print(void)
 	}
 	std::cout <<  MAGENTA <<"|" << std::endl;
 	std::cout << "*-----------------------------------------------*" << WHITE << std::endl;
+}
+
+std::string	Channel::getName(void) const{
+	return this->_name;
+}
+
+void		Channel::setOperator(Client &client) {
+	this->_operators[client.getNick()] = client;
+}
+
+void		Channel::setUser(Client &client) {
+	this->_users[client.getNick()] = client;
 }
 
 /*Channel name can't contain more than 200chars, spaces, commas, ^D or miss a & or # at the beginning*/
