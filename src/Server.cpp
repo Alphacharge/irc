@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 17:03:05 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/03 17:09:59 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,7 +178,7 @@ void	Server::serverStart(void) {
 						}
 						commands.clear();
 					}
-					else if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
+					if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
 					{
 						std::cout << "Client disconnected" << std::endl;
 						close(this->_fds[i].fd);
