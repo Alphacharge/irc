@@ -100,7 +100,11 @@ class	Server {
 
 		//Commands
 		void		join(Client &client, std::string& channel);
+		void	cap(Client& client, std::string& params);
+		void	pong(Client &client, std::string& params);
+		void	nick(Client &client, std::string& params);
+		void	user(Client &client, std::string& params);
 
 		//Helper functions
-		void		sendMessage(Client& client, std::string message);
+		void		sendMessage(Client&, std::string);
 };

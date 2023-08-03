@@ -21,7 +21,11 @@ Server::Server(void) {
 Server::Server(int port, std::string password) : _serverPort(port), _serverPassword(password) {
 	if (VERBOSE >= 3)
 		std::cout << DGREEN << "Server parametric constructor called" << WHITE << std::endl;
-	this->_commandMap["join"] = &Server::join;
+	this->_commandMap["JOIN"] = &Server::join;
+	this->_commandMap["CAP"] = &Server::cap;
+	this->_commandMap["PING"] = &Server::pong;
+	this->_commandMap["NICK"] = &Server::nick;
+	this->_commandMap["USER"] = &Server::user;
 }
 
 Server::Server(Server const& src) {
@@ -180,11 +184,14 @@ void	Server::serverStart(void) {
 
 			//check clients
 			for (size_t i = 1; i < this->_fds.size(); ++i) {
-				std::vector<t_ircMessage>	commands; // contains all valid client messages
+				std::vector<t_ircMessage>		commands; // contains all valid client messages
 				std::vector<Client>::iterator	clientIterator = this->_clientVector.begin() + i - 1;
+
 				if ((this->_fds[i].revents & POLLIN)) {
 					bzero(buffer, sizeof(buffer));
+
 					recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
+
 					if(ret > 0) {
 						handleClient(buffer, clientIterator, commands);
 						/* simulates commands implementation */
@@ -192,6 +199,13 @@ void	Server::serverStart(void) {
 							std::cout << "Prefix     : " << it->prefix << std::endl;
 							std::cout << "Command    : " << it->command << std::endl;
 							std::cout << "Parameters : " << it->parameters << std::endl;
+
+							std::map<std::string, void (Server::*)(Client&, std::string&)>::iterator	function = this->_commandMap.find(it->command);
+							if (function != _commandMap.end())
+							{
+std::cout << "DEBUG: found function\n";
+								(this->*(function->second))(*clientIterator, it->parameters);
+							}
 						}
 						commands.clear();
 					}
@@ -212,6 +226,19 @@ void	Server::serverStart(void) {
 	}
 }
 
+void	Server::sendMessage(Client& client, std::string message)
+{
+	size_t	bytesSent = 0;
+
+	//loop might not be needed?
+	// while (bytesSent < message.length())
+	// {
+		bytesSent += send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
+	// }
+}
+
+/* === COMMANDS === */
+
 void	Server::join(Client &client, std::string& channel){
 	std::list<Channel>::iterator it = this->_channel_list.begin();
 	while (it != this->_channel_list.end() && it->getName() != channel)
@@ -224,4 +251,55 @@ void	Server::join(Client &client, std::string& channel){
 	} else {
 		it->setUser(client);
 	}
+}
+
+void	Server::cap(Client& client, std::string& params){
+	if (params == "LS") {
+		client.setStatus(CAP);
+		sendMessage(client, RPL_CAP);
+std::cout << "DEBUG: sent RPL_CAP";
+	}
+	if (params == "END")
+		client.setStatus(CONNECTED);
+}
+
+void	Server::pong(Client &client, std::string& params){
+	(void)params;
+	sendMessage(client, PONG(params));
+}
+
+void	Server::nick(Client &client, std::string& params){
+	if (params.empty())
+		sendMessage(client, ERR_NONICKNAMEGIVEN);
+
+	client.setNick(params);
+	client.setStatus(NICK);
+std::cout << "DEBUG: set nick '" << client.getNick() << "'\n";
+
+	if (client.getStatus() == USER)
+	{
+		client.setStatus(REGISTERED);
+		sendMessage(client, RPL_WELCOME(client));
+	}
+}
+
+void	Server::user(Client &client, std::string& params){
+	size_t	length = params.find(" ");
+
+	if (client.getStatus() == REGISTERED)
+		sendMessage(client, ERR_ALREADYREGISTERED);
+
+	if (length == 0)
+		client.setUsername("unknown");
+	else
+		client.setUsername(params.substr(0, length));
+std::cout << "DEBUG: set username '" << client.getUsername() << "'\n";
+
+	if (client.getStatus() == NICK)
+	{
+		client.setStatus(REGISTERED);
+		sendMessage(client, RPL_WELCOME(client));
+	}
+	else
+		client.setStatus(USER);
 }
