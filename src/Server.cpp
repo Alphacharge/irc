@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 08:49:37 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 11:23:32 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,11 +130,11 @@ bool	Server::inputParse(std::string const& message, t_ircMessage& clientCommand)
 			clientCommand.command = clientCommand.command.substr(0,clientCommand.command.size() - 1);
 	}
 	if (!clientCommand.parameters.empty())
-		splitString(clientCommand.parametersList, clientCommand.parameters);
-	// /* === START debug parametersList === */
-	// std::cout << "DEBUG test parametersList : " << std::endl;
-	// for (std::list<std::string>::iterator it = clientCommand.parametersList.begin(); it != clientCommand.parametersList.end(); ++it) {std::cout << *it << std::endl;}
-	// /* === END   debug parametersList === */
+		clientCommand.parametersList = splitString(clientCommand.parameters, ' ');
+	/* === START debug parametersList === */
+	std::cout << "DEBUG test parametersList : " << std::endl;
+	for (std::list<std::string>::iterator it = clientCommand.parametersList.begin(); it != clientCommand.parametersList.end(); ++it) {std::cout << *it << std::endl;}
+	/* === END   debug parametersList === */
 
 	return true;
 }
@@ -250,7 +250,7 @@ void	Server::join(Client &client, t_ircMessage& params){
 		Channel newCH(params.parameters);
 		newCH.setOperator(client);
 		this->_channel_list.push_back(newCH);
-		
+
 	} else {
 		it->setUser(client);
 		//message all clients

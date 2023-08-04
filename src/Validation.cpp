@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 10:32:04 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 11:20:54 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,11 @@ std::map<std::string, std::string>	joinSplitInput(std::string const &input)
 }
 
 /* split strings on spaces*/
-void	splitString(std::list<std::string>& parametersList, std::string const& parameters) {
-	std::istringstream	iss(parameters);
-	std::string			token;
+std::list<std::string>	splitString(std::string const&parameters, char const& delimiter) {
+	std::list<std::string>	parametersList;
+	std::istringstream		iss(parameters);
+	std::string				token;
 
-	while(getline(iss, token, ' ')) {parametersList.push_back(token);}
+	while(getline(iss, token, delimiter)) {parametersList.push_back(token);}
+	return parametersList;
 }
