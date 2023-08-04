@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 09:14:52 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 11:06:27 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,11 @@ bool	isValidChannelName(std::string const &name)
 }
 
 /* split strings on spaces*/
-void	splitString(std::list<std::string>& parametersList, std::string const& parameters) {
-	std::istringstream	iss(parameters);
-	std::string			token;
+std::list<std::string>	splitString(std::string const&parameters, char const& delimiter) {
+	std::list<std::string>	parametersList;
+	std::istringstream		iss(parameters);
+	std::string				token;
 
-	while(getline(iss, token, ' ')) {parametersList.push_back(token);}
+	while(getline(iss, token, delimiter)) {parametersList.push_back(token);}
+	return parametersList;
 }
