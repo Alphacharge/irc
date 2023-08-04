@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:01:01 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 15:47:34 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 17:59:12 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ std::string&	Client::getBuffer(void) {
 }
 
 void	Client::appendBuffer(std::string const& str) {
-	this->_buffer.append(str);
+	this->_buffer += str;
 }
 
 int	Client::getStatus(void) {

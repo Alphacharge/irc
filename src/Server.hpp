@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 08:47:44 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 17:14:04 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ class	Server {
 		void		serverSetup(void);
 		void		addClient(void);
 		bool		inputParse(std::string const&, t_ircMessage&);
-		void		handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
+		bool		handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
 
 		//Commands
 		void	join(Client&, t_ircMessage&);
