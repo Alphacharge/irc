@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 16:02:01 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 07:05:51 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # include <iostream>
 # include <cstring>
 # include <map>
+# include "Colors.hpp"
 
 bool	isValidChannelName(std::string const &name);
 bool	containsPasswords(std::string const &input);

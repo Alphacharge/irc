@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/03 16:17:00 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 07:30:37 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,16 +48,26 @@ std::map<std::string, std::string>	joinSplitInput(std::string const &input)
 {
 	std::map<std::string, std::string>	map;
 	std::string	channels = input;
+	std::string	passwords;
 	size_t		pos = input.find(' ');
-	if (pos != 0)
+	std::cout << LGREEN << input << WHITE << std::endl;
+	if (pos != input.npos)
 	{
 		channels = input.substr(0, pos);
-		std::string passwords = input.substr(pos + 1, input.length() - pos);
+		passwords = input.substr(pos + 1, input.length() - pos);
+		std::cout << RED << channels << WHITE << std::endl;
+		std::cout << YELLOW << passwords << WHITE << std::endl;
 	}
 	while (containsMultipleChannels(channels))
 	{
+		std::cout << PURPLE << channels << WHITE << std::endl;
 		size_t		lim = channels.find(',');
 		size_t		limpw = passwords.find(',');
-		map[channels.substr(0, lim)] = 
+		map[channels.substr(0, lim)] = passwords.substr(0, limpw);
+		channels = channels[lim];
+		passwords = passwords[limpw];
+		std::cout << DGREEN << channels << WHITE << std::endl;
+		std::cout << BLUE << channels << WHITE << std::endl;
 	}
+	return map;
 }
