@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 08:49:37 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 09:27:04 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,20 +231,22 @@ void	Server::sendMessage(Client& client, std::string message)
 /* === COMMANDS === */
 
 void	Server::join(Client &client, t_ircMessage& params){
-	// std::map<std::string, std::string> input = joinSplitInput(params);
-	// std::map<std::string, std::string>::iterator it2 = input.begin();
-	// while (it2 != input.end())
-	// {
-	// 	std::cout << CYAN << "Channel:|" << it2->first << "|\tPassword:|" << it2->second << "|" << WHITE << std::endl;
-	// 	it2++;
-	// }
+
 	if (params.parameters.empty()) {
-		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
+		sendMessage(client, ERR_NEEDMOREPARAMS(params.command));
 		return ;
 	}
-	std::list<Channel>::iterator it = this->_channel_list.begin();
-	while (it != this->_channel_list.end() && it->getName() != params.parameters)
-		it++;
+	std::list<std::string> tojoin = function(params.parametersList.front());
+	std::list<std::string>::iterator it_join = tojoin.begin();
+	while (it_join != tojoin.end()) {
+		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
+		while (it_chan != this->_channel_list.end()) {
+			if (it_chan->getName() == *it_join && it_chan->getInvite() == true)
+				sendMessage(client, ERR_INVITEONLYCHAN(*it_join));
+			it_chan++;
+		}
+		it_join++;
+	}
 	if (it == this->_channel_list.end())
 	{
 		Channel newCH(params.parameters);
@@ -255,6 +257,7 @@ void	Server::join(Client &client, t_ircMessage& params){
 		it->setUser(client);
 		//message all clients
 	}
+	
 }
 
 void	Server::cap(Client& client, t_ircMessage& params){

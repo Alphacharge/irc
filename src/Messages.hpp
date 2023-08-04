@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 08:39:38 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 09:26:49 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -354,7 +354,7 @@
 // # define ERR_KICKEDFROMCHAN() ()
 // # define ERR_CHANNELISFULL() ()
 // # define ERR_UNKNOWNMODE() ()
-// # define ERR_INVITEONLYCHAN() ()
+# define ERR_INVITEONLYCHAN(params) (std::string(params + " :Cannot join channel (+i)"))
 // # define ERR_BANNEDFROMCHAN() ()
 // # define ERR_BADCHANNELKEY() ()
 // # define ERR_BADCHANMASK() ()
