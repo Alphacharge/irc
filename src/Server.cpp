@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 11:23:32 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 14:57:22 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,6 @@ void	Server::serverStart(void) {
 							std::cout << "Prefix     : " << it->prefix << std::endl;
 							std::cout << "Command    : " << it->command << std::endl;
 							std::cout << "Parameters : " << it->parameters << std::endl;
-
 							std::map<std::string, void (Server::*)(Client&, t_ircMessage&)>::iterator	function = this->_commandMap.find(it->command);
 							if (function != _commandMap.end())
 								(this->*(function->second))(*clientIterator, *it);
@@ -210,6 +209,8 @@ void	Server::serverStart(void) {
 						}
 						commands.clear();
 					}
+					if (!this->_clientVector[i].getStatus()) // client status is DISCONNECTED e.g. cleint sent QUIT
+						this->_fds[i].revents |= POLLHUP;
 					if (this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
 					{
 						std::cout << "Client disconnected" << std::endl;
