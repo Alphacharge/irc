@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 10:33:29 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 08:45:06 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,11 +101,11 @@ class	Server {
 		void		handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
 
 		//Commands
-		void		join(Client &client, std::string& channel);
-		void	cap(Client& client, std::string& params);
-		void	pong(Client &client, std::string& params);
-		void	nick(Client &client, std::string& params);
-		void	user(Client &client, std::string& params);
+		void	join(Client&, t_ircMessage&);
+		void	cap(Client&, t_ircMessage&);
+		void	pong(Client&, t_ircMessage&);
+		void	nick(Client&, t_ircMessage&);
+		void	user(Client&, t_ircMessage&);
 
 		//Helper functions
 		void		sendMessage(Client&, std::string);

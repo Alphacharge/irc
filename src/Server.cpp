@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 10:40:50 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 08:45:30 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,10 +196,7 @@ void	Server::serverStart(void) {
 
 							std::map<std::string, void (Server::*)(Client&, std::string&)>::iterator	function = this->_commandMap.find(it->command);
 							if (function != _commandMap.end())
-							{
-std::cout << "DEBUG: found function\n";
 								(this->*(function->second))(*clientIterator, it->parameters);
-							}
 						}
 						commands.clear();
 					}
@@ -233,50 +230,56 @@ void	Server::sendMessage(Client& client, std::string message)
 
 /* === COMMANDS === */
 
-void	Server::join(Client &client, std::string& channel){
-	std::map<std::string, std::string> input = joinSplitInput(channel);
-	std::map<std::string, std::string>::iterator it2 = input.begin();
-	while (it2 != input.end())
-	{
-		std::cout << CYAN << "Channel:|" << it2->first << "|\tPassword:|" << it2->second << "|" << WHITE << std::endl;
-		it2++;
+void	Server::join(Client &client, t_ircMessage& params){
+	// std::map<std::string, std::string> input = joinSplitInput(params);
+	// std::map<std::string, std::string>::iterator it2 = input.begin();
+	// while (it2 != input.end())
+	// {
+	// 	std::cout << CYAN << "Channel:|" << it2->first << "|\tPassword:|" << it2->second << "|" << WHITE << std::endl;
+	// 	it2++;
+	// }
+	if (params.parameters.empty()) {
+		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
+		return ;
 	}
 	std::list<Channel>::iterator it = this->_channel_list.begin();
-	while (it != this->_channel_list.end() && it->getName() != channel)
+	while (it != this->_channel_list.end() && it->getName() != params.parameters)
 		it++;
 	if (it == this->_channel_list.end())
 	{
-		Channel newCH(channel);
+		Channel newCH(params.parameters);
 		newCH.setOperator(client);
 		this->_channel_list.push_back(newCH);
+		
 	} else {
 		it->setUser(client);
+		//message all clients
 	}
 }
 
-void	Server::cap(Client& client, std::string& params){
-	if (params == "LS") {
+void	Server::cap(Client& client, t_ircMessage& params){
+	if (params.parameters == "LS") {
 		client.setStatus(CAP);
 		sendMessage(client, RPL_CAP);
-std::cout << "DEBUG: sent RPL_CAP";
+		if (VERBOSE >= 3)
+			std::cout << ORANGE << "DEBUG: sent RPL_CAP" << WHITE << std::endl;
 	}
-	if (params == "END")
+	if (params.parameters == "END")
 		client.setStatus(CONNECTED);
 }
 
-void	Server::pong(Client &client, std::string& params){
-	(void)params;
-	sendMessage(client, PONG(params));
+void	Server::pong(Client &client, t_ircMessage& params){
+	sendMessage(client, PONG(params.parameters));
 }
 
-void	Server::nick(Client &client, std::string& params){
-	if (params.empty())
+void	Server::nick(Client &client, t_ircMessage& params){
+	if (params.parametersList.size() == 0)
 		sendMessage(client, ERR_NONICKNAMEGIVEN);
 
-	client.setNick(params);
+	client.setNick(params.parametersList.front());
 	client.setStatus(NICK);
-std::cout << "DEBUG: set nick '" << client.getNick() << "'\n";
-
+	if (VERBOSE >= 3)
+		std::cout << ORANGE << "DEBUG: set nick '" << client.getNick() << WHITE << std::endl;
 	if (client.getStatus() == USER)
 	{
 		client.setStatus(REGISTERED);
@@ -284,18 +287,16 @@ std::cout << "DEBUG: set nick '" << client.getNick() << "'\n";
 	}
 }
 
-void	Server::user(Client &client, std::string& params){
-	size_t	length = params.find(" ");
-
+void	Server::user(Client &client, t_ircMessage& params){
 	if (client.getStatus() == REGISTERED)
 		sendMessage(client, ERR_ALREADYREGISTERED);
 
-	if (length == 0)
+	if (params.parametersList.size() == 0)
 		client.setUsername("unknown");
 	else
-		client.setUsername(params.substr(0, length));
-std::cout << "DEBUG: set username '" << client.getUsername() << "'\n";
-
+		client.setUsername(params.parametersList.front());
+	if (VERBOSE >= 3)
+		std::cout << ORANGE << "DEBUG: set username '" << client.getUsername() << WHITE << std::endl;
 	if (client.getStatus() == NICK)
 	{
 		client.setStatus(REGISTERED);

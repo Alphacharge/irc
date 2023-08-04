@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/03 15:51:09 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 08:41:22 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ Channel& Channel::operator=(Channel const& other)
 		this->_name		= other._name;
 		this->_topic	= other._topic;
 		this->_password	= other._password;
+		this->_inviteonly	= other._inviteonly;
 		this->_mode		= other._mode;
 		this->_users	= other._users;
 		this->_operators = other._operators;
@@ -69,6 +70,7 @@ void	Channel::print(void)
 	std::cout << "|name:\t\t|" << WHITE << this->_name <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|topic:\t\t|" << WHITE << this->_topic <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|password:\t|" << WHITE << this->_password <<  MAGENTA <<"|" << std::endl;
+	std::cout << "|inviteonly:\t|" << WHITE << this->_inviteonly <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|modes:\t\t|" << WHITE;
 	std::set<t_chmode>::const_iterator it = this->_mode.begin();
 	while (it != this->_mode.end())
