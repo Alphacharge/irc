@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 15:39:25 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 15:44:54 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,7 +296,6 @@ void	Server::pass(Client &client, t_ircMessage& params) {
 		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
 	else if (client.getStatus() >= AUTHENTICATED)
 		sendMessage(client, ERR_ALREADYREGISTERED);
-	// else if (_serverPassword == params.parameters.substr(1))
 	else if (_serverPassword == params.parameters)
 	{
 		client.setStatus(AUTHENTICATED);
