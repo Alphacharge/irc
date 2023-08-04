@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 08:39:29 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 08:43:57 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,7 +232,7 @@ void	Server::join(Client &client, t_ircMessage& params){
 	// 	it2++;
 	// }
 	if (params.parameters.empty()) {
-		sendMessage(client, ERR_NEEDMOREPARAMS);
+		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
 		return ;
 	}
 	std::list<Channel>::iterator it = this->_channel_list.begin();
