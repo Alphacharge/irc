@@ -35,6 +35,6 @@ ircserv
 
 # Config
 .vscode
-
+.vscode/settings.json
 # Notes
 notes_fkernbac
