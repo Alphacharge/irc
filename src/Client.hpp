@@ -24,7 +24,7 @@ class Client {
 		pollfd				_clientPollfd;
 		std::string			_nick;
 		std::string			_username;
-		int					_status;	//string? int? makro?
+		int					_status;
 		std::string			_buffer;
 
 	public:

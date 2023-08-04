@@ -24,8 +24,10 @@ Server::Server(int port, std::string password) : _serverPort(port), _serverPassw
 	this->_commandMap["JOIN"] = &Server::join;
 	this->_commandMap["CAP"] = &Server::cap;
 	this->_commandMap["PING"] = &Server::pong;
+	this->_commandMap["PASS"] = &Server::pass;
 	this->_commandMap["NICK"] = &Server::nick;
 	this->_commandMap["USER"] = &Server::user;
+	this->_commandMap["QUIT"] = &Server::quit;
 }
 
 Server::Server(Server const& src) {
@@ -131,9 +133,13 @@ bool	Server::inputParse(std::string const& message, t_ircMessage& clientCommand)
 	}
 	if (!clientCommand.parameters.empty())
 		clientCommand.parametersList = splitString(clientCommand.parameters, ' ');
+
 	/* === START debug parametersList === */
-	std::cout << "DEBUG test parametersList : " << std::endl;
-	for (std::list<std::string>::iterator it = clientCommand.parametersList.begin(); it != clientCommand.parametersList.end(); ++it) {std::cout << *it << std::endl;}
+	if (VERBOSE >= 3)
+	{
+		std::cout << "DEBUG test parametersList : " << std::endl;
+		for (std::list<std::string>::iterator it = clientCommand.parametersList.begin(); it != clientCommand.parametersList.end(); ++it) {std::cout << *it << std::endl;}
+	}
 	/* === END   debug parametersList === */
 
 	return true;
@@ -190,6 +196,8 @@ void	Server::serverStart(void) {
 						handleClient(buffer, clientIterator, commands);
 						/* simulates commands implementation */
 						for (std::vector<t_ircMessage>::iterator it = commands.begin(); it != commands.end(); ++it) {
+							std::cout << "------------\n";
+							std::cout << "Status     : " << clientIterator->getStatus() << std::endl;
 							std::cout << "Prefix     : " << it->prefix << std::endl;
 							std::cout << "Command    : " << it->command << std::endl;
 							std::cout << "Parameters : " << it->parameters << std::endl;
@@ -197,6 +205,8 @@ void	Server::serverStart(void) {
 							std::map<std::string, void (Server::*)(Client&, t_ircMessage&)>::iterator	function = this->_commandMap.find(it->command);
 							if (function != _commandMap.end())
 								(this->*(function->second))(*clientIterator, *it);
+							else if (VERBOSE >= 3)
+								std::cout << "Command not found.\n";
 						}
 						commands.clear();
 					}
@@ -231,6 +241,9 @@ void	Server::sendMessage(Client& client, std::string message)
 /* === COMMANDS === */
 
 void	Server::join(Client &client, t_ircMessage& params){
+	if (client.getStatus() != REGISTERED)
+		return;
+
 	// std::map<std::string, std::string> input = joinSplitInput(params);
 	// std::map<std::string, std::string>::iterator it2 = input.begin();
 	// while (it2 != input.end())
@@ -257,7 +270,7 @@ void	Server::join(Client &client, t_ircMessage& params){
 	}
 }
 
-void	Server::cap(Client& client, t_ircMessage& params){
+void	Server::cap(Client& client, t_ircMessage& params) {
 	if (params.parameters == "LS") {
 		client.setStatus(CAP);
 		sendMessage(client, RPL_CAP);
@@ -268,40 +281,98 @@ void	Server::cap(Client& client, t_ircMessage& params){
 		client.setStatus(CONNECTED);
 }
 
-void	Server::pong(Client &client, t_ircMessage& params){
+void	Server::pong(Client &client, t_ircMessage& params) {
 	sendMessage(client, PONG(params.parameters));
 }
 
-void	Server::nick(Client &client, t_ircMessage& params){
+void	Server::pass(Client &client, t_ircMessage& params) {
+	if (VERBOSE >= 3)
+		std::cout  << ORANGE << "DEBUG: server password " << _serverPassword << " | " << params.parameters.substr(1) << "\n" << WHITE;
+
+	if (params.parameters.empty())
+		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
+	else if (client.getStatus() >= AUTHENTICATED)
+		sendMessage(client, ERR_ALREADYREGISTERED);
+	else if (_serverPassword == params.parameters.substr(1))
+	{
+		client.setStatus(AUTHENTICATED);
+		if (VERBOSE >= 3)
+			std::cout << ORANGE << "DEBUG: Password accepted.\n" << WHITE;
+	}
+	else
+		sendMessage(client, ERR_PASSWDMISMATCH);
+}
+
+void	Server::nick(Client &client, t_ircMessage& params) {
+	std::string	oldNick = client.getNick();
+	std::cout << "DEBUG: oldNICK " << oldNick << "\n";
+
+	//check if a password was supplied
+	if (client.getStatus() < AUTHENTICATED)
+		return;
+
+	//check if there is a name
 	if (params.parametersList.size() == 0)
 		sendMessage(client, ERR_NONICKNAMEGIVEN);
 
+	//MISSING: check character validity ERR_ERRONEUSNICKNAME
+
+	//check uniqueness
+	for (std::vector<Client>::iterator it = _clientVector.begin(); it != _clientVector.end() - 1; it++) {
+		if (VERBOSE >= 3)
+			std::cout << ORANGE << "DEBUG: comparing " << params.parameters << " to " << it->getNick() << WHITE << std::endl;
+		if (it->getStatus() == REGISTERED && it->getNick() == params.parameters) {
+			sendMessage(client, ERR_NICKNAMEINUSE(params.parameters));
+			return;
+		}
+	}
+
+	//set nickname
 	client.setNick(params.parametersList.front());
-	client.setStatus(NICK);
+	client.setStatus(NICKGIVEN);
 	if (VERBOSE >= 3)
-		std::cout << ORANGE << "DEBUG: set nick '" << client.getNick() << WHITE << std::endl;
-	if (client.getStatus() == USER)
+		std::cout << ORANGE << "DEBUG: set nick " << client.getNick() << WHITE << std::endl;
+
+	//check registration status
+	if (client.getStatus() == USERGIVEN)
 	{
 		client.setStatus(REGISTERED);
 		sendMessage(client, RPL_WELCOME(client));
 	}
+	else if (client.getStatus() == REGISTERED)
+		sendMessage(client, NICK(oldNick, client));
 }
 
-void	Server::user(Client &client, t_ircMessage& params){
+void	Server::user(Client& client, t_ircMessage& params) {
+
+	//check if a password was supplied
+	if (client.getStatus() < AUTHENTICATED)
+		return;
+
+	//set username
 	if (client.getStatus() == REGISTERED)
 		sendMessage(client, ERR_ALREADYREGISTERED);
-
-	if (params.parametersList.size() == 0)
+	else if (params.parametersList.size() == 0)
 		client.setUsername("unknown");
 	else
 		client.setUsername(params.parametersList.front());
 	if (VERBOSE >= 3)
-		std::cout << ORANGE << "DEBUG: set username '" << client.getUsername() << WHITE << std::endl;
-	if (client.getStatus() == NICK)
+		std::cout << ORANGE << "DEBUG: set username " << client.getUsername() << WHITE << std::endl;
+
+	//check registration status
+	if (client.getStatus() == NICKGIVEN)
 	{
 		client.setStatus(REGISTERED);
 		sendMessage(client, RPL_WELCOME(client));
 	}
 	else
-		client.setStatus(USER);
+		client.setStatus(USERGIVEN);
+}
+
+void	Server::quit(Client& client, t_ircMessage& params) {
+	(void)params;
+	sendMessage(client, ERROR((std::string)"Connection closed."));
+	client.setStatus(DISCONNECTED);
+	//MISSING: message to all other clients
+	//MISSING: connection not actually closed
 }

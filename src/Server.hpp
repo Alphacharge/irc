@@ -104,8 +104,10 @@ class	Server {
 		void	join(Client&, t_ircMessage&);
 		void	cap(Client&, t_ircMessage&);
 		void	pong(Client&, t_ircMessage&);
+		void	pass(Client&, t_ircMessage&);
 		void	nick(Client&, t_ircMessage&);
 		void	user(Client&, t_ircMessage&);
+		void	quit(Client&, t_ircMessage&);
 
 		//Helper functions
 		void		sendMessage(Client&, std::string);

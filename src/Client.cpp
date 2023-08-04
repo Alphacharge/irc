@@ -17,7 +17,7 @@
 Client::Client(void) {
 	if (VERBOSE >= 3)
 		std::cout << DGREEN << "Client default constructor called" << WHITE << std::endl;
-	_status = 0;
+	_status = 1;
 }
 
 Client::Client(Client const& src) {
@@ -38,6 +38,7 @@ Client&	Client::operator=(Client const& rhs) {
 		this->_clientAddress = rhs._clientAddress;
 		this->_clientPollfd = rhs._clientPollfd;
 		this->_clientSocket = rhs._clientSocket;
+		this->_nick = rhs._nick;
 	}
 	return *this;
 }
