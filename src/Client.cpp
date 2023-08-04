@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:01:01 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 15:59:21 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 15:47:34 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,13 @@ Client&	Client::operator=(Client const& rhs) {
 	if (VERBOSE >= 3)
 		std::cout << BLUE << "Client assignment operator called" << WHITE << std::endl;
 	if (this != &rhs) {
+		this->_clientSocket = rhs._clientSocket;
 		this->_clientAddress = rhs._clientAddress;
 		this->_clientPollfd = rhs._clientPollfd;
-		this->_clientSocket = rhs._clientSocket;
 		this->_nick = rhs._nick;
+		this->_username = rhs._username;
+		this->_status = rhs._status;
+		this->_buffer = rhs._buffer;
 	}
 	return *this;
 }

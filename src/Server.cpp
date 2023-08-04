@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 15:44:54 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 15:49:24 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,9 @@ Server&	Server::operator=(Server const& rhs) {
 		this->_serverAddress = rhs._serverAddress;
 		this->_fds = rhs._fds;
 		this->_serverPollfd = rhs._serverPollfd;
+		this->_clientVector = rhs._clientVector;
+		this->_channel_list = rhs._channel_list;
+		this->_commandMap = rhs._commandMap;
 	}
 	return *this;
 }
