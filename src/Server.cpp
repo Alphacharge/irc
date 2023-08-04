@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 07:38:21 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 10:40:50 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,13 @@ bool	Server::inputParse(std::string const& message, t_ircMessage& clientCommand)
 		if (clientCommand.command[clientCommand.command.size() - 1] == '\r')
 			clientCommand.command = clientCommand.command.substr(0,clientCommand.command.size() - 1);
 	}
+	if (!clientCommand.parameters.empty())
+		splitString(clientCommand.parametersList, clientCommand.parameters);
+	// /* === START debug parametersList === */
+	// std::cout << "DEBUG test parametersList : " << std::endl;
+	// for (std::list<std::string>::iterator it = clientCommand.parametersList.begin(); it != clientCommand.parametersList.end(); ++it) {std::cout << *it << std::endl;}
+	// /* === END   debug parametersList === */
+
 	return true;
 }
 

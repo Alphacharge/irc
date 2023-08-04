@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 07:18:00 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 10:33:29 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,10 @@
 # include "Validation.hpp"
 
 typedef struct s_irc {
-	std::string	prefix;
-	std::string	command;
-	std::string	parameters;
+	std::string				prefix;
+	std::string				command;
+	std::string				parameters;
+	std::list<std::string>	parametersList;
 }		t_ircMessage;
 
 class Client;

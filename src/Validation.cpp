@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Validation.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 07:30:37 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 10:32:04 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,12 @@ std::map<std::string, std::string>	joinSplitInput(std::string const &input)
 		std::cout << BLUE << channels << WHITE << std::endl;
 	}
 	return map;
+}
+
+/* split strings on spaces*/
+void	splitString(std::list<std::string>& parametersList, std::string const& parameters) {
+	std::istringstream	iss(parameters);
+	std::string			token;
+
+	while(getline(iss, token, ' ')) {parametersList.push_back(token);}
 }
