@@ -1,12 +1,12 @@
 /* ************************************************************************** */
-/*                                                                            */
+/*	                                                                        */
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 15:49:24 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 13:04:54 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,6 +251,15 @@ void	Server::sendMessage(Client& client, std::string message)
 	// }
 }
 
+void	Server::broadcastMessage(std::map<std::string, Client> map, std::string channel, std::string message){
+	std::map<std::string, Client>::iterator it = map.begin();
+	while (it != map.end()) {
+		if (message == "JOIN")
+			sendMessage(it->second, JOIN(it->second, inet_ntoa(it->second.getClientAddress().sin_addr), channel));
+		it++;
+	}
+}
+
 /* === COMMANDS === */
 
 void	Server::join(Client &client, t_ircMessage& params){
@@ -265,21 +274,107 @@ void	Server::join(Client &client, t_ircMessage& params){
 	// 	it2++;
 	// }
 	if (params.parameters.empty()) {
-		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
+		sendMessage(client, ERR_NEEDMOREPARAMS(params.command));
 		return ;
 	}
-	std::list<Channel>::iterator it = this->_channel_list.begin();
-	while (it != this->_channel_list.end() && it->getName() != params.parameters)
-		it++;
-	if (it == this->_channel_list.end())
-	{
-		Channel newCH(params.parameters);
-		newCH.setOperator(client);
-		this->_channel_list.push_back(newCH);
-
-	} else {
-		it->setUser(client);
-		//message all clients
+std::cout << "1\n";
+	std::list<std::string> tojoin = splitString(params.parametersList.front(), ',');
+std::cout << "2\n";
+	std::list<std::string> tojoinpw = splitString(params.parametersList.back(), ',');
+std::cout << "3\n";
+	std::list<std::string>::iterator it_join = tojoin.begin();
+std::cout << "4\n";
+	std::list<std::string>::iterator it_joinpw = tojoinpw.begin();
+std::cout << "5\n";
+	while (it_join != tojoin.end()) {
+		//--->We found on official Server no Character that triggers this error
+		// if (!isValidChannelName(*it_join)) {
+		// 	sendMessage(client, ERR_BADCHANMASK(*it_join));
+		// 	return ;
+		// }
+		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
+std::cout << "6\n";
+		while (it_chan != this->_channel_list.end()) {
+			if (VERBOSE >= 3)
+				std::cout << CYAN << client.getNick() << " tries to join " << *it_join << ". Testing: " << it_chan->getName() << WHITE << std::endl;
+std::cout << "7\n";
+			if (it_chan->getName() == *it_join && it_chan->getInvite() == true) {
+				sendMessage(client, ERR_INVITEONLYCHAN(*it_join));
+				return ;
+			}
+std::cout << "8\n";
+			if (it_chan->getName() == *it_join && it_chan->getAmountOfAll() == it_chan->getLimit()) {
+				sendMessage(client, ERR_CHANNELISFULL(*it_join));
+				return ;
+			}
+std::cout << "9\n";
+			//possible proble if no password exist in the command, also valid iterator of password is not secured
+			// if (it_chan->getName() == *it_join && it_chan->getPassword() != *it_joinpw) {
+			// 	sendMessage(client, ERR_BADCHANNELKEY(*it_join));
+			// 	return ;
+			// }
+std::cout << "10\n";
+			if (it_chan->getName() == *it_join && it_chan->isBanned(client)) {
+				sendMessage(client, ERR_BANNEDFROMCHAN(*it_join));
+				return ;
+			}
+std::cout << "11\n";
+			//--->We don't have a Channellimit, if we want just create this variables and the getter
+			// if (it_chan->getName() == *it_join && this->_channelLimit == client->getAmountOfChannels()) {
+			// 	sendMessage(client, ERR_TOOMANYCHANNELS(*it_join));
+			// 	return ;
+			// }
+			//--->We don't support shortnames for channel names
+			//ERR_TOOMANYTARGETS
+			//	Returned to a client which is attempting to JOIN a safe
+			//	channel using the shortname when there are more than one
+			//	such channel.
+			//--->We don't support delay mechanism
+			//ERR_UNAVAILRESOURCE
+			//	Returned by a server to a user trying to join a channel
+			//	currently blocked by the channel delay mechanism.
+			it_chan++;
+		}
+		//--->Not clear in which case we send Nosuchchannel, because we create
+		// if (it_chan == this->_channel_list.end()) {
+		// 	sendMessage(client, ERR_NOSUCHCHANNEL(*it_join));
+		// 	return ;
+		// }
+std::cout << "12\n";
+		if (it_chan == this->_channel_list.end())
+		{
+			Channel newCH(*it_join);
+std::cout << "13" + client.getNick() << std::endl;
+			newCH.setOperator(client);
+std::cout << "14\n";
+			this->_channel_list.push_back(newCH);
+std::cout << "15\n";
+			broadcastMessage(newCH.getOperators(), newCH.getName(), "JOIN");
+std::cout << "16\n";
+			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, newCH.getName(), newCH.genUserlist()));
+std::cout << "17\n";
+			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, newCH.getName()));
+			newCH.print();
+		} else {
+std::cout << "18\n";
+			it_chan->setUser(client);
+std::cout << "19\n";
+			broadcastMessage(it_chan->getUsers(), it_chan->getName(), "JOIN");
+std::cout << "20\n";
+			broadcastMessage(it_chan->getOperators(), it_chan->getName(), "JOIN");
+std::cout << "21\n";
+			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName(), it_chan->genUserlist()));
+std::cout << "22\n";
+			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName()));
+		}
+		//Send all back:
+		// :rt!~e@188.244.102.158 JOIN #this
+		//Send client back: 
+		// :Stopover.ky.us.starlink-irc.org 353 rt = #this :rt @doush
+		// :Stopover.ky.us.starlink-irc.org 366 rt #this :End of /NAMES list.
+std::cout << "23\n";
+		it_join++;
+		it_joinpw++;
 	}
 }
 
