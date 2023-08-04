@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 07:18:00 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 08:25:35 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,11 +100,11 @@ class	Server {
 		void		handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
 
 		//Commands
-		void		join(Client &client, std::string& channel);
-		void	cap(Client& client, std::string& params);
-		void	pong(Client &client, std::string& params);
-		void	nick(Client &client, std::string& params);
-		void	user(Client &client, std::string& params);
+		void	join(Client&, t_ircMessage&);
+		void	cap(Client&, t_ircMessage&);
+		void	pong(Client&, t_ircMessage&);
+		void	nick(Client&, t_ircMessage&);
+		void	user(Client&, t_ircMessage&);
 
 		//Helper functions
 		void		sendMessage(Client&, std::string);
