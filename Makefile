@@ -6,7 +6,7 @@
 #    By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/02 16:33:15 by rbetz             #+#    #+#              #
-#    Updated: 2023/08/03 08:30:00 by rbetz            ###   ########.fr        #
+#    Updated: 2023/08/04 07:31:35 by rbetz            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ CXXFLAGS	+=	-g #-fsanitize=address
 VPATH	:=	src/
 
 SRC_F	:=	ircserv.cpp Server.cpp Client.cpp Channel.cpp
-# SRC_F	+=
+SRC_F	+=	Validation.cpp
 
 ###			###			OBJECTS			###			###
 OBJ_D	:=	./obj
@@ -68,6 +68,10 @@ endif
 
 all: message
 	@$(MAKE) -j $(NAME)
+
+run:
+	@$(MAKE) -j $(NAME)
+	./ircserv 8080 pw
 
 lsan: clean_lsan $(OBJ_D) $(LSAN_F)
 	@$(MAKE) -j $(NAME)

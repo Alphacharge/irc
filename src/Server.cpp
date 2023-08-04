@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 17:52:07 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 07:38:21 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,6 +227,13 @@ void	Server::sendMessage(Client& client, std::string message)
 /* === COMMANDS === */
 
 void	Server::join(Client &client, std::string& channel){
+	std::map<std::string, std::string> input = joinSplitInput(channel);
+	std::map<std::string, std::string>::iterator it2 = input.begin();
+	while (it2 != input.end())
+	{
+		std::cout << CYAN << "Channel:|" << it2->first << "|\tPassword:|" << it2->second << "|" << WHITE << std::endl;
+		it2++;
+	}
 	std::list<Channel>::iterator it = this->_channel_list.begin();
 	while (it != this->_channel_list.end() && it->getName() != channel)
 		it++;
