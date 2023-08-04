@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 08:40:26 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 11:17:59 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,11 @@ class Channel {
 	/*---------------	Methods			---------------*/
 	void			print(void);
 	std::string		getName(void) const;
+	bool			getInvite(void) const;
 	void			setOperator(Client &client);
 	void			setUser(Client &client);
+	int				getAmountOfAll();
+	int				getLimit();
 
 	private:
 	Channel(void);
@@ -48,6 +51,7 @@ class Channel {
 	std::string						_topic;
 	std::string						_password;
 	bool							_inviteonly;
+	int								_limit;
 	std::set<t_chmode>				_mode;
 	std::map<std::string, Client>	_users;
 	std::map<std::string, Client>	_operators;

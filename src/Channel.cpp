@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 08:41:22 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 11:20:41 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,10 +102,21 @@ std::string	Channel::getName(void) const{
 	return this->_name;
 }
 
+bool		Channel::getInvite(void) const{
+	return this->_inviteonly;
+}
+
 void		Channel::setOperator(Client &client) {
 	this->_operators[client.getNick()] = client;
 }
 
 void		Channel::setUser(Client &client) {
 	this->_users[client.getNick()] = client;
+}
+
+int				Channel::getAmountOfAll(){
+	return (this->_users.size() + this->_operators.size());
+}
+int				Channel::getLimit(){
+	return this->_limit;
 }
