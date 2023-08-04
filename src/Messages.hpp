@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/02 16:20:34 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 08:39:38 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -340,7 +340,7 @@
 // # define ERR_ACCEPTNOT() ()
 // # define ERR_NOHIDING() ()
 // # define ERR_NOTFORHALFOPS() ()
-// # define ERR_NEEDMOREPARAMS(params)	(std::string(":irc42 461 " + params + " :Not enough parameters\n"))
+# define ERR_NEEDMOREPARAMS(params)	(std::string(":irc42 461 " + params + " :Not enough parameters\n"))
 # define ERR_ALREADYREGISTERED		(std::string(":irc42 462 :Already registered\n"))
 // # define ERR_NOPERMFORHOST() ()
 // # define ERR_PASSWDMISMATCH() ()
