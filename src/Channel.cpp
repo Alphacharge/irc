@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 11:20:41 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 16:18:14 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ Channel::Channel(std::string &name)
 	if (VERBOSE >= 3)
 		std::cout << DGREEN << "Channel argument constructor called" << WHITE << std::endl;
 	this->_name = name;
+	this->_inviteonly = false;
+	this->_limit = -1;
 }
 
 Channel::Channel(Channel const& other)
@@ -41,6 +43,7 @@ Channel::~Channel(void)
 	if (VERBOSE >= 3)
 		std::cout << RED << "Channel destructor called" << WHITE << std::endl;
 	this->_mode.clear();
+	this->_banns.clear();
 	this->_users.clear();
 	this->_operators.clear();
 }
@@ -56,7 +59,9 @@ Channel& Channel::operator=(Channel const& other)
 		this->_topic	= other._topic;
 		this->_password	= other._password;
 		this->_inviteonly	= other._inviteonly;
+		this->_limit		= other._limit;
 		this->_mode		= other._mode;
+		this->_banns		= other._banns;
 		this->_users	= other._users;
 		this->_operators = other._operators;
 	}
@@ -71,6 +76,7 @@ void	Channel::print(void)
 	std::cout << "|topic:\t\t|" << WHITE << this->_topic <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|password:\t|" << WHITE << this->_password <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|inviteonly:\t|" << WHITE << this->_inviteonly <<  MAGENTA <<"|" << std::endl;
+	std::cout << "|limit:\t|" << WHITE << this->_limit <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|modes:\t\t|" << WHITE;
 	std::set<t_chmode>::const_iterator it = this->_mode.begin();
 	while (it != this->_mode.end())
@@ -102,6 +108,10 @@ std::string	Channel::getName(void) const{
 	return this->_name;
 }
 
+std::string	Channel::getPassword(void) const{
+	return this->_password;
+}
+
 bool		Channel::getInvite(void) const{
 	return this->_inviteonly;
 }
@@ -110,13 +120,59 @@ void		Channel::setOperator(Client &client) {
 	this->_operators[client.getNick()] = client;
 }
 
+std::map<std::string, Client>	Channel::getOperators(void){
+	return this->_operators;
+}
+
 void		Channel::setUser(Client &client) {
 	this->_users[client.getNick()] = client;
+}
+
+std::map<std::string, Client>	Channel::getUsers(void){
+	return this->_users;
 }
 
 int				Channel::getAmountOfAll(){
 	return (this->_users.size() + this->_operators.size());
 }
+
 int				Channel::getLimit(){
 	return this->_limit;
+}
+
+void			Channel::bann(Client &client) {
+	if (!isBanned(client))
+		this->_banns.insert(&client);
+}
+
+bool			Channel::isBanned(Client &client) {
+	std::set<Client*>::iterator it = this->_banns.find(&client);
+	if (it == this->_banns.end())
+		return false;
+	return true;
+}
+
+std::string		Channel::genUserlist(void){
+	std::string userlist;
+	std::map<std::string, Client>::iterator it = this->_users.begin();
+	if (it != this->_users.end()) {
+		userlist += it->second.getNick();
+		it++;
+	}
+	while (it != this->_users.end())
+	{
+		userlist += " " + it->second.getNick();
+		it++;
+	}
+	it = this->_operators.begin();
+	if (it != this->_operators.end() && userlist.empty()){
+		userlist += "@" + it->second.getNick();
+		it++;
+	}
+	while (it != this->_operators.end())
+	{
+		userlist += " @" + it->second.getNick();
+		it++;
+	}
+	return userlist;
 }

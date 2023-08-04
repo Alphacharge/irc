@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 11:17:59 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 15:03:29 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,13 +36,19 @@ class Channel {
 	Channel&	operator=(Channel const& other);
 
 	/*---------------	Methods			---------------*/
-	void			print(void);
-	std::string		getName(void) const;
-	bool			getInvite(void) const;
-	void			setOperator(Client &client);
-	void			setUser(Client &client);
-	int				getAmountOfAll();
-	int				getLimit();
+	void							print(void);
+	std::string						getName(void) const;
+	std::string						getPassword(void) const;
+	bool							getInvite(void) const;
+	void							setOperator(Client &client);
+	std::map<std::string, Client>	getOperators(void);
+	void							setUser(Client &client);
+	std::map<std::string, Client>	getUsers(void);
+	int								getAmountOfAll();
+	int								getLimit();
+	void							bann(Client &client);
+	bool							isBanned(Client &client);
+	std::string						genUserlist(void);
 
 	private:
 	Channel(void);
@@ -53,6 +59,7 @@ class Channel {
 	bool							_inviteonly;
 	int								_limit;
 	std::set<t_chmode>				_mode;
+	std::set<Client*>				_banns;
 	std::map<std::string, Client>	_users;
 	std::map<std::string, Client>	_operators;
 };
