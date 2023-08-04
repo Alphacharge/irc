@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 15:18:02 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/04 15:39:25 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,16 +131,20 @@ bool	Server::inputParse(std::string const& message, t_ircMessage& clientCommand)
 		if (clientCommand.command[clientCommand.command.size() - 1] == '\r')
 			clientCommand.command = clientCommand.command.substr(0,clientCommand.command.size() - 1);
 	}
+	/* remove initial ':' if present, e.g. KVirc PASS :pw */
+	if (!clientCommand.parameters.empty() && clientCommand.parameters.size() > 1 && clientCommand.parameters[0] == ':')
+		clientCommand.parameters = clientCommand.parameters.substr(1,clientCommand.parameters.size());
+	/* split parameters string on space, into list of strings */
 	if (!clientCommand.parameters.empty())
 		clientCommand.parametersList = splitString(clientCommand.parameters, ' ');
 
-	/* === START debug parametersList === */
-	if (VERBOSE >= 3)
-	{
-		std::cout << "DEBUG test parametersList : " << std::endl;
-		for (std::list<std::string>::iterator it = clientCommand.parametersList.begin(); it != clientCommand.parametersList.end(); ++it) {std::cout << *it << std::endl;}
-	}
-	/* === END   debug parametersList === */
+	// /* === START debug parametersList === */
+	// if (VERBOSE >= 3)
+	// {
+	// 	std::cout << "DEBUG test parametersList : " << std::endl;
+	// 	for (std::list<std::string>::iterator it = clientCommand.parametersList.begin(); it != clientCommand.parametersList.end(); ++it) {std::cout << *it << std::endl;}
+	// }
+	// /* === END   debug parametersList === */
 
 	return true;
 }
@@ -292,7 +296,8 @@ void	Server::pass(Client &client, t_ircMessage& params) {
 		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
 	else if (client.getStatus() >= AUTHENTICATED)
 		sendMessage(client, ERR_ALREADYREGISTERED);
-	else if (_serverPassword == params.parameters.substr(1))
+	// else if (_serverPassword == params.parameters.substr(1))
+	else if (_serverPassword == params.parameters)
 	{
 		client.setStatus(AUTHENTICATED);
 		if (VERBOSE >= 3)
