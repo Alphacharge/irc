@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:45:04 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 08:45:30 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 08:49:37 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,9 +194,9 @@ void	Server::serverStart(void) {
 							std::cout << "Command    : " << it->command << std::endl;
 							std::cout << "Parameters : " << it->parameters << std::endl;
 
-							std::map<std::string, void (Server::*)(Client&, std::string&)>::iterator	function = this->_commandMap.find(it->command);
+							std::map<std::string, void (Server::*)(Client&, t_ircMessage&)>::iterator	function = this->_commandMap.find(it->command);
 							if (function != _commandMap.end())
-								(this->*(function->second))(*clientIterator, it->parameters);
+								(this->*(function->second))(*clientIterator, *it);
 						}
 						commands.clear();
 					}

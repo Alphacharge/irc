@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 08:45:06 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 08:47:44 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ class	Server {
 		//Channels
 		std::list<Channel>	_channel_list;
 		//Functions
-		std::map<std::string, void (Server::*)(Client&, std::string&)>	_commandMap;
+		std::map<std::string, void (Server::*)(Client&, t_ircMessage&)>	_commandMap;
 		Server(void);
 
 	public:
