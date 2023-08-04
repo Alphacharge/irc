@@ -29,9 +29,9 @@ class Client {
 
 	public:
 		Client(void);
-		Client(Client const&);
+		// Client(Client const&);
 		~Client(void);
-		Client&	operator=(Client const&);
+		// Client&	operator=(Client const&);
 
 		void	setClientSocket(int const&);
 		void	setClientAddress(struct sockaddr_in const&);

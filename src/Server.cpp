@@ -89,6 +89,10 @@ void	Server::serverSetup(void) {
 		this->_serverPollfd.fd = this->_serverSocket;
 		this->_serverPollfd.events = POLLIN;
 		this->_fds.push_back(this->_serverPollfd);
+
+		//setting socket to non-blocking as required in subject
+		fcntl(_serverSocket, F_SETFL, O_NONBLOCK);
+
 		std::cout << "Server startup completed. Listening on port " << this->_serverPort << std::endl;
 	}
 	catch (std::exception &e) {
@@ -109,6 +113,9 @@ void	Server::addClient(void) {
 	newClient.setStatus(CONNECTED);
 	this->_clientVector.push_back(newClient);
 	this->_fds.push_back(newClient.getClientPollfd());
+
+	//setting socket to non-blocking as required in subject
+	fcntl(newClient.getClientSocket(), F_SETFL, O_NONBLOCK);
 }
 
 bool	Server::inputParse(std::string const& message, t_ircMessage& clientCommand) {
@@ -324,10 +331,10 @@ void	Server::nick(Client &client, t_ircMessage& params) {
 	//MISSING: check character validity ERR_ERRONEUSNICKNAME
 
 	//check uniqueness
-	for (std::vector<Client>::iterator it = _clientVector.begin(); it != _clientVector.end() - 1; it++) {
+	for (std::vector<Client>::iterator it = _clientVector.begin(); it != _clientVector.end(); it++) {
 		if (VERBOSE >= 3)
 			std::cout << ORANGE << "DEBUG: comparing " << params.parameters << " to " << it->getNick() << WHITE << std::endl;
-		if (it->getStatus() == REGISTERED && it->getNick() == params.parameters) {
+		if (it->getStatus() >= AUTHENTICATED && it->getNick() == params.parameters) {
 			sendMessage(client, ERR_NICKNAMEINUSE(params.parameters));
 			return;
 		}
@@ -380,5 +387,4 @@ void	Server::quit(Client& client, t_ircMessage& params) {
 	sendMessage(client, ERROR((std::string)"Connection closed."));
 	client.setStatus(DISCONNECTED);
 	//MISSING: message to all other clients
-	//MISSING: connection not actually closed
 }
