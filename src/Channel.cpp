@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 16:18:14 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/05 19:54:10 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,11 @@ bool		Channel::getInvite(void) const{
 }
 
 void		Channel::setOperator(Client &client) {
+	// if (VERBOSE >= 3)
+		// std::cout << ORANGE "xx" << WHITE << std::endl;
 	this->_operators[client.getNick()] = client;
+	// if (VERBOSE >= 3)
+	// 	std::cout << ORANGE "yy" << WHITE << std::endl;
 }
 
 std::map<std::string, Client>	Channel::getOperators(void){

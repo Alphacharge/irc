@@ -254,6 +254,7 @@ void	Server::sendMessage(Client& client, std::string message)
 void	Server::broadcastMessage(std::map<std::string, Client> map, std::string channel, std::string message){
 	std::map<std::string, Client>::iterator it = map.begin();
 	while (it != map.end()) {
+		it->second.print();
 		if (message == "JOIN")
 			sendMessage(it->second, JOIN(it->second, inet_ntoa(it->second.getClientAddress().sin_addr), channel));
 		it++;
@@ -263,16 +264,9 @@ void	Server::broadcastMessage(std::map<std::string, Client> map, std::string cha
 /* === COMMANDS === */
 
 void	Server::join(Client &client, t_ircMessage& params){
-	if (client.getStatus() != REGISTERED)
-		return;
-
-	// std::map<std::string, std::string> input = joinSplitInput(params);
-	// std::map<std::string, std::string>::iterator it2 = input.begin();
-	// while (it2 != input.end())
-	// {
-	// 	std::cout << CYAN << "Channel:|" << it2->first << "|\tPassword:|" << it2->second << "|" << WHITE << std::endl;
-	// 	it2++;
-	// }
+	//--->USer and nick and still not reg???
+	// if (client.getStatus() != REGISTERED)
+	//	return;
 	if (params.parameters.empty()) {
 		sendMessage(client, ERR_NEEDMOREPARAMS(params.command));
 		return ;
@@ -333,7 +327,8 @@ std::cout << "11\n";
 			//ERR_UNAVAILRESOURCE
 			//	Returned by a server to a user trying to join a channel
 			//	currently blocked by the channel delay mechanism.
-			it_chan++;
+			if (*it_join != it_chan->getName())
+				it_chan++;
 		}
 		//--->Not clear in which case we send Nosuchchannel, because we create
 		// if (it_chan == this->_channel_list.end()) {
@@ -351,9 +346,9 @@ std::cout << "14\n";
 std::cout << "15\n";
 			broadcastMessage(newCH.getOperators(), newCH.getName(), "JOIN");
 std::cout << "16\n";
-			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, newCH.getName(), newCH.genUserlist()));
+			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join, newCH.genUserlist()));
 std::cout << "17\n";
-			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, newCH.getName()));
+			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join));
 			newCH.print();
 		} else {
 std::cout << "18\n";
