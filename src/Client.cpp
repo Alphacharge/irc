@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:01:01 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 15:47:34 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/05 20:31:17 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,4 +107,12 @@ void	Client::appendBuffer(std::string const& str) {
 
 int	Client::getStatus(void) {
 	return (_status);
+}
+
+void	Client::print(void) {
+	std::cout << LGREEN << "-----Printing Client:-----" << WHITE << std::endl;
+	std::cout << LGREEN << "Name:\t|" << this->_username << WHITE << std::endl;
+	std::cout << LGREEN << "Nick:\t|" << this->_nick << WHITE << std::endl;
+	std::cout << LGREEN << "Status:\t|" << this->_status << WHITE << std::endl;
+	std::cout << LGREEN << "Buffer:\t|" << this->_buffer << WHITE << std::endl;
 }
