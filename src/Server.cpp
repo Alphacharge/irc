@@ -30,6 +30,7 @@ Server::Server(int port, std::string password) : _serverPort(port), _serverPassw
 	this->_commandMap["NICK"] = &Server::nick;
 	this->_commandMap["USER"] = &Server::user;
 	this->_commandMap["QUIT"] = &Server::quit;
+	this->_commandMap["PRIVMSG"] = &Server::privmsg;
 }
 
 Server::Server(Server const &src)
@@ -81,7 +82,7 @@ char const *Server::PollException::what() const throw() { return ("Error in poll
 char const *Server::FdException::what() const throw() { return ("Error with the connection."); }
 
 /* === FUNCTIONS === */
-void Server::serverSetup(void)
+void	Server::serverSetup(void)
 {
 	try
 	{
@@ -121,7 +122,7 @@ void Server::serverSetup(void)
 	}
 }
 
-void Server::addClient(void)
+void	Server::addClient(void)
 {
 	Client newClient;
 	socklen_t clientAddressLen = sizeof(newClient.getClientAddress());
@@ -143,7 +144,7 @@ void Server::addClient(void)
 	fcntl(newClient.getClientSocket(), F_SETFL, O_NONBLOCK);
 }
 
-bool Server::inputParse(std::string const &message, t_ircMessage &clientCommand)
+bool	Server::inputParse(std::string const &message, t_ircMessage &clientCommand)
 {
 	size_t pos = 0;
 	if (!message.empty() && message[pos] == ':')
@@ -185,7 +186,7 @@ bool Server::inputParse(std::string const &message, t_ircMessage &clientCommand)
 	return true;
 }
 
-bool Server::handleClient(char *buffer, std::vector<Client>::iterator &clientIterator, std::vector<t_ircMessage> &commands) {
+bool	Server::handleClient(char *buffer, std::vector<Client>::iterator &clientIterator, std::vector<t_ircMessage> &commands) {
 	std::istringstream	iss(buffer);
 	std::string 		tmpBuffer;
 	t_ircMessage 		clientCommand;
@@ -210,7 +211,7 @@ bool Server::handleClient(char *buffer, std::vector<Client>::iterator &clientIte
 }
 
 /*Starts up the server and waits in poll until an event is registered.*/
-void Server::serverStart(void)
+void	Server::serverStart(void)
 {
 	char buffer[1024];
 	int ret;
@@ -275,7 +276,7 @@ void Server::serverStart(void)
 	}
 }
 
-void Server::sendMessage(Client &client, std::string message)
+void	Server::sendMessage(Client &client, std::string message)
 {
 	size_t bytesSent = 0;
 
@@ -297,7 +298,7 @@ void	Server::broadcastMessage(std::map<std::string, Client> map, std::string cha
 
 /* === COMMANDS === */
 
-void Server::join(Client &client, t_ircMessage &params)
+void	Server::join(Client &client, t_ircMessage &params)
 {
 	if (client.getStatus() != REGISTERED)
 		return;
@@ -414,7 +415,7 @@ std::cout << "23\n";
 	}
 }
 
-void Server::cap(Client &client, t_ircMessage &params)
+void	Server::cap(Client &client, t_ircMessage &params)
 {
 	if (params.parameters == "LS")
 	{
@@ -427,12 +428,12 @@ void Server::cap(Client &client, t_ircMessage &params)
 		client.setStatus(CONNECTED);
 }
 
-void Server::pong(Client &client, t_ircMessage &params)
+void	Server::pong(Client &client, t_ircMessage &params)
 {
 	sendMessage(client, PONG(params.parameters));
 }
 
-void Server::pass(Client &client, t_ircMessage &params)
+void	Server::pass(Client &client, t_ircMessage &params)
 {
 	if (VERBOSE >= 3)
 		std::cout << ORANGE << "DEBUG: server password " << _serverPassword << " | " << params.parameters.substr(1) << "\n"
@@ -453,7 +454,7 @@ void Server::pass(Client &client, t_ircMessage &params)
 		sendMessage(client, ERR_PASSWDMISMATCH);
 }
 
-void Server::nick(Client &client, t_ircMessage &params)
+void	Server::nick(Client &client, t_ircMessage &params)
 {
 	std::string oldNick = client.getNick();
 	std::cout << "DEBUG: oldNICK " << oldNick << "\n";
@@ -494,7 +495,7 @@ void Server::nick(Client &client, t_ircMessage &params)
 		sendMessage(client, NICK(oldNick, client));
 }
 
-void Server::user(Client &client, t_ircMessage &params)
+void	Server::user(Client &client, t_ircMessage &params)
 {
 
 	// check if a password was supplied
@@ -521,7 +522,7 @@ void Server::user(Client &client, t_ircMessage &params)
 		client.setStatus(USERGIVEN);
 }
 
-void Server::quit(Client &client, t_ircMessage &params)
+void	Server::quit(Client &client, t_ircMessage &params)
 {
 	(void)params;
 	sendMessage(client, ERROR((std::string) "Connection closed."));
@@ -529,8 +530,9 @@ void Server::quit(Client &client, t_ircMessage &params)
 	//MISSING: message to all other clients
 }
 
-// void Server::privmsg(Client &client, t_ircMessage &params)
-// {
-// 	size_t	spacePos = params.parameters.find(" ");
+void	Server::privmsg(Client &client, t_ircMessage &params)
+{
+	size_t	spacePos = params.parameters.find(" ");
+	if (spacePos == std::string::npos) {}
 
-// }
+}

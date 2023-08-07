@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/07 09:40:01 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/07 09:43:34 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ class	Server {
 		void	nick(Client&, t_ircMessage&);
 		void	user(Client&, t_ircMessage&);
 		void	quit(Client&, t_ircMessage&);
+		void	privmsg(Client&, t_ircMessage&);
 
 		//Helper functions
 		void		sendMessage(Client&, std::string);
