@@ -342,7 +342,7 @@ std::cout << "7\n";
 			Channel newCH(*it_join);
 // std::cout << "13\n";
 			newCH.setOperator(client);
-			// newCH.setPassword(*it_joinpw);
+			newCH.setPassword(*it_joinpw);
 // std::cout << "14\n";
 			this->_channel_list.push_back(newCH);
 // std::cout << "15\n";

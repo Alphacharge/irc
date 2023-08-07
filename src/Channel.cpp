@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/05 19:54:10 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/07 09:24:45 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,11 @@ std::string	Channel::getName(void) const{
 
 std::string	Channel::getPassword(void) const{
 	return this->_password;
+}
+
+void	Channel::setPassword(std::string &pw)
+{
+	this->_password = pw;
 }
 
 bool		Channel::getInvite(void) const{
