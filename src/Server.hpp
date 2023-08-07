@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/07 13:36:42 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/07 14:50:49 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,7 @@ class	Server {
 		void	user(Client&, t_ircMessage&);
 		void	quit(Client&, t_ircMessage&);
 		void	privmsg(Client&, t_ircMessage&);
+		void	shutdown(Client&, t_ircMessage&);
 
 		//Helper functions
 		void		sendMessage(Client&, std::string);

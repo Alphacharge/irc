@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/07 14:43:44 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/07 13:50:27 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -357,7 +357,7 @@
 # define ERR_INVITEONLYCHAN(params) (std::string(params + " :Cannot join channel (+i)\n"))
 # define ERR_BANNEDFROMCHAN(params) (std::string(params + " :Cannot join channel (+b)\n"))
 # define ERR_BADCHANNELKEY(params) (std::string(params + " :Cannot join channel (+k)\n"))
-// # define ERR_BADCHANMASK(params) (std::string(params + " :Bad Channel Mask"))
+# define ERR_BADCHANMASK(params) (std::string(params + " :Bad Channel Mask"))
 // # define ERR_NOCHANMODES() ()
 // # define ERR_NEEDREGGEDNICK() ()
 // # define ERR_BANLISTFULL() ()
