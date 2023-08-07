@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/07 13:40:27 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/07 14:43:44 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,9 +284,9 @@
 // # define RPL_NOUSERS() ()
 // # define RPL_HOSTHIDDEN() ()
 // # define ERR_UNKNOWNERROR() ()
-# define ERR_NOSUCHNICK(params) (std::string (params + " :No such nick/channel"))
+# define ERR_NOSUCHNICK(params) (std::string (params + " :No such nick/channel\n"))
 // # define ERR_NOSUCHSERVER() ()
-# define ERR_NOSUCHCHANNEL(params) (std::string(params + " :No such channel"))
+# define ERR_NOSUCHCHANNEL(params) (std::string(params + " :No such channel\n"))
 // # define ERR_CANNOTSENDTOCHAN() ()
 // # define ERR_TOOMANYCHANNELS(params) (std::string(params + " :You have joined too many channels"))
 // # define ERR_WASNOSUCHNICK() ()
@@ -295,7 +295,7 @@
 // # define ERR_NOCOLORSONCHAN() ()
 // # define ERR_NOORIGIN() ()
 // # define ERR_NORECIPIENT() ()
-# define ERR_NOTEXTTOSEND(params) (std::string(params + ":irc42 401 :No such nick/channel"))
+# define ERR_NOTEXTTOSEND(params) (std::string(params + ":irc42 401 :No such nick/channel\n"))
 // # define ERR_NOTOPLEVEL() ()
 // # define ERR_WILDTOPLEVEL() ()
 // # define ERR_BADMASK() ()

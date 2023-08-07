@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/07 10:27:51 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/07 14:22:44 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ bool	isValidChannelName(std::string const &name)
 		return false;
 	if (name.find('\a', 0) != name.npos)
 		return false;
-	if (name.length() > 0 && (name[0] == '&' || name[0] == '#'))
+	if (name.length() > 0 && !(name[0] == '&' || name[0] == '#'))
 		return false;
-	return false;
+	return true;
 }
 
 /* splits the stringToBeSPlit on delimiter and returns a list of splits  */
