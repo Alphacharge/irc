@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 09:38:50 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/03 15:56:39 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/05 20:15:37 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ class Client {
 
 	public:
 		Client(void);
-		// Client(Client const&);
+		Client(Client const&);
 		~Client(void);
-		// Client&	operator=(Client const&);
+		Client&	operator=(Client const&);
 
 		void	setClientSocket(int const&);
 		void	setClientAddress(struct sockaddr_in const&);
@@ -41,6 +41,7 @@ class Client {
 		void	setUsername(std::string);
 		void	setStatus(int);
 		void	appendBuffer(std::string const&);
+		void	print(void);
 
 		int&				getClientSocket(void);
 		struct sockaddr_in&	getClientAddress(void);

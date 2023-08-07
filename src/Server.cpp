@@ -46,6 +46,7 @@ Server::~Server(void)
 		std::cout << RED << "Server destructor called" << WHITE << std::endl;
 	this->_fds.clear();
 	this->_clientVector.clear();
+	this->_channel_list.clear();
 }
 
 Server &Server::operator=(Server const &rhs)
@@ -281,48 +282,39 @@ void	Server::sendMessage(Client &client, std::string message)
 	size_t bytesSent = 0;
 
 	// loop might not be needed?
-	//  while (bytesSent < message.length())
-	//  {
+	 while (bytesSent < message.length())
+	 {
 	bytesSent += send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
-	// }
+	}
 }
 
-void	Server::broadcastMessage(std::map<std::string, Client> map, std::string channel, std::string message){
+void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent){
 	std::map<std::string, Client>::iterator it = map.begin();
 	while (it != map.end()) {
-		if (message == "JOIN")
-			sendMessage(it->second, JOIN(it->second, inet_ntoa(it->second.getClientAddress().sin_addr), channel));
+			sendMessage(it->second, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), channelName, type, textToBeSent));
 		it++;
 	}
 }
 
 /* === COMMANDS === */
 
-void	Server::join(Client &client, t_ircMessage &params)
-{
-	if (client.getStatus() != REGISTERED)
-		return;
-
-	// std::map<std::string, std::string> input = joinSplitInput(params);
-	// std::map<std::string, std::string>::iterator it2 = input.begin();
-	// while (it2 != input.end())
-	// {
-	// 	std::cout << CYAN << "Channel:|" << it2->first << "|\tPassword:|" << it2->second << "|" << WHITE << std::endl;
-	// 	it2++;
-	// }
+void	Server::join(Client &client, t_ircMessage& params){
+	//---> that does not work @ fkernbac
+	// if (client.getStatus() != REGISTERED)
+	// 	return;
+// std::cout << "1\n";
 	if (params.parameters.empty()) {
 		sendMessage(client, ERR_NEEDMOREPARAMS(params.command));
 		return ;
 	}
-std::cout << "1\n";
-	std::list<std::string> tojoin = splitString(params.parametersList.front(), ',');
 std::cout << "2\n";
+	if (params.parametersList.size() == 1)
+		params.parametersList.push_back("");
+	std::list<std::string> tojoin = splitString(params.parametersList.front(), ',');
 	std::list<std::string> tojoinpw = splitString(params.parametersList.back(), ',');
-std::cout << "3\n";
 	std::list<std::string>::iterator it_join = tojoin.begin();
-std::cout << "4\n";
 	std::list<std::string>::iterator it_joinpw = tojoinpw.begin();
-std::cout << "5\n";
+	std::cout << RED << "Channel:|" << *it_join << "|PW:|" << *it_join << "|" << WHITE << std::endl;
 	while (it_join != tojoin.end()) {
 		//--->We found on official Server no Character that triggers this error
 		// if (!isValidChannelName(*it_join)) {
@@ -330,32 +322,31 @@ std::cout << "5\n";
 		// 	return ;
 		// }
 		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
-std::cout << "6\n";
+std::cout << "7\n";
 		while (it_chan != this->_channel_list.end()) {
 			if (VERBOSE >= 3)
 				std::cout << CYAN << client.getNick() << " tries to join " << *it_join << ". Testing: " << it_chan->getName() << WHITE << std::endl;
-std::cout << "7\n";
+// std::cout << "8\n";
 			if (it_chan->getName() == *it_join && it_chan->getInvite() == true) {
 				sendMessage(client, ERR_INVITEONLYCHAN(*it_join));
 				return ;
 			}
-std::cout << "8\n";
+// std::cout << "9\n";
 			if (it_chan->getName() == *it_join && it_chan->getAmountOfAll() == it_chan->getLimit()) {
 				sendMessage(client, ERR_CHANNELISFULL(*it_join));
 				return ;
 			}
-std::cout << "9\n";
 			//possible proble if no password exist in the command, also valid iterator of password is not secured
 			// if (it_chan->getName() == *it_join && it_chan->getPassword() != *it_joinpw) {
 			// 	sendMessage(client, ERR_BADCHANNELKEY(*it_join));
 			// 	return ;
 			// }
-std::cout << "10\n";
+// std::cout << "10\n";
 			if (it_chan->getName() == *it_join && it_chan->isBanned(client)) {
 				sendMessage(client, ERR_BANNEDFROMCHAN(*it_join));
 				return ;
 			}
-std::cout << "11\n";
+// std::cout << "11\n";
 			//--->We don't have a Channellimit, if we want just create this variables and the getter
 			// if (it_chan->getName() == *it_join && this->_channelLimit == client->getAmountOfChannels()) {
 			// 	sendMessage(client, ERR_TOOMANYCHANNELS(*it_join));
@@ -370,38 +361,43 @@ std::cout << "11\n";
 			//ERR_UNAVAILRESOURCE
 			//	Returned by a server to a user trying to join a channel
 			//	currently blocked by the channel delay mechanism.
-			it_chan++;
+			if (*it_join != it_chan->getName())
+				it_chan++;
+			else
+				break;
 		}
 		//--->Not clear in which case we send Nosuchchannel, because we create
 		// if (it_chan == this->_channel_list.end()) {
 		// 	sendMessage(client, ERR_NOSUCHCHANNEL(*it_join));
 		// 	return ;
 		// }
-std::cout << "12\n";
+// std::cout << "12\n";
 		if (it_chan == this->_channel_list.end())
 		{
 			Channel newCH(*it_join);
-std::cout << "13" + client.getNick() << std::endl;
+// std::cout << "13\n";
 			newCH.setOperator(client);
-std::cout << "14\n";
+			// newCH.setPassword(*it_joinpw);
+// std::cout << "14\n";
 			this->_channel_list.push_back(newCH);
-std::cout << "15\n";
-			broadcastMessage(newCH.getOperators(), newCH.getName(), "JOIN");
-std::cout << "16\n";
-			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, newCH.getName(), newCH.genUserlist()));
-std::cout << "17\n";
-			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, newCH.getName()));
-			newCH.print();
+// std::cout << "15\n";
+			broadcastMessage(newCH.getOperators(), client, newCH.getName(), "JOIN", "");
+// std::cout << "16\n";
+			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join, newCH.genUserlist()));
+// std::cout << "17\n";
+			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join));
+			// newCH.print();
 		} else {
-std::cout << "18\n";
+// std::cout << "18\n";
 			it_chan->setUser(client);
-std::cout << "19\n";
-			broadcastMessage(it_chan->getUsers(), it_chan->getName(), "JOIN");
-std::cout << "20\n";
-			broadcastMessage(it_chan->getOperators(), it_chan->getName(), "JOIN");
-std::cout << "21\n";
+// std::cout << "19\n";
+			// here a problem, the broadcast should contain the nick of the joining client, not the iterator one
+			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
+// std::cout << "20\n";
+			// joinMessage(it_chan->getOperators(), client, it_chan->getName());
+// std::cout << "21\n";
 			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName(), it_chan->genUserlist()));
-std::cout << "22\n";
+// std::cout << "22\n";
 			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName()));
 		}
 		//Send all back:
@@ -413,6 +409,7 @@ std::cout << "23\n";
 		it_join++;
 		it_joinpw++;
 	}
+	printAllChannels();
 }
 
 void	Server::cap(Client &client, t_ircMessage &params)
@@ -495,11 +492,9 @@ void	Server::nick(Client &client, t_ircMessage &params)
 		sendMessage(client, NICK(oldNick, client));
 }
 
-void	Server::user(Client &client, t_ircMessage &params)
-{
-
-	// check if a password was supplied
-	if (client.getStatus() < AUTHENTICATED)
+void	Server::user(Client& client, t_ircMessage& params) {
+	//check if a password was supplied
+	if (client.getStatus() >= AUTHENTICATED)
 		return;
 
 	// set username
@@ -528,6 +523,25 @@ void	Server::quit(Client &client, t_ircMessage &params)
 	sendMessage(client, ERROR((std::string) "Connection closed."));
 	client.setStatus(DISCONNECTED);
 	//MISSING: message to all other clients
+	// broadcastMessage(channel.getUsers(), channel.getName(), "x left the channel");
+}
+
+void	Server::printAllClients(void) {
+	std::vector<Client>::iterator it = this->_clientVector.begin();
+	while (it != this->_clientVector.end())
+	{
+		it->print();
+		it++;
+	}
+}
+
+void	Server::printAllChannels(void) {
+	std::list<Channel>::iterator it = this->_channel_list.begin();
+	while (it != this->_channel_list.end())
+	{
+		it->print();
+		it++;
+	}
 }
 
 void	Server::privmsg(Client &client, t_ircMessage &params)
@@ -546,9 +560,7 @@ void	Server::privmsg(Client &client, t_ircMessage &params)
 			std::list<Channel>::iterator itChannel = this->_channel_list.begin();
 			while (itChannel != this->_channel_list.end()) {
 				if (itChannel->getName() == *itTarget) {
-					
-					//std::cerr << "DEBUG : " << *itTarget << " seems to be a channel." << std::endl;
-					sendMessageToChannel(client, itChannel->getName(), textToBeSent);
+					broadcastMessage(itChannel->getAllMember(), client, itChannel->getName(), "PRIVMSG", textToBeSent);
 					break;
 				}
 				itChannel++;

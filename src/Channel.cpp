@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 16:18:14 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/07 13:39:10 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,12 +112,21 @@ std::string	Channel::getPassword(void) const{
 	return this->_password;
 }
 
+void	Channel::setPassword(std::string &pw)
+{
+	this->_password = pw;
+}
+
 bool		Channel::getInvite(void) const{
 	return this->_inviteonly;
 }
 
 void		Channel::setOperator(Client &client) {
+	// if (VERBOSE >= 3)
+		// std::cout << ORANGE "xx" << WHITE << std::endl;
 	this->_operators[client.getNick()] = client;
+	// if (VERBOSE >= 3)
+	// 	std::cout << ORANGE "yy" << WHITE << std::endl;
 }
 
 std::map<std::string, Client>	Channel::getOperators(void){
@@ -132,6 +141,16 @@ std::map<std::string, Client>	Channel::getUsers(void){
 	return this->_users;
 }
 
+std::map<std::string, Client>	Channel::getAllMember(void) {
+	std::map<std::string, Client> copy = this->_users;
+	std::map<std::string, Client>::iterator it = this->_operators.begin();
+	while (it != this->_operators.end())
+	{
+		copy[it->first] = it->second;
+		it++;
+	}
+	return copy;
+}
 int				Channel::getAmountOfAll(){
 	return (this->_users.size() + this->_operators.size());
 }

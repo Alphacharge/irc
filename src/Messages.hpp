@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/07 12:23:24 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/07 13:40:27 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -521,8 +521,8 @@
 # define PONG(params)			(std::string(":irc42 PONG irc42 " + params + "\n"))
 # define NICK(oldNick, client)	(std::string(":" + oldNick + "NICK " + client.getNick() + " ; " + oldNick + " changed nickname to " + client.getNick() + ".\n"))
 
-# define JOIN(client, address, chname)	(std::string(":" + client.getNick() + "!~" + client.getUsername() + "@" + address + " JOIN #" + chname + "\n"))
-# define USERLIST(host, client, channel, clients)	(std::string(std::string(":") + host + " 353 " + client.getNick() + " = #" + channel + " :" + clients + "\n"))
-# define USERLISTEND(host, client, channel)	(std::string(std::string(":") + host + " 366 " + client.getNick() + " #" + channel + " :End of /NAMES list.\n"))
+# define GENMESSAGE(client, address, target, type, textToBeSent)	(std::string(":" + client.getNick() + "!~" + client.getUsername() + "@" + address + " " + type + " " + target + " " + textToBeSent + "\n"))
+# define USERLIST(host, client, channel, clients)	(std::string(std::string(":") + host + " 353 " + client.getNick() + " = " + channel + " :" + clients + "\n"))
+# define USERLISTEND(host, client, channel)	(std::string(std::string(":") + host + " 366 " + client.getNick() + " " + channel + " :End of /NAMES list.\n"))
 
 #endif

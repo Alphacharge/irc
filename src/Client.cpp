@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:01:01 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 17:59:12 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/07 13:18:25 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,4 +107,12 @@ void	Client::appendBuffer(std::string const& str) {
 
 int	Client::getStatus(void) {
 	return (_status);
+}
+
+void	Client::print(void) {
+	std::cout << LGREEN << "-----Printing Client:-----" << WHITE << std::endl;
+	std::cout << LGREEN << "Name:\t|" << this->_username << WHITE << std::endl;
+	std::cout << LGREEN << "Nick:\t|" << this->_nick << WHITE << std::endl;
+	std::cout << LGREEN << "Status:\t|" << this->_status << WHITE << std::endl;
+	std::cout << LGREEN << "Buffer:\t|" << this->_buffer << WHITE << std::endl;
 }
