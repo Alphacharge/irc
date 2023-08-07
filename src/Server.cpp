@@ -667,4 +667,4 @@ void	Server::modeO(Client& client, Channel& channel, bool add, std::string& targ
 		channel.removeOperator(*it);
 }
 
-// void	Server::invite()
+
