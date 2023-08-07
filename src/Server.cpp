@@ -32,6 +32,7 @@ Server::Server(int port, std::string password) : _serverPort(port), _serverPassw
 	this->_commandMap["QUIT"] = &Server::quit;
 	this->_commandMap["PRIVMSG"] = &Server::privmsg;
 	this->_commandMap["SHUTDOWN"] = &Server::shutdown;
+	_commandMap["MODE"] = &Server::mode;
 }
 
 Server::Server(Server const &src)
@@ -253,11 +254,10 @@ void	Server::serverStart(void)
 							std::cout << "Prefix     : " << it->prefix << std::endl;
 							std::cout << "Command    : " << it->command << std::endl;
 							std::cout << "Parameters : " << it->parameters << std::endl;
+
 							std::map<std::string, void (Server::*)(Client &, t_ircMessage &)>::iterator function = this->_commandMap.find(it->command);
 							if (function != _commandMap.end())
 								(this->*(function->second))(*clientIterator, *it);
-							else if (VERBOSE >= 3)
-								std::cout << "Command not found.\n";
 						}
 						commands.clear();
 					}
@@ -302,6 +302,11 @@ void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client,
 			sendMessage(it->second, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), channelName, type, textToBeSent));
 		it++;
 	}
+}
+
+void	Server::broadcastMessage(std::map<std::string, Client> map, std::string message){
+	for (std::map<std::string, Client>::iterator it = map.begin(); it != map.end(); it++)
+			sendMessage(it->second, message);
 }
 
 /* === COMMANDS === */
@@ -521,8 +526,12 @@ void	Server::quit(Client &client, t_ircMessage &params)
 	(void)params;
 	sendMessage(client, ERROR((std::string) "Connection closed."));
 	client.setStatus(DISCONNECTED);
-	//MISSING: message to all other clients
-	// broadcastMessage(channel.getUsers(), channel.getName(), "x left the channel");
+
+	//broadcast to all relevant channels
+	for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++) {
+		if (it->isMember(client))
+			broadcastMessage(it->getAllMember(), ":" + client.getNick() + "@irc42" + params.parameters + "; User left the irc network.");
+	}
 }
 
 //Debug function
@@ -602,4 +611,60 @@ void	Server::privmsg(Client &client, t_ircMessage &params)
 				sendMessage(client, ERR_NOSUCHNICK(*itTarget));
 		}
 	}
+}
+
+void	Server::mode(Client& client, t_ircMessage& params) {
+	std::list<std::string>::iterator	parameter = params.parametersList.begin();
+	std::string							channelname = params.parametersList.front();
+
+	//check if a channel mode is given
+	if (params.parametersList.size() < 2)
+		return;
+	//check if channel exists
+	if (isValidChannelName(channelname) == false) {
+		sendMessage(client, ERR_BADCHANMASK(channelname));
+		return;
+	}
+
+	std::list<Channel>::iterator channel = _channel_list.begin();
+	while (channel->getName() != channelname)
+		if (channel++ == _channel_list.end()) {
+			sendMessage(client, ERR_NOSUCHCHANNEL(channelname));
+			return;
+		}
+
+	//check if client is channel operator
+	if (channel->isOperator(client) == false) {
+		sendMessage(client, ERR_CHANOPRIVSNEEDED(client));
+		return;
+	}
+
+	std::string	mode = *++parameter;
+	//MISSING: check if there is no sign
+	bool		add = true;
+
+	for (std::string::iterator s = mode.begin(); s != mode.end(); s++) {
+		if (*s == '+')
+			add = true;
+		else if (*s == '-')
+			add = false;
+		else if (*s == 'o')
+		//MISSING: what happens if mode doesn't exist?
+			modeO(client, *channel, add, *++parameter);
+	}
+}
+
+void	Server::modeO(Client& client, Channel& channel, bool add, std::string& target) {
+	// search target client
+	std::vector<Client>::iterator	it = _clientVector.begin();
+	while (it->getNick() != target)
+		if (it++ == _clientVector.end()) {
+			sendMessage(client, ERR_NOSUCHNICK(target));
+			return;
+		}
+
+	if (add == true)
+		channel.setOperator(*it);
+	else
+		channel.removeOperator(*it);
 }

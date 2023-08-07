@@ -35,7 +35,7 @@ class Channel {
 	std::set<Client*>				_banns;
 	std::map<std::string, Client>	_users;
 	std::map<std::string, Client>	_operators;
-	
+
 	public:
 	/*---------------	Exceptions		---------------*/
 	/*---------------	Constructors	---------------*/
@@ -50,21 +50,25 @@ class Channel {
 
 	/*---------------	Methods			---------------*/
 	void							print(void);
+
 	std::string						getName(void) const;
 	std::string						getPassword(void) const;
 	void							setPassword(std::string& pw);
 	bool							getInvite(void) const;
+
 	void							setOperator(Client &client);
+	void							removeOperator(Client& client);
+	bool							isOperator(Client& client);
 	std::map<std::string, Client>	getOperators(void);
 	std::map<std::string, Client>	getUsers(void);
 	std::map<std::string, Client>	getAllMember(void);
 	void							setUser(Client &client);
 	int								getAmountOfAll();
 	int								getLimit();
-	
+	bool							isMember(Client&);
+
 	void							bann(Client &client);
 	bool							isBanned(Client &client);
 	std::string						genUserlist(void);
-
 };
 #endif

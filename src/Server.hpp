@@ -109,11 +109,16 @@ class	Server {
 		void	user(Client&, t_ircMessage&);
 		void	quit(Client&, t_ircMessage&);
 		void	privmsg(Client&, t_ircMessage&);
+		void	mode(Client&, t_ircMessage&);
+
+		//Mode Commands
+		void	modeO(Client&, Channel&, bool, std::string&);
 		void	shutdown(Client&, t_ircMessage&);
 
 		//Helper functions
 		void		sendMessage(Client&, std::string);
 		void		broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent);
+		void		broadcastMessage(std::map<std::string, Client>, std::string);
 		void		printAllClients(void);
 		void		printAllChannels(void);
 };

@@ -125,8 +125,22 @@ void		Channel::setOperator(Client &client) {
 	// if (VERBOSE >= 3)
 		// std::cout << ORANGE "xx" << WHITE << std::endl;
 	this->_operators[client.getNick()] = client;
+	_users.erase(client.getNick());
 	// if (VERBOSE >= 3)
 	// 	std::cout << ORANGE "yy" << WHITE << std::endl;
+}
+
+void	Channel::removeOperator(Client& client) {
+	_operators.erase(client.getNick());
+	_users[client.getNick()] = client;
+}
+
+bool	Channel::isOperator(Client& client)
+{
+	std::map<std::string, Client>::iterator found = _operators.find(client.getNick());
+	if (found == _operators.end())
+		return (false);
+	return (true);
 }
 
 std::map<std::string, Client>	Channel::getOperators(void){
@@ -157,6 +171,12 @@ int				Channel::getAmountOfAll(){
 
 int				Channel::getLimit(){
 	return this->_limit;
+}
+
+bool	Channel::isMember(Client& client) {
+	if (_users.find(client.getNick()) != _users.end())
+		return (true);
+	return (false);
 }
 
 void			Channel::bann(Client &client) {
