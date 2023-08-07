@@ -252,11 +252,10 @@ void	Server::sendMessage(Client& client, std::string message)
 	// }
 }
 
-void	Server::broadcastMessage(std::map<std::string, Client> map, std::string channel, std::string message){
+void	Server::joinMessage(std::map<std::string, Client> map, Client& client, std::string channel){
 	std::map<std::string, Client>::iterator it = map.begin();
 	while (it != map.end()) {
-		if (message == "JOIN")
-			sendMessage(it->second, JOIN(it->second, inet_ntoa(it->second.getClientAddress().sin_addr), channel));
+			sendMessage(it->second, JOIN(client, inet_ntoa(it->second.getClientAddress().sin_addr), channel));
 		it++;
 	}
 }
@@ -342,11 +341,11 @@ std::cout << "7\n";
 			Channel newCH(*it_join);
 // std::cout << "13\n";
 			newCH.setOperator(client);
-			newCH.setPassword(*it_joinpw);
+			// newCH.setPassword(*it_joinpw);
 // std::cout << "14\n";
 			this->_channel_list.push_back(newCH);
 // std::cout << "15\n";
-			broadcastMessage(newCH.getOperators(), newCH.getName(), "JOIN");
+			joinMessage(newCH.getOperators(), client, newCH.getName());
 // std::cout << "16\n";
 			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join, newCH.genUserlist()));
 // std::cout << "17\n";
@@ -356,10 +355,10 @@ std::cout << "7\n";
 // std::cout << "18\n";
 			it_chan->setUser(client);
 // std::cout << "19\n";
-			// here a problem, the biradcast should contain the nick of the joining client, not the iterator one
-			broadcastMessage(it_chan->getUsers(), it_chan->getName(), "JOIN");
+			// here a problem, the broadcast should contain the nick of the joining client, not the iterator one
+			joinMessage(it_chan->getAllMember(), client, it_chan->getName());
 // std::cout << "20\n";
-			broadcastMessage(it_chan->getOperators(), it_chan->getName(), "JOIN");
+			// joinMessage(it_chan->getOperators(), client, it_chan->getName());
 // std::cout << "21\n";
 			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName(), it_chan->genUserlist()));
 // std::cout << "22\n";

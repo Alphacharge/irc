@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/07 09:24:45 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/07 11:01:49 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,16 @@ std::map<std::string, Client>	Channel::getUsers(void){
 	return this->_users;
 }
 
+std::map<std::string, Client>	Channel::getAllMember(void) {
+	std::map<std::string, Client> copy = this->_users;
+	std::map<std::string, Client>::iterator it = this->_operators.begin();
+	while (it != this->_operators.end())
+	{
+		copy[it->first] = it->second;
+		it++;
+	}
+	return copy;
+}
 int				Channel::getAmountOfAll(){
 	return (this->_users.size() + this->_operators.size());
 }
