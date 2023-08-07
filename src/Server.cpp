@@ -113,7 +113,7 @@ void	Server::serverSetup(void)
 		this->_fds.push_back(this->_serverPollfd);
 
 		//setting socket to non-blocking as required in subject
-		fcntl(_serverSocket, F_SETFL, O_NONBLOCK);
+		// fcntl(_serverSocket, F_SETFL, O_NONBLOCK);
 
 		std::cout << "Server startup completed. Listening on port " << this->_serverPort << std::endl;
 	}
@@ -142,7 +142,7 @@ void	Server::addClient(void)
 	this->_fds.push_back(newClient.getClientPollfd());
 
 	//setting socket to non-blocking as required in subject
-	fcntl(newClient.getClientSocket(), F_SETFL, O_NONBLOCK);
+	// fcntl(newClient.getClientSocket(), F_SETFL, O_NONBLOCK);
 }
 
 bool	Server::inputParse(std::string const &message, t_ircMessage &clientCommand)
@@ -284,9 +284,7 @@ void	Server::sendMessage(Client &client, std::string message)
 	if (message.back() != '\n')
 		message += '\n';
 	while (bytesSent < message.length())
-	 {
-	bytesSent += send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
-	}
+		bytesSent += send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
 }
 
 void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent){
@@ -300,9 +298,10 @@ void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client,
 /* === COMMANDS === */
 
 void	Server::join(Client &client, t_ircMessage& params){
-	//---> that does not work @ fkernbac
-	// if (client.getStatus() != REGISTERED)
-	// 	return;
+	if (client.getStatus() < REGISTERED) {
+		sendMessage(client, ERR_NOTREGISTERED);
+		return;
+	}
 // std::cout << "1\n";
 	if (params.parameters.empty()) {
 		sendMessage(client, ERR_NEEDMOREPARAMS(params.command));
@@ -433,9 +432,8 @@ void	Server::pong(Client &client, t_ircMessage &params)
 
 void	Server::pass(Client &client, t_ircMessage &params)
 {
-	if (VERBOSE >= 3)
-		std::cout << ORANGE << "DEBUG: server password " << _serverPassword << " | " << params.parameters.substr(1) << "\n"
-				  << WHITE;
+	if (client.getStatus() >= AUTHENTICATED)
+		return;
 
 	if (params.parameters.empty())
 		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
@@ -454,12 +452,11 @@ void	Server::pass(Client &client, t_ircMessage &params)
 
 void	Server::nick(Client &client, t_ircMessage &params)
 {
-	std::string oldNick = client.getNick();
-	std::cout << "DEBUG: oldNICK " << oldNick << "\n";
-
 	// check if a password was supplied
-	if (client.getStatus() < AUTHENTICATED)
+	if (client.getStatus() < AUTHENTICATED) {
+		sendMessage(client, ERR_NOTREGISTERED);
 		return;
+	}
 
 	// check if there is a name
 	if (params.parametersList.size() == 0)
@@ -478,25 +475,35 @@ void	Server::nick(Client &client, t_ircMessage &params)
 	}
 
 	// set nickname
+	std::string	oldNick = client.getNick();
 	client.setNick(params.parametersList.front());
-	client.setStatus(NICKGIVEN);
 	if (VERBOSE >= 3)
 		std::cout << ORANGE << "DEBUG: set nick " << client.getNick() << WHITE << std::endl;
 
 	// check registration status
-	if (client.getStatus() == USERGIVEN)
+	switch (client.getStatus())
 	{
+	case AUTHENTICATED:
+		client.setStatus(NICKGIVEN);
+		break;
+	case USERGIVEN:
 		client.setStatus(REGISTERED);
 		sendMessage(client, RPL_WELCOME(client));
-	}
-	else if (client.getStatus() == REGISTERED)
+		break;
+	case REGISTERED:
 		sendMessage(client, NICK(oldNick, client));
+		break;
+	default:
+		break;
+	}
 }
 
 void	Server::user(Client& client, t_ircMessage& params) {
 	//check if a password was supplied
-	if (client.getStatus() >= AUTHENTICATED)
+	if (client.getStatus() < AUTHENTICATED) {
+		sendMessage(client, ERR_NOTREGISTERED);
 		return;
+	}
 
 	// set username
 	if (client.getStatus() == REGISTERED)
@@ -509,13 +516,18 @@ void	Server::user(Client& client, t_ircMessage& params) {
 		std::cout << ORANGE << "DEBUG: set username " << client.getUsername() << WHITE << std::endl;
 
 	// check registration status
-	if (client.getStatus() == NICKGIVEN)
+	switch (client.getStatus())
 	{
+	case AUTHENTICATED:
+		client.setStatus(USERGIVEN);
+		break;
+	case NICKGIVEN:
 		client.setStatus(REGISTERED);
 		sendMessage(client, RPL_WELCOME(client));
+		break;
+	default:
+		break;
 	}
-	else
-		client.setStatus(USERGIVEN);
 }
 
 void	Server::quit(Client &client, t_ircMessage &params)
@@ -547,6 +559,11 @@ void	Server::printAllChannels(void) {
 
 void	Server::privmsg(Client &client, t_ircMessage &params)
 {
+	if (client.getStatus() < REGISTERED) {
+		sendMessage(client, ERR_NOTREGISTERED);
+		return;
+	}
+
 	std::string	textToBeSent;
 	size_t	spacePos = params.parameters.find(" ");
 	if (spacePos != std::string::npos)
