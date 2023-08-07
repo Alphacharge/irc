@@ -156,16 +156,14 @@ bool	Server::inputParse(std::string const &message, t_ircMessage &clientCommand)
 		pos++;
 		size_t prefixEnd = message.find(' ', pos);
 		if (prefixEnd == std::string::npos)
-		{
 			return false;
-		}
 		clientCommand.prefix = message.substr(pos, prefixEnd - pos);
 		pos = prefixEnd + 1;
 	}
 	size_t commandEnd = message.find(' ', pos);
-	if (commandEnd == std::string::npos)
-	{
-		return false;
+	if (commandEnd == std::string::npos) {
+		clientCommand.command = message.substr(pos, commandEnd);
+		return true;
 	}
 	clientCommand.command = message.substr(pos, commandEnd - pos);
 	pos = commandEnd + 1;
@@ -572,7 +570,6 @@ void	Server::privmsg(Client &client, t_ircMessage &params)
 		sendMessage(client, ERR_NOTREGISTERED);
 		return;
 	}
-
 	std::string	textToBeSent;
 	size_t	spacePos = params.parameters.find(" ");
 	if (spacePos != std::string::npos)
