@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 15:01:54 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/07 08:45:13 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,4 +112,6 @@ class	Server {
 		//Helper functions
 		void		sendMessage(Client&, std::string);
 		void		broadcastMessage(std::map<std::string, Client>, std::string, std::string);
+		void		printAllClients(void);
+		void		printAllChannels(void);
 };
