@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 16:40:45 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/07 12:23:24 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,7 +284,7 @@
 // # define RPL_NOUSERS() ()
 // # define RPL_HOSTHIDDEN() ()
 // # define ERR_UNKNOWNERROR() ()
-// # define ERR_NOSUCHNICK() ()
+# define ERR_NOSUCHNICK(params) (std::string (params + " :No such nick/channel"))
 // # define ERR_NOSUCHSERVER() ()
 # define ERR_NOSUCHCHANNEL(params) (std::string(params + " :No such channel"))
 // # define ERR_CANNOTSENDTOCHAN() ()
@@ -295,7 +295,7 @@
 // # define ERR_NOCOLORSONCHAN() ()
 // # define ERR_NOORIGIN() ()
 // # define ERR_NORECIPIENT() ()
-// # define ERR_NOTEXTTOSEND() ()
+# define ERR_NOTEXTTOSEND(params) (std::string(params + ":irc42 401 :No such nick/channel"))
 // # define ERR_NOTOPLEVEL() ()
 // # define ERR_WILDTOPLEVEL() ()
 // # define ERR_BADMASK() ()

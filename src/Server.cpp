@@ -532,7 +532,40 @@ void	Server::quit(Client &client, t_ircMessage &params)
 
 void	Server::privmsg(Client &client, t_ircMessage &params)
 {
+	std::string	textToBeSent;
 	size_t	spacePos = params.parameters.find(" ");
-	if (spacePos == std::string::npos) {}
-
+	if (spacePos != std::string::npos)
+		textToBeSent = params.parameters.substr(spacePos, params.parameters.size());
+	if (spacePos == std::string::npos || textToBeSent.empty()) {
+		sendMessage(client, ERR_NOTEXTTOSEND(client.getNick()));
+		return;}
+	std::list<std::string>	targetList = splitString(params.parameters.substr(0, spacePos), ',');
+	for (std::list<std::string>::iterator itTarget = targetList.begin(); itTarget != targetList.end(); ++itTarget) {
+		// target is a channel
+		if (isValidChannelName(*itTarget)) {
+			std::list<Channel>::iterator itChannel = this->_channel_list.begin();
+			while (itChannel != this->_channel_list.end()) {
+				if (itChannel->getName() == *itTarget) {
+					
+					//std::cerr << "DEBUG : " << *itTarget << " seems to be a channel." << std::endl;
+					sendMessageToChannel(client, itChannel->getName(), textToBeSent);
+					break;
+				}
+				itChannel++;
+			}
+			if (itChannel == this->_channel_list.end())
+				sendMessage(client, ERR_NOSUCHCHANNEL(*itTarget));
+		}
+		//target is a user
+		std::vector<Client>::iterator itClient = this->_clientVector.begin();
+		while(itClient != this->_clientVector.end()) {
+			if(itClient->getNick() == *itTarget) {
+				sendMessage(*itClient, textToBeSent);
+				break;
+			}
+			itClient++;
+		}
+		if (itClient != this->_clientVector.end())
+			sendMessage(client, ERR_NOSUCHNICK(itClient->getNick()));
+	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Validation.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 11:06:27 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/07 10:27:51 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,12 @@ bool	isValidChannelName(std::string const &name)
 	return false;
 }
 
-/* split strings on spaces*/
-std::list<std::string>	splitString(std::string const&parameters, char const& delimiter) {
-	std::list<std::string>	parametersList;
-	std::istringstream		iss(parameters);
+/* splits the stringToBeSPlit on delimiter and returns a list of splits  */
+std::list<std::string>	splitString(std::string const&stringToBeSplit, char const& delimiter) {
+	std::list<std::string>	listOfSplits;
+	std::istringstream		iss(stringToBeSplit);
 	std::string				token;
 
-	while(getline(iss, token, delimiter)) {parametersList.push_back(token);}
-	return parametersList;
+	while(getline(iss, token, delimiter)) {listOfSplits.push_back(token);}
+	return listOfSplits;
 }
