@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/04 08:39:38 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/04 16:40:45 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,11 +286,11 @@
 // # define ERR_UNKNOWNERROR() ()
 // # define ERR_NOSUCHNICK() ()
 // # define ERR_NOSUCHSERVER() ()
-// # define ERR_NOSUCHCHANNEL() ()
+# define ERR_NOSUCHCHANNEL(params) (std::string(params + " :No such channel"))
 // # define ERR_CANNOTSENDTOCHAN() ()
-// # define ERR_TOOMANYCHANNELS() ()
+// # define ERR_TOOMANYCHANNELS(params) (std::string(params + " :You have joined too many channels"))
 // # define ERR_WASNOSUCHNICK() ()
-// # define ERR_TOOMANYTARGETS() ()
+// # define ERR_TOOMANYTARGETS() ()			//We don't support shortnames for channel names
 // # define ERR_NOSUCHSERVICE() ()
 // # define ERR_NOCOLORSONCHAN() ()
 // # define ERR_NOORIGIN() ()
@@ -317,7 +317,7 @@
 // # define ERR_SERVICECONFUSED() ()
 // # define ERR_BANONCHAN() ()
 // # define ERR_NICKCOLLISION() ()
-// # define ERR_UNAVAILRESOURCE() ()
+// # define ERR_UNAVAILRESOURCE() ()		//We don't support delay mechanism
 // # define ERR_BANNICKCHANGE() ()
 // # define ERR_NICKTOOFAST() ()
 // # define ERR_DEAD() ()
@@ -352,12 +352,12 @@
 // # define ERR_LINKSET() ()
 // # define ERR_LINKCHANNEL() ()
 // # define ERR_KICKEDFROMCHAN() ()
-// # define ERR_CHANNELISFULL() ()
+# define ERR_CHANNELISFULL(params) (std::string(params + " :Cannot join channel (+l)"))
 // # define ERR_UNKNOWNMODE() ()
-// # define ERR_INVITEONLYCHAN() ()
-// # define ERR_BANNEDFROMCHAN() ()
-// # define ERR_BADCHANNELKEY() ()
-// # define ERR_BADCHANMASK() ()
+# define ERR_INVITEONLYCHAN(params) (std::string(params + " :Cannot join channel (+i)"))
+# define ERR_BANNEDFROMCHAN(params) (std::string(params + " :Cannot join channel (+b)"))
+# define ERR_BADCHANNELKEY(params) (std::string(params + " :Cannot join channel (+k)"))
+// # define ERR_BADCHANMASK(params) (std::string(params + " :Bad Channel Mask"))
 // # define ERR_NOCHANMODES() ()
 // # define ERR_NEEDREGGEDNICK() ()
 // # define ERR_BANLISTFULL() ()
@@ -520,5 +520,9 @@
 # define ERROR(message)			(std::string(":irc42 ERROR :" + message + "\n"))
 # define PONG(params)			(std::string(":irc42 PONG irc42 " + params + "\n"))
 # define NICK(oldNick, client)	(std::string(":" + oldNick + "NICK " + client.getNick() + " ; " + oldNick + " changed nickname to " + client.getNick() + ".\n"))
+
+# define JOIN(client, address, chname)	(std::string(":" + client.getNick() + "!~" + client.getUsername() + "@" + address + " JOIN #" + chname + "\n"))
+# define USERLIST(host, client, channel, clients)	(std::string(std::string(":") + host + " 353 " + client.getNick() + " = #" + channel + " :" + clients + "\n"))
+# define USERLISTEND(host, client, channel)	(std::string(std::string(":") + host + " 366 " + client.getNick() + " #" + channel + " :End of /NAMES list.\n"))
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/04 17:14:04 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/07 09:40:01 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,4 +111,5 @@ class	Server {
 
 		//Helper functions
 		void		sendMessage(Client&, std::string);
+		void		broadcastMessage(std::map<std::string, Client>, std::string, std::string);
 };
