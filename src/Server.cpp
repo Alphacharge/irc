@@ -297,6 +297,7 @@ void	Server::sendMessage(Client &client, std::string message)
 void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent){
 	std::map<std::string, Client>::iterator it = map.begin();
 	while (it != map.end()) {
+		if(it->second.getNick() != client.getNick())
 			sendMessage(it->second, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), channelName, type, textToBeSent));
 		it++;
 	}
@@ -599,7 +600,6 @@ void	Server::privmsg(Client &client, t_ircMessage &params)
 					std::map<std::string, Client> target;
 					target[itClient->getNick()] =  *itClient;
 					broadcastMessage(target, client, "", "PRIVMSG", textToBeSent);
-					// sendMessage(*itClient, textToBeSent);
 					break;
 				}
 				itClient++;
@@ -648,6 +648,7 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 		else if (*s == 'o')
 		//MISSING: what happens if mode doesn't exist?
 			modeO(client, *channel, add, *++parameter);
+		// further modes follow here tbd
 	}
 }
 
@@ -665,3 +666,5 @@ void	Server::modeO(Client& client, Channel& channel, bool add, std::string& targ
 	else
 		channel.removeOperator(*it);
 }
+
+// void	Server::invite()
