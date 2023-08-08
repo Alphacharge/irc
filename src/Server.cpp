@@ -584,11 +584,6 @@ void	Server::privmsg(Client &client, t_ircMessage &params)
 }
 
 void	Server::invite(Client& client, t_ircMessage& params) {
-	/* sent to invited user
-	:scoobidoo!~kvirc@188.244.102.158 INVITE luca :#myChannel */
-	// :Stopover.ky.us.starlink-irc.org 341 luca scoobidoo #myChannel
-
-
 	// too few parameters
 	if (params.parametersList.size() < 2)
 		return (sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters)));
@@ -619,10 +614,10 @@ void	Server::invite(Client& client, t_ircMessage& params) {
 	if (itChannel->getInvite() && !itChannel->isOperator(client))
 		return (sendMessage(client, ERR_CHANOPRIVSNEEDED(client)));
 	// channel is not invit0e only and issuer is not a channel opertator and is not a channel member
-	else if(!itChannel->getInvite() && !itChannel->isOperator(client) && !itChannel->isMember(client))
+	else if(!itChannel->getInvite() && !itChannel->isOperator(client) && !itChannel->isMember(client.getNick()))
 		return (sendMessage(client, ERR_NOTONCHANNEL(client)));
 	// invited nickname is already on channel
-	if (itChannel->isMember(*itClient))
+	if (itChannel->isMember((*itClient).getNick()))
 		return (sendMessage(*itClient, ERR_USERONCHANNEL((*itClient).getNick())));
 	std::string	textToBeSent = " :" + itChannel->getName();
 	sendMessage(*itClient, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), itClient->getNick(), "INVITE", textToBeSent));
