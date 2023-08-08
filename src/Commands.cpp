@@ -335,8 +335,6 @@ void	Server::modeO(Client& client, Channel& channel, bool add, std::string& targ
 		channel.removeOperatorStatus(*it);
 }
 
-// void	Server::invite()
-
 void	Server::kick(Client &client, t_ircMessage& params) {
 	if (client.getStatus() < REGISTERED) {
 		sendMessage(client, ERR_NOTREGISTERED);
