@@ -302,9 +302,10 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 		sendMessage(client, ERR_CHANOPRIVSNEEDED(client));
 		return;
 	}
+	
+	bool	add = true;
 	std::string	mode = *++parameter;
 	//MISSING: check if there is no sign
-	bool		add = true;
 	for (std::string::iterator s = mode.begin(); s != mode.end(); s++) {
 		if (*s == '+')
 			add = true;
@@ -314,12 +315,8 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 			channel->setInviteOnly(add);
 		else if (*s == 't')
 			channel->setRestrictTopic(add);
-		else if (*s == 'k') {
-			if (add == true)
-				channel->setPassword(*++parameter);
-			else
-				channel->setPassword("");
-		}
+		else if (*s == 'k')
+			modeK(client, *channel, add, *++parameter);
 		else if (*s == 'o')
 			modeO(client, *channel, add, *++parameter);
 		else if (*s == 'l') {
@@ -344,6 +341,20 @@ void	Server::modeO(Client& client, Channel& channel, bool add, std::string& targ
 		channel.setOperatorStatus(*it);
 	else
 		channel.removeOperatorStatus(*it);
+}
+
+void	Server::modeK(Client& client, Channel& channel, bool add, std::string& password) {
+	if (add == true) {
+		if (channel.getPassword() != "")
+			sendMessage(client, ERR_KEYSET);
+		else
+			channel.setPassword(password);
+	} else {
+		if (channel.getPassword() != password)
+			sendMessage(client, ERR_PASSWDMISMATCH);
+		else
+			channel.setPassword("");
+	}
 }
 
 void	Server::kick(Client &client, t_ircMessage& params) {

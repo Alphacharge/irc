@@ -68,7 +68,6 @@ class Channel {
 	std::map<std::string, Client>	getUsers(void);
 	std::string						genUserlist(void);
 
-	bool	isMember(Client&);
 	bool	isMember(std::string& nick);
 
 	void	setOperatorStatus(Client &client);
@@ -80,9 +79,9 @@ class Channel {
 	bool	isUser(Client& client);
 	void	removeUser(Client& client);
 
-	int								getAmountOfAll(void);
+	void	bann(Client &client);
+	bool	isBanned(Client &client);
 
-	void							bann(Client &client);
-	bool							isBanned(Client &client);
+	int		getAmountOfAll(void);
 };
 #endif
