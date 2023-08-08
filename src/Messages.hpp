@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/07 13:50:27 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 11:23:19 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,7 +224,7 @@
 // # define RPL_WHOISACTUALLY() ()
 // # define RPL_BADCHANPASS() ()
 // # define RPL_USERIP() ()
-// # define RPL_INVITING() ()
+# define RPL_INVITING(issuerName, guestName, channelName)	(std::string(":irc42 341 " + issuerName + " " + guestName + " " + channelName))
 // # define RPL_SUMMONING() ()
 // # define RPL_INVITED() ()
 // # define RPL_INVITELIST() ()
@@ -324,8 +324,8 @@
 // # define ERR_TARGETTOOFAST() ()
 // # define ERR_SERVICESDOWN() ()
 // # define ERR_USERNOTINCHANNEL() ()
-// # define ERR_NOTONCHANNEL() ()
-// # define ERR_USERONCHANNEL() ()
+# define ERR_NOTONCHANNEL(client) (std::string("irc42 442 " + client.getNick() + ": You're not on that channel"))
+# define ERR_USERONCHANNEL(params) (std::string("irc42 443 " + params + ": is already on channel"))
 // # define ERR_NOLOGIN() ()
 // # define ERR_SUMMONDISABLED() ()
 // # define ERR_USERSDISABLED() ()

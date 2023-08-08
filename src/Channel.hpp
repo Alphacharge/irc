@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/07 10:59:22 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 09:23:15 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,13 +59,13 @@ class Channel {
 	void							setOperator(Client &client);
 	void							removeOperator(Client& client);
 	bool							isOperator(Client& client);
+	bool							isMember(Client&);
 	std::map<std::string, Client>	getOperators(void);
 	std::map<std::string, Client>	getUsers(void);
 	std::map<std::string, Client>	getAllMember(void);
 	void							setUser(Client &client);
 	int								getAmountOfAll();
 	int								getLimit();
-	bool							isMember(Client&);
 
 	void							bann(Client &client);
 	bool							isBanned(Client &client);

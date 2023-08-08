@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/07 14:50:49 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 08:17:46 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,7 @@ class	Server {
 		void	quit(Client&, t_ircMessage&);
 		void	privmsg(Client&, t_ircMessage&);
 		void	mode(Client&, t_ircMessage&);
+		void	invite(Client&, t_ircMessage&);
 
 		//Mode Commands
 		void	modeO(Client&, Channel&, bool, std::string&);

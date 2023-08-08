@@ -33,6 +33,7 @@ Server::Server(int port, std::string password) : _serverPort(port), _serverPassw
 	this->_commandMap["PRIVMSG"] = &Server::privmsg;
 	this->_commandMap["SHUTDOWN"] = &Server::shutdown;
 	_commandMap["MODE"] = &Server::mode;
+	this->_commandMap["INVITE"] = &Server::invite;
 }
 
 Server::Server(Server const &src)
@@ -533,6 +534,101 @@ void	Server::quit(Client &client, t_ircMessage &params)
 	}
 }
 
+void	Server::privmsg(Client &client, t_ircMessage &params)
+{
+	if (client.getStatus() < REGISTERED) {
+		sendMessage(client, ERR_NOTREGISTERED);
+		return;
+	}
+	std::string	textToBeSent;
+	size_t	spacePos = params.parameters.find(" ");
+	if (spacePos != std::string::npos)
+		textToBeSent = params.parameters.substr(spacePos + 1, params.parameters.size());
+	if (spacePos == std::string::npos || textToBeSent.empty()) {
+		sendMessage(client, ERR_NOTEXTTOSEND(client.getNick()));
+		return;
+		}
+	std::list<std::string>	targetList = splitString(params.parameters.substr(0, spacePos), ',');
+	for (std::list<std::string>::iterator itTarget = targetList.begin(); itTarget != targetList.end(); ++itTarget) {
+		if (isValidChannelName(*itTarget)) {
+			std::list<Channel>::iterator itChannel = this->_channel_list.begin();
+			while (itChannel != this->_channel_list.end()) {
+				if (itChannel->getName() == *itTarget) {
+					broadcastMessage(itChannel->getAllMember(), client, itChannel->getName(), "PRIVMSG", textToBeSent);
+					break;
+				}
+				itChannel++;
+			}
+			if (itChannel == this->_channel_list.end()) {
+				sendMessage(client, ERR_NOSUCHCHANNEL(*itTarget));
+				return;
+			}
+		}
+		else {
+			std::vector<Client>::iterator itClient = this->_clientVector.begin();
+			while(itClient != this->_clientVector.end()) {
+				if(itClient->getNick() == *itTarget) {
+					std::map<std::string, Client> target;
+					target[itClient->getNick()] =  *itClient;
+					broadcastMessage(target, client, "", "PRIVMSG", textToBeSent);
+					break;
+				}
+				itClient++;
+			}
+			if (itClient == this->_clientVector.end()) {
+				sendMessage(client, ERR_NOSUCHNICK(*itTarget));
+				return;
+			}
+		}
+	}
+}
+
+void	Server::invite(Client& client, t_ircMessage& params) {
+	/* sent to invited user
+	:scoobidoo!~kvirc@188.244.102.158 INVITE luca :#myChannel */
+	// :Stopover.ky.us.starlink-irc.org 341 luca scoobidoo #myChannel
+
+
+	// too few parameters
+	if (params.parametersList.size() < 2)
+		return (sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters)));
+	std::list<std::string>::iterator itParams = params.parametersList.begin();
+	std::list<Channel>::iterator itChannel = this->_channel_list.begin();
+	std::vector<Client>::iterator itClient = this->_clientVector.begin();
+	while (itClient != this->_clientVector.end()) {
+		if (*itParams == itClient->getNick())
+			break;
+		itClient++;
+	}
+	// invited nickname does not exist
+	if (itClient == this->_clientVector.end())
+		return(sendMessage(client, ERR_NOSUCHNICK(*itParams)));
+	itParams++;
+	// channel name is not valid
+	if(!isValidChannelName(*itParams))
+		return (sendMessage(client, ERR_NOSUCHCHANNEL(*itParams)));
+	while(itChannel != this->_channel_list.end()) {
+		if (*itParams == itChannel->getName())
+			break;
+		itChannel++;
+	}
+	// channel does not exist
+	if (itChannel == this->_channel_list.end())
+		return (sendMessage(client, ERR_NOSUCHCHANNEL(*itParams)));
+	// channel is invite only and issuer is not operator
+	if (itChannel->getInvite() && !itChannel->isOperator(client))
+		return (sendMessage(client, ERR_CHANOPRIVSNEEDED(client)));
+	// channel is not invit0e only and issuer is not a channel opertator and is not a channel member
+	else if(!itChannel->getInvite() && !itChannel->isOperator(client) && !itChannel->isMember(client))
+		return (sendMessage(client, ERR_NOTONCHANNEL(client)));
+	// invited nickname is already on channel
+	if (itChannel->isMember(*itClient))
+		return (sendMessage(*itClient, ERR_USERONCHANNEL((*itClient).getNick())));
+	std::string	textToBeSent = " :" + itChannel->getName();
+	sendMessage(*itClient, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), itClient->getNick(), "INVITE", textToBeSent));
+	sendMessage(client, RPL_INVITING(client.getNick(), itClient->getNick(), itChannel->getName()));
+}
+
 //Debug function
 void	Server::shutdown(Client &client, t_ircMessage &params)
 {
@@ -562,51 +658,6 @@ void	Server::printAllChannels(void) {
 	{
 		it->print();
 		it++;
-	}
-}
-
-void	Server::privmsg(Client &client, t_ircMessage &params)
-{
-	if (client.getStatus() < REGISTERED) {
-		sendMessage(client, ERR_NOTREGISTERED);
-		return;
-	}
-	std::string	textToBeSent;
-	size_t	spacePos = params.parameters.find(" ");
-	if (spacePos != std::string::npos)
-		textToBeSent = params.parameters.substr(spacePos + 1, params.parameters.size());
-	if (spacePos == std::string::npos || textToBeSent.empty()) {
-		sendMessage(client, ERR_NOTEXTTOSEND(client.getNick()));
-		return;}
-	std::list<std::string>	targetList = splitString(params.parameters.substr(0, spacePos), ',');
-	for (std::list<std::string>::iterator itTarget = targetList.begin(); itTarget != targetList.end(); ++itTarget) {
-		if (isValidChannelName(*itTarget)) {
-			std::list<Channel>::iterator itChannel = this->_channel_list.begin();
-			while (itChannel != this->_channel_list.end()) {
-				if (itChannel->getName() == *itTarget) {
-					broadcastMessage(itChannel->getAllMember(), client, itChannel->getName(), "PRIVMSG", textToBeSent);
-					break;
-				}
-				itChannel++;
-			}
-			if (itChannel == this->_channel_list.end()) {
-				sendMessage(client, ERR_NOSUCHCHANNEL(*itTarget));
-			}
-		}
-		else {
-			std::vector<Client>::iterator itClient = this->_clientVector.begin();
-			while(itClient != this->_clientVector.end()) {
-				if(itClient->getNick() == *itTarget) {
-					std::map<std::string, Client> target;
-					target[itClient->getNick()] =  *itClient;
-					broadcastMessage(target, client, "", "PRIVMSG", textToBeSent);
-					break;
-				}
-				itClient++;
-			}
-			if (itClient == this->_clientVector.end())
-				sendMessage(client, ERR_NOSUCHNICK(*itTarget));
-		}
 	}
 }
 
