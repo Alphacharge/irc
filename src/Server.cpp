@@ -31,6 +31,7 @@ Server::Server(int port, std::string password) : _serverPort(port), _serverPassw
 	this->_commandMap["PRIVMSG"] = &Server::privmsg;
 	this->_commandMap["SHUTDOWN"] = &Server::shutdown;
 	this->_commandMap["MODE"] = &Server::mode;
+	this->_commandMap["KICK"] = &Server::kick;
 }
 
 Server::Server(Server const &src) {
@@ -186,3 +187,9 @@ void	Server::serverStart(void)
 	}
 }
 
+std::vector<Client>::iterator	Server::getClient(std::string& nick) {
+	std::vector<Client>::iterator	it = this->_clientVector.begin();
+	while (it->getNick() != nick)
+		it++;
+	return it;
+}
