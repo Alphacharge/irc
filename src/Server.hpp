@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/07 14:50:49 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 06:50:54 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@
 # include "Macros.hpp"
 # include "Messages.hpp"
 # include "Colors.hpp"
-# include "Validation.hpp"
+# include "OverallFunctions.hpp"
 
 typedef struct s_irc {
 	std::string				prefix;
@@ -64,11 +64,12 @@ class	Server {
 		Server(void);
 
 	public:
-		Server(int, std::string);
-		Server(Server const&);
+		/*---------------	Constructors	---------------*/
+		Server(int port, std::string password);
+		Server(Server const& src);
 		~Server(void);
-		Server&	operator=(Server const&);
-
+		Server&	operator=(Server const& rhs);
+		/*---------------	Exceptions		---------------*/
 		class SocketException : public std::exception {
 			public:
 				virtual char const* what() const throw();
@@ -93,15 +94,19 @@ class	Server {
 			public:
 				virtual char const* what() const throw();
 		};
-
+		/*---------------	Methods			---------------*/
 		void		serverStart(void);
+		
+		private:
 		void		serverSetup(void);
+
+		//Parsing
 		void		addClient(void);
 		bool		inputParse(std::string const&, t_ircMessage&);
 		bool		handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
 
 		//Commands
-		void	join(Client&, t_ircMessage&);
+		void	join(Client& , t_ircMessage&);
 		void	cap(Client&, t_ircMessage&);
 		void	pong(Client&, t_ircMessage&);
 		void	pass(Client&, t_ircMessage&);
@@ -110,12 +115,11 @@ class	Server {
 		void	quit(Client&, t_ircMessage&);
 		void	privmsg(Client&, t_ircMessage&);
 		void	mode(Client&, t_ircMessage&);
-
 		//Mode Commands
 		void	modeO(Client&, Channel&, bool, std::string&);
 		void	shutdown(Client&, t_ircMessage&);
 
-		//Helper functions
+		//SendMessages
 		void		sendMessage(Client&, std::string);
 		void		broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent);
 		void		broadcastMessage(std::map<std::string, Client>, std::string);

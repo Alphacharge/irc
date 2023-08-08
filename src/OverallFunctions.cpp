@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Validation.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/07 14:22:44 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/08 06:46:54 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Validation.hpp"
+#include "OverallFunctions.hpp"
 
 /*Channel name can't contain more than 200chars, spaces, commas, ^D or miss a & or # at the beginning*/
 bool	isValidChannelName(std::string const &name)

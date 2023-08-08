@@ -6,7 +6,7 @@
 #    By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/02 16:33:15 by rbetz             #+#    #+#              #
-#    Updated: 2023/08/04 07:31:35 by rbetz            ###   ########.fr        #
+#    Updated: 2023/08/08 06:50:02 by rbetz            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,8 @@ CXXFLAGS	+=	-g #-fsanitize=address
 VPATH	:=	src/
 
 SRC_F	:=	ircserv.cpp Server.cpp Client.cpp Channel.cpp
-SRC_F	+=	Validation.cpp
+SRC_F	+=	OverallFunctions.cpp Commands.cpp Parsing.cpp
+SRC_F	+=	SendMessages.cpp
 
 ###			###			OBJECTS			###			###
 OBJ_D	:=	./obj
