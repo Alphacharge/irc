@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/07 10:59:22 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 06:11:42 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,12 @@ class Channel {
 	void							removeOperator(Client& client);
 	bool							isOperator(Client& client);
 	std::map<std::string, Client>	getOperators(void);
+	void							setUser(Client &client);
 	std::map<std::string, Client>	getUsers(void);
 	std::map<std::string, Client>	getAllMember(void);
-	void							setUser(Client &client);
-	int								getAmountOfAll();
-	int								getLimit();
-	bool							isMember(Client&);
+	int								getAmountOfAll(void);
+	int								getLimit(void);
+	bool							isMember(Client& client);
 
 	void							bann(Client &client);
 	bool							isBanned(Client &client);
