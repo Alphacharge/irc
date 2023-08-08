@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 10:40:55 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 15:18:02 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ class Channel {
 	std::set<Client*>				_banns;
 	std::map<std::string, Client>	_users;
 	std::map<std::string, Client>	_operators;
+	std::map<std::string, Client>	_inviteList;
 
 	public:
 	/*---------------	Exceptions		---------------*/
@@ -63,6 +64,8 @@ class Channel {
 	bool							isMember(Client&);
 	std::map<std::string, Client>	getOperators(void);
 	void							setUser(Client &client);
+	void							setInviteList(Client& client);
+	std::map<std::string, Client>	getInviteList(void);
 	std::map<std::string, Client>	getUsers(void);
 	bool							isUser(Client& client);
 	void							removeUser(Client& client);

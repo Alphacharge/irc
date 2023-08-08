@@ -440,6 +440,7 @@ void	Server::invite(Client& client, t_ircMessage& params) {
 	if (itChannel->isMember((*itClient).getNick()))
 		return (sendMessage(client, ERR_USERONCHANNEL((*itClient).getNick())));
 	std::string	textToBeSent = ":" + itChannel->getName();
+	itChannel->setInviteList(*itClient);
 	sendMessage(*itClient, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), itClient->getNick(), "INVITE", textToBeSent));
 	sendMessage(client, RPL_INVITING(client.getNick(), itClient->getNick(), itChannel->getName()));
 }
