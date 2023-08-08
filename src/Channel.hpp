@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 10:40:55 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 15:45:45 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,25 +63,30 @@ class Channel {
 	void		setLimit(std::string&);
 	int			getLimit(void);
 
-	std::map<std::string, Client>	getAllMember(void);
+	void							setOperator(Client &client);
 	std::map<std::string, Client>	getOperators(void);
+	void							removeOperator(Client& client);
+
+	void							setOperatorStatus(Client &client);
+	void							removeOperatorStatus(Client& client);
+
+	bool							isOperator(Client& client);
+
+	void							setUser(Client &client);
 	std::map<std::string, Client>	getUsers(void);
+	
+	void							setInviteList(Client& client);
+	std::map<std::string, Client>	getInviteList(void);
+
+	bool							isUser(Client& client);
+	void							removeUser(Client& client);
+
+	std::map<std::string, Client>	getAllMember(void);
 	std::string						genUserlist(void);
 
-	bool	isMember(Client&);
 	bool	isMember(std::string& nick);
-
-	void	setOperatorStatus(Client &client);
-	void	removeOperator(Client& client);
-	void	removeOperatorStatus(Client& client);
-	bool	isOperator(Client& client);
-
 	void	setUser(Client &client);
-	bool	isUser(Client& client);
-	void	removeUser(Client& client);
-
 	int								getAmountOfAll(void);
-
 	void							bann(Client &client);
 	bool							isBanned(Client &client);
 };

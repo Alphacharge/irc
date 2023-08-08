@@ -31,7 +31,7 @@ void	Server::sendMessage(Client &client, std::string message) {
 void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent) {
 	std::map<std::string, Client>::iterator it = map.begin();
 	while (it != map.end()) {
-		if(it->second.getNick() != client.getNick())
+		if(it->second.getNick() != client.getNick() || type != "PRIVMSG")
 			sendMessage(it->second, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), channelName, type, textToBeSent));
 		it++;
 	}
