@@ -39,8 +39,9 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		while (it_chan != this->_channel_list.end()) {
 			if (VERBOSE >= 3)
 				std::cout << CYAN << client.getNick() << " tries to join " << *it_join << ". Testing: " << it_chan->getName() << WHITE << std::endl;
-			// Missing check if client is not invited
-			if (it_chan->getName() == *it_join && it_chan->getInvite() == true) {
+			std::map<std::string, Client> invites = it_chan->getInvites();
+			std::map<std::string, Client>::iterator clientinvited = invites.find(client.getNick());
+			if (it_chan->getName() == *it_join && it_chan->getInvite() == true && clientinvited != invites.end()) {
 				sendMessage(client, ERR_INVITEONLYCHAN(*it_join));
 				return ;
 			}
@@ -86,7 +87,6 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		{
 			Channel newCH(*it_join);
 			newCH.setOperator(client);
-				// std::cout << RED << *it_joinpw << WHITE << std::endl;
 			if (it_joinpw != tojoinpw.end())
 				newCH.setPassword(*it_joinpw);
 			this->_channel_list.push_back(newCH);
