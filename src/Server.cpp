@@ -615,7 +615,7 @@ void	Server::invite(Client& client, t_ircMessage& params) {
 		return (sendMessage(client, ERR_CHANOPRIVSNEEDED(client)));
 	// channel is not invit0e only and issuer is not a channel opertator and is not a channel member
 	else if(!itChannel->getInvite() && !itChannel->isOperator(client) && !itChannel->isMember(client.getNick()))
-		return (sendMessage(client, ERR_NOTONCHANNEL(client)));
+		return (sendMessage(client, ERR_NOTONCHANNEL(client.getNick())));
 	// invited nickname is already on channel
 	if (itChannel->isMember((*itClient).getNick()))
 		return (sendMessage(*itClient, ERR_USERONCHANNEL((*itClient).getNick())));
