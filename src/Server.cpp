@@ -192,8 +192,8 @@ std::vector<Client>::iterator	Server::getClient(std::string& nick) {
 	std::vector<Client>::iterator	it = this->_clientVector.begin();
 	while (it->getNick() != nick)
 		it++;
+	return it;
 	}
-}
 
 void	Server::broadcastMessage(std::map<std::string, Client> map, std::string message){
 	for (std::map<std::string, Client>::iterator it = map.begin(); it != map.end(); it++)
