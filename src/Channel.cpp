@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 08:35:58 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 09:31:01 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,10 @@ void	Channel::setOperator(Client &client) {
 
 void	Channel::removeOperator(Client& client) {
 	this->_operators.erase(client.getNick());
+}
+
+void	Channel::removeOperatorStatus(Client& client) {
+	this->removeOperator(client);
 	this->_users[client.getNick()] = client;
 }
 
@@ -154,6 +158,10 @@ bool	Channel::isUser(Client& client)
 	if (found == this->_users.end())
 		return (false);
 	return (true);
+}
+
+void	Channel::removeUser(Client& client) {
+	this->_users.erase(client.getNick());
 }
 
 std::map<std::string, Client>	Channel::getAllMember(void) {
