@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/08 09:22:24 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 10:39:40 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ class	Server {
 		void	quit(Client&, t_ircMessage&);
 		void	privmsg(Client&, t_ircMessage&);
 		void	mode(Client&, t_ircMessage&);
+		void	invite(Client&, t_ircMessage&);
 		void	kick(Client& , t_ircMessage&);
 		//Mode Commands
 		void	modeO(Client&, Channel&, bool, std::string&);

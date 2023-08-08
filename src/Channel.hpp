@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 09:29:29 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 10:40:55 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ class Channel {
 	void							removeOperator(Client& client);
 	void							removeOperatorStatus(Client& client);
 	bool							isOperator(Client& client);
+	bool							isMember(Client&);
 	std::map<std::string, Client>	getOperators(void);
 	void							setUser(Client &client);
 	std::map<std::string, Client>	getUsers(void);
