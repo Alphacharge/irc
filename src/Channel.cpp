@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 15:25:44 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/08 09:31:01 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ Channel::~Channel(void) {
 	this->_banns.clear();
 	this->_users.clear();
 	this->_operators.clear();
-	this->_inviteList.clear();
 }
 
 /*---------------	Operators		---------------*/
@@ -60,7 +59,6 @@ Channel& Channel::operator=(Channel const& other) {
 		this->_banns		= other._banns;
 		this->_users	= other._users;
 		this->_operators = other._operators;
-		this->_inviteList = other._inviteList;
 	}
 	return *this;
 }
@@ -108,15 +106,23 @@ std::string	Channel::getPassword(void) const {
 	return this->_password;
 }
 
-void	Channel::setPassword(std::string &pw) {
+void	Channel::setPassword(std::string pw) {
 	this->_password = pw;
 }
 
-bool	Channel::getInvite(void) const {
+bool	Channel::isInviteOnly(void) const {
 	return this->_inviteonly;
 }
 
-void	Channel::setOperator(Client &client) {
+void	Channel::setInviteOnly(bool yesOrNo) {
+	_inviteonly = yesOrNo;
+}
+
+void	Channel::setRestrictTopic(bool yesOrNo) {
+	_restrictTopic = yesOrNo;
+}
+
+void	Channel::setOperatorStatus(Client &client) {
 	// if (VERBOSE >= 3)
 		// std::cout << ORANGE "xx" << WHITE << std::endl;
 	this->_operators[client.getNick()] = client;
@@ -148,14 +154,6 @@ std::map<std::string, Client>	Channel::getOperators(void) {
 
 void	Channel::setUser(Client &client) {
 	this->_users[client.getNick()] = client;
-}
-
-std::map<std::string, Client>	Channel::getInviteList(void) {
-	return	this->_inviteList;
-}
-
-void	Channel::setInviteList(Client& client) {
-	this->_inviteList[client.getNick()] = client;
 }
 
 std::map<std::string, Client>	Channel::getUsers(void) {
@@ -191,6 +189,18 @@ int	Channel::getAmountOfAll(void) {
 
 int	Channel::getLimit(void) {
 	return this->_limit;
+}
+
+void	Channel::setLimit(int limit) {
+	_limit = limit;
+}
+
+void	Channel::setLimit(std::string& limit) {
+	std::istringstream	iss(limit);
+	int					integer;
+
+	if (iss >> integer)
+		_limit = integer;
 }
 
 bool	Channel::isMember(std::string& nick) {

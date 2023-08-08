@@ -11,11 +11,20 @@
 /* ************************************************************************** */
 
 #pragma once
+
 # include <iostream>
 # include <netinet/in.h>
 # include <poll.h>
 # include "Macros.hpp"
 # include "Colors.hpp"
+
+# define DISCONNECTED	0
+# define CONNECTED		1
+# define CAP			2
+# define AUTHENTICATED	3
+# define NICKGIVEN		4
+# define USERGIVEN		5
+# define REGISTERED		6
 
 class Client {
 	private:

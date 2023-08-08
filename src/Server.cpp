@@ -190,7 +190,7 @@ void	Server::serverStart(void)
 
 std::vector<Client>::iterator	Server::getClient(std::string& nick) {
 	std::vector<Client>::iterator	it = this->_clientVector.begin();
-	while (it->getNick() != nick)
+	while (it->getNick() != nick && it != _clientVector.end())
 		it++;
 	return it;
 }

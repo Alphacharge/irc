@@ -120,6 +120,7 @@ class	Server {
 		void	kick(Client& , t_ircMessage&);
 		//Mode Commands
 		void	modeO(Client&, Channel&, bool, std::string&);
+		void	modeK(Client&, Channel&, bool, std::string&);
 		void	shutdown(Client&, t_ircMessage&);
 
 		//SendMessages

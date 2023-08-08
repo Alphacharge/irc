@@ -40,7 +40,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 			if (VERBOSE >= 3)
 				std::cout << CYAN << client.getNick() << " tries to join " << *it_join << ". Testing: " << it_chan->getName() << WHITE << std::endl;
 			// Missing check if client is not invited
-			if (it_chan->getName() == *it_join && it_chan->getInvite() == true) {
+			if (it_chan->getName() == *it_join && it_chan->isInviteOnly() == true) {
 				sendMessage(client, ERR_INVITEONLYCHAN(*it_join));
 				return ;
 			}
@@ -85,7 +85,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		if (it_chan == this->_channel_list.end())
 		{
 			Channel newCH(*it_join);
-			newCH.setOperator(client);
+			newCH.setOperatorStatus(client);
 				// std::cout << RED << *it_joinpw << WHITE << std::endl;
 			if (it_joinpw != tojoinpw.end())
 				newCH.setPassword(*it_joinpw);
@@ -282,8 +282,10 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 	std::string							channelname = params.parametersList.front();
 
 	//check if a channel mode is given
-	if (params.parametersList.size() < 2)
+	if (params.parametersList.size() < 2) {
+		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
 		return;
+	}
 	//check if channel exists
 	if (isValidChannelName(channelname) == false) {
 		sendMessage(client, ERR_BADCHANMASK(channelname));
@@ -308,21 +310,30 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 			add = true;
 		else if (*s == '-')
 			add = false;
+		else if (*s == 'i')
+			channel->setInviteOnly(add);
+		else if (*s == 't')
+			channel->setRestrictTopic(add);
+		else if (*s == 'k') {
+			if (add == true)
+				channel->setPassword(*++parameter);
+			else
+				channel->setPassword("");
+		}
 		else if (*s == 'o')
-		//MISSING: what happens if mode doesn't exist?
 			modeO(client, *channel, add, *++parameter);
-		// further modes follow here tbd
+		else if (*s == 'l') {
+			if (add == true)
+				channel->setLimit(*++parameter);
+			else
+				channel->setLimit(-1);
+		}
+		else
+			sendMessage(client, ERR_UNKNOWNMODE(mode, channel->getName()));
 	}
 }
 
 void	Server::modeO(Client& client, Channel& channel, bool add, std::string& target) {
-	// search target client
-	// std::vector<Client>::iterator	it = this->_clientVector.begin();
-	// while (it->getNick() != target)
-	// 	if (it++ == this->_clientVector.end()) {
-	// 		sendMessage(client, ERR_NOSUCHNICK(target));
-	// 		return;
-	// 	}
 	std::vector<Client>::iterator	it = getClient(target);
 	if (it == this->_clientVector.end()) {
 			sendMessage(client, ERR_NOSUCHNICK(target));
@@ -330,7 +341,7 @@ void	Server::modeO(Client& client, Channel& channel, bool add, std::string& targ
 	}
 
 	if (add == true)
-		channel.setOperator(*it);
+		channel.setOperatorStatus(*it);
 	else
 		channel.removeOperatorStatus(*it);
 }
@@ -431,16 +442,15 @@ void	Server::invite(Client& client, t_ircMessage& params) {
 	if (itChannel == this->_channel_list.end())
 		return (sendMessage(client, ERR_NOSUCHCHANNEL(*itParams)));
 	// channel is invite only and issuer is not operator
-	if (itChannel->getInvite() && !itChannel->isOperator(client))
+	if (itChannel->isInviteOnly() && !itChannel->isOperator(client))
 		return (sendMessage(client, ERR_CHANOPRIVSNEEDED(client)));
-	// channel is not invit0e only and issuer is not a channel opertator and is not a channel member
-	else if(!itChannel->getInvite() && !itChannel->isOperator(client) && !itChannel->isMember(client.getNick()))
+	// channel is not invite only and issuer is not a channel opertator and is not a channel member
+	else if(!itChannel->isInviteOnly() && !itChannel->isMember(client.getNick()))
 		return (sendMessage(client, ERR_NOTONCHANNEL(client.getNick())));
 	// invited nickname is already on channel
 	if (itChannel->isMember((*itClient).getNick()))
 		return (sendMessage(client, ERR_USERONCHANNEL((*itClient).getNick())));
 	std::string	textToBeSent = ":" + itChannel->getName();
-	itChannel->setInviteList(*itClient);
 	sendMessage(*itClient, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), itClient->getNick(), "INVITE", textToBeSent));
 	sendMessage(client, RPL_INVITING(client.getNick(), itClient->getNick(), itChannel->getName()));
 }

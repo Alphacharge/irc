@@ -76,7 +76,7 @@ bool	Server::handleClient(char *buffer, std::vector<Client>::iterator &clientIte
 	std::istringstream	iss(buffer);
 	std::string 		tmpBuffer;
 	t_ircMessage 		clientCommand;
-	bool				executable;
+	bool				executable = true;
 
 	while (getline(iss, tmpBuffer)) {
 		if (iss.eof()) {
