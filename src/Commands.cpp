@@ -438,8 +438,8 @@ void	Server::invite(Client& client, t_ircMessage& params) {
 		return (sendMessage(client, ERR_NOTONCHANNEL(client.getNick())));
 	// invited nickname is already on channel
 	if (itChannel->isMember((*itClient).getNick()))
-		return (sendMessage(*itClient, ERR_USERONCHANNEL((*itClient).getNick())));
-	std::string	textToBeSent = " :" + itChannel->getName();
+		return (sendMessage(client, ERR_USERONCHANNEL((*itClient).getNick())));
+	std::string	textToBeSent = ":" + itChannel->getName();
 	sendMessage(*itClient, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), itClient->getNick(), "INVITE", textToBeSent));
 	sendMessage(client, RPL_INVITING(client.getNick(), itClient->getNick(), itChannel->getName()));
 }
