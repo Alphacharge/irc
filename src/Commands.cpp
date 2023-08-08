@@ -29,7 +29,6 @@ void	Server::join(Client &client, t_ircMessage& params) {
 	std::list<std::string> tojoinpw = splitString(params.parametersList.back(), ',');
 	std::list<std::string>::iterator it_join = tojoin.begin();
 	std::list<std::string>::iterator it_joinpw = tojoinpw.begin();
-	std::cout << RED << "Channel:|" << *it_join << "|PW:|" << *it_join << "|" << WHITE << std::endl;
 	while (it_join != tojoin.end()) {
 		//--->We found on official Server no Character that triggers this error
 		if (!isValidChannelName(*it_join)) {
@@ -218,7 +217,7 @@ void	Server::quit(Client &client, t_ircMessage &params) {
 	client.setStatus(DISCONNECTED);
 	//broadcast to all relevant channels
 	for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++) {
-		if (it->isMember(client))
+		if (it->isMember(client.getNick()))
 			broadcastMessage(it->getAllMember(), ":" + client.getNick() + "@irc42" + params.parameters + "; User left the irc network.");
 	}
 }
@@ -318,17 +317,131 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 
 void	Server::modeO(Client& client, Channel& channel, bool add, std::string& target) {
 	// search target client
-	std::vector<Client>::iterator	it = this->_clientVector.begin();
-	while (it->getNick() != target)
-		if (it++ == this->_clientVector.end()) {
+	// std::vector<Client>::iterator	it = this->_clientVector.begin();
+	// while (it->getNick() != target)
+	// 	if (it++ == this->_clientVector.end()) {
+	// 		sendMessage(client, ERR_NOSUCHNICK(target));
+	// 		return;
+	// 	}
+	std::vector<Client>::iterator	it = getClient(target);
+	if (it == this->_clientVector.end()) {
 			sendMessage(client, ERR_NOSUCHNICK(target));
 			return;
-		}
+	}
 
 	if (add == true)
 		channel.setOperator(*it);
 	else
-		channel.removeOperator(*it);
+		channel.removeOperatorStatus(*it);
 }
 
 // void	Server::invite()
+
+void	Server::kick(Client &client, t_ircMessage& params) {
+	if (client.getStatus() < REGISTERED) {
+		sendMessage(client, ERR_NOTREGISTERED);
+		return;
+	}
+	if (params.parameters.size() < 2) {
+		sendMessage(client, ERR_NEEDMOREPARAMS(params.command));
+		return ;
+	}
+	std::list<std::string> to_kick_from = splitString(params.parametersList.front(), ',');
+	std::list<std::string> to_kick_users = splitString(params.parametersList.back(), ',');
+	std::list<std::string>::iterator it_to_kick_from = to_kick_from.begin();
+	std::list<std::string>::iterator it_to_kick_users = to_kick_users.begin();
+	while (it_to_kick_from != to_kick_from.end()) {
+		//--->We found on official Server no Character that triggers this error
+		if (!isValidChannelName(*it_to_kick_from)) {
+			sendMessage(client, ERR_BADCHANMASK(*it_to_kick_from));
+			return ;
+		}
+		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
+		while (it_chan != this->_channel_list.end()) {
+			if (VERBOSE >= 3)
+				std::cout << CYAN << client.getNick() << " tries to join " << *it_to_kick_from << ". Testing: " << it_chan->getName() << WHITE << std::endl;
+			//client is no Member of the Channel
+			if (it_chan->getName() == *it_to_kick_from && it_chan->isMember(client.getNick())) {
+				sendMessage(client, ERR_NOTONCHANNEL(it_chan->getName()));
+				return ;
+			}
+			//Kicking Member is no Operator
+			if (it_chan->getName() == *it_to_kick_from && it_chan->isOperator(client)) {
+				sendMessage(client, ERR_CHANOPRIVSNEEDED(client));
+				return ;
+			}
+			//To be kicked User is no Member of the Channel
+			if (it_chan->getName() == *it_to_kick_from && it_chan->isMember(*it_to_kick_users)) {
+				sendMessage(client, ERR_USERNOTINCHANNEL(*it_to_kick_users, it_chan));
+				return ;
+			}
+			if (*it_to_kick_from != it_chan->getName())
+				it_chan++;
+			else
+				break;
+		}
+		std::string	textToBeSent;
+		//extract message
+		if (params.parameters.size() > 2) {
+			size_t	spacePos = params.parameters.find(" ", params.parameters.find(" ") + 1);
+			if (spacePos != std::string::npos)
+				textToBeSent = params.parameters.substr(spacePos + 1, params.parameters.size());
+		}
+		if (it_chan == this->_channel_list.end()) {
+			sendMessage(client, ERR_NOSUCHCHANNEL(*it_to_kick_from));
+			return ;
+		} else {
+			std::vector<Client>::iterator it_client = getClient(*it_to_kick_users);
+			if (it_chan->isOperator(*it_client))
+				it_chan->removeOperator(*it_client);
+			if (it_chan->isUser(*it_client))
+				it_chan->removeUser(*it_client);
+			// sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName(), it_chan->genUserlist()));
+			// broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
+		}
+		it_to_kick_from++;
+		it_to_kick_users++;
+	}
+	printAllChannels();
+}
+
+void	Server::invite(Client& client, t_ircMessage& params) {
+	// too few parameters
+	if (params.parametersList.size() < 2)
+		return (sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters)));
+	std::list<std::string>::iterator itParams = params.parametersList.begin();
+	std::list<Channel>::iterator itChannel = this->_channel_list.begin();
+	std::vector<Client>::iterator itClient = this->_clientVector.begin();
+	while (itClient != this->_clientVector.end()) {
+		if (*itParams == itClient->getNick())
+			break;
+		itClient++;
+	}
+	// invited nickname does not exist
+	if (itClient == this->_clientVector.end())
+		return(sendMessage(client, ERR_NOSUCHNICK(*itParams)));
+	itParams++;
+	// channel name is not valid
+	if(!isValidChannelName(*itParams))
+		return (sendMessage(client, ERR_NOSUCHCHANNEL(*itParams)));
+	while(itChannel != this->_channel_list.end()) {
+		if (*itParams == itChannel->getName())
+			break;
+		itChannel++;
+	}
+	// channel does not exist
+	if (itChannel == this->_channel_list.end())
+		return (sendMessage(client, ERR_NOSUCHCHANNEL(*itParams)));
+	// channel is invite only and issuer is not operator
+	if (itChannel->getInvite() && !itChannel->isOperator(client))
+		return (sendMessage(client, ERR_CHANOPRIVSNEEDED(client)));
+	// channel is not invit0e only and issuer is not a channel opertator and is not a channel member
+	else if(!itChannel->getInvite() && !itChannel->isOperator(client) && !itChannel->isMember(client.getNick()))
+		return (sendMessage(client, ERR_NOTONCHANNEL(client.getNick())));
+	// invited nickname is already on channel
+	if (itChannel->isMember((*itClient).getNick()))
+		return (sendMessage(*itClient, ERR_USERONCHANNEL((*itClient).getNick())));
+	std::string	textToBeSent = " :" + itChannel->getName();
+	sendMessage(*itClient, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), itClient->getNick(), "INVITE", textToBeSent));
+	sendMessage(client, RPL_INVITING(client.getNick(), itClient->getNick(), itChannel->getName()));
+}
