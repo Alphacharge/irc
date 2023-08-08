@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 09:31:01 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 15:25:44 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ Channel::~Channel(void) {
 	this->_banns.clear();
 	this->_users.clear();
 	this->_operators.clear();
+	this->_inviteList.clear();
 }
 
 /*---------------	Operators		---------------*/
@@ -59,6 +60,7 @@ Channel& Channel::operator=(Channel const& other) {
 		this->_banns		= other._banns;
 		this->_users	= other._users;
 		this->_operators = other._operators;
+		this->_inviteList = other._inviteList;
 	}
 	return *this;
 }
@@ -146,6 +148,14 @@ std::map<std::string, Client>	Channel::getOperators(void) {
 
 void	Channel::setUser(Client &client) {
 	this->_users[client.getNick()] = client;
+}
+
+std::map<std::string, Client>	Channel::getInviteList(void) {
+	return	this->_inviteList;
+}
+
+void	Channel::setInviteList(Client& client) {
+	this->_inviteList[client.getNick()] = client;
 }
 
 std::map<std::string, Client>	Channel::getUsers(void) {
