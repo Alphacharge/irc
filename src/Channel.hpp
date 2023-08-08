@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 15:45:45 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 15:54:30 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ class Channel {
 	std::set<Client*>				_banns;
 	std::map<std::string, Client>	_users;
 	std::map<std::string, Client>	_operators;
+	std::map<std::string, Client>	_inviteList;
 
 	public:
 	/*---------------	Exceptions		---------------*/
@@ -85,7 +86,6 @@ class Channel {
 	std::string						genUserlist(void);
 
 	bool	isMember(std::string& nick);
-	void	setUser(Client &client);
 	int								getAmountOfAll(void);
 	void							bann(Client &client);
 	bool							isBanned(Client &client);
