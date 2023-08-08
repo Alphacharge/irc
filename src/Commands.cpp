@@ -39,8 +39,9 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		while (it_chan != this->_channel_list.end()) {
 			if (VERBOSE >= 3)
 				std::cout << CYAN << client.getNick() << " tries to join " << *it_join << ". Testing: " << it_chan->getName() << WHITE << std::endl;
-			// Missing check if client is not invited
-			if (it_chan->getName() == *it_join && it_chan->isInviteOnly() == true) {
+			std::map<std::string, Client> invites = it_chan->getInviteList();
+			std::map<std::string, Client>::iterator clientinvited = invites.find(client.getNick());
+			if (it_chan->getName() == *it_join && it_chan->isInviteOnly() == true && clientinvited != invites.end()) {
 				sendMessage(client, ERR_INVITEONLYCHAN(*it_join));
 				return ;
 			}
@@ -85,8 +86,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		if (it_chan == this->_channel_list.end())
 		{
 			Channel newCH(*it_join);
-			newCH.setOperatorStatus(client);
-				// std::cout << RED << *it_joinpw << WHITE << std::endl;
+			newCH.setOperator(client);
 			if (it_joinpw != tojoinpw.end())
 				newCH.setPassword(*it_joinpw);
 			this->_channel_list.push_back(newCH);
@@ -370,17 +370,17 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 			if (VERBOSE >= 3)
 				std::cout << CYAN << client.getNick() << " tries to join " << *it_to_kick_from << ". Testing: " << it_chan->getName() << WHITE << std::endl;
 			//client is no Member of the Channel
-			if (it_chan->getName() == *it_to_kick_from && it_chan->isMember(client.getNick())) {
+			if (it_chan->getName() == *it_to_kick_from && !it_chan->isMember(client.getNick())) {
 				sendMessage(client, ERR_NOTONCHANNEL(it_chan->getName()));
 				return ;
 			}
 			//Kicking Member is no Operator
-			if (it_chan->getName() == *it_to_kick_from && it_chan->isOperator(client)) {
+			if (it_chan->getName() == *it_to_kick_from && !it_chan->isOperator(client)) {
 				sendMessage(client, ERR_CHANOPRIVSNEEDED(client));
 				return ;
 			}
 			//To be kicked User is no Member of the Channel
-			if (it_chan->getName() == *it_to_kick_from && it_chan->isMember(*it_to_kick_users)) {
+			if (it_chan->getName() == *it_to_kick_from && !it_chan->isMember(*it_to_kick_users)) {
 				sendMessage(client, ERR_USERNOTINCHANNEL(*it_to_kick_users, it_chan));
 				return ;
 			}
@@ -401,12 +401,20 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 			return ;
 		} else {
 			std::vector<Client>::iterator it_client = getClient(*it_to_kick_users);
+			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "KICK", textToBeSent);
 			if (it_chan->isOperator(*it_client))
 				it_chan->removeOperator(*it_client);
 			if (it_chan->isUser(*it_client))
 				it_chan->removeUser(*it_client);
-			// sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName(), it_chan->genUserlist()));
-			// broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
+			// :6!~1@127.0.0.1 KICK &test
+			//Operator
+			// KICK #test me bye
+			// :you!~1@188.244.102.158 KICK #test me :bye
+			//Kicked Ueer
+			// :you!~1@188.244.102.158 KICK #test me :bye
+			// PING :Stopover.ky.us.starlink-irc.org
+			//3rd Party User
+			// :you!~1@188.244.102.158 KICK #test me :bye
 		}
 		it_to_kick_from++;
 		it_to_kick_users++;
@@ -414,6 +422,7 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 	printAllChannels();
 }
 
+//JOIN #test:you!~1@188.244.102.158 INVITE me :#test
 void	Server::invite(Client& client, t_ircMessage& params) {
 	// too few parameters
 	if (params.parametersList.size() < 2)
