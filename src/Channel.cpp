@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 08:23:14 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 08:35:58 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,14 @@ std::map<std::string, Client>	Channel::getUsers(void) {
 	return this->_users;
 }
 
+bool	Channel::isUser(Client& client)
+{
+	std::map<std::string, Client>::iterator found = this->_users.find(client.getNick());
+	if (found == this->_users.end())
+		return (false);
+	return (true);
+}
+
 std::map<std::string, Client>	Channel::getAllMember(void) {
 	std::map<std::string, Client> copy = this->_users;
 	std::map<std::string, Client>::iterator it = this->_operators.begin();
@@ -168,7 +176,7 @@ int	Channel::getLimit(void) {
 }
 
 bool	Channel::isMember(std::string& nick) {
-	if (this->_users.find(nick) != this->_users.end())
+	if (this->_users.find(nick) != this->_users.end() || this->_operators.find(nick) != this->_operators.end())
 		return (true);
 	return (false);
 }
