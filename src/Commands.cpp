@@ -241,38 +241,38 @@ void	Server::privmsg(Client &client, t_ircMessage &params) {
 	}
 	std::string	textToBeSent;
 	size_t	spacePos = params.parameters.find(" ");
+	// no text to be sent
 	if (spacePos != std::string::npos)
 		textToBeSent = params.parameters.substr(spacePos + 1, params.parameters.size());
-	if (spacePos == std::string::npos || textToBeSent.empty()) {
-		sendMessage(client, ERR_NOTEXTTOSEND(client.getNick()));
-		return;}
+	if (spacePos == std::string::npos || textToBeSent.empty()) {return(sendMessage(client, ERR_NOTEXTTOSEND(client.getNick())));}
 	std::list<std::string>	targetList = splitString(params.parameters.substr(0, spacePos), ',');
 	for (std::list<std::string>::iterator itTarget = targetList.begin(); itTarget != targetList.end(); ++itTarget) {
+		// no valid channel name
 		if (isValidChannelName(*itTarget)) {
 			std::list<Channel>::iterator itChannel = this->_channel_list.begin();
 			while (itChannel != this->_channel_list.end()) {
 				if (itChannel->getName() == *itTarget) {
-					broadcastMessage(itChannel->getAllMember(), client, itChannel->getName(), "PRIVMSG", textToBeSent);
-					break;
+					if (!itChannel->isMember(client.getNick())) { return(sendMessage(client, ERR_CANNOTSENDTOCHAN(client.getNick(),itChannel->getName())));}
+					return(broadcastMessage(itChannel->getAllMember(), client, itChannel->getName(), "PRIVMSG", textToBeSent));
 				}
 				itChannel++;
 			}
-			if (itChannel == this->_channel_list.end()) {
-				sendMessage(client, ERR_NOSUCHCHANNEL(*itTarget));
-			}
-		} else {
+			// no existing channel name
+			if (itChannel == this->_channel_list.end()) {return (sendMessage(client, ERR_NOSUCHCHANNEL(*itTarget)));}
+		}
+		else {
+			// send message to user
 			std::vector<Client>::iterator itClient = this->_clientVector.begin();
 			while(itClient != this->_clientVector.end()) {
 				if(itClient->getNick() == *itTarget) {
 					std::map<std::string, Client> target;
 					target[itClient->getNick()] =  *itClient;
-					broadcastMessage(target, client, "", "PRIVMSG", textToBeSent);
-					break;
+					return(broadcastMessage(target, client, "", "PRIVMSG", textToBeSent));
 				}
 				itClient++;
 			}
-			if (itClient == this->_clientVector.end())
-				sendMessage(client, ERR_NOSUCHNICK(*itTarget));
+			// nickname not found
+			if (itClient == this->_clientVector.end()) {return(sendMessage(client, ERR_NOSUCHNICK(*itTarget)));}
 		}
 	}
 }
