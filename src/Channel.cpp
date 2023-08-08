@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 09:31:01 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 15:53:41 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,4 +244,12 @@ std::string	Channel::genUserlist(void) {
 		it++;
 	}
 	return userlist;
+}
+
+std::map<std::string, Client>	Channel::getInviteList(void) {
+	return this->_inviteList;
+}
+
+void	Channel::setInviteList(Client& client) {
+	this->_inviteList[client.getNick()] = client;
 }
