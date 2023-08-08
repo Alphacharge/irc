@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/07 13:50:27 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 08:39:52 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -323,8 +323,8 @@
 // # define ERR_DEAD() ()
 // # define ERR_TARGETTOOFAST() ()
 // # define ERR_SERVICESDOWN() ()
-// # define ERR_USERNOTINCHANNEL() ()
-// # define ERR_NOTONCHANNEL() ()
+# define ERR_USERNOTINCHANNEL(nick, channel) (std::string(std::string(nick) + " " + channel->getName() + " :They aren't on that channel"))
+# define ERR_NOTONCHANNEL(channel) (std::string(channel->getName() + " :You're not on that channel"))
 // # define ERR_USERONCHANNEL() ()
 // # define ERR_NOLOGIN() ()
 // # define ERR_SUMMONDISABLED() ()
