@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:01:01 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/07 13:18:25 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/08 06:17:10 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,16 +65,15 @@ void Client::setClientPollfd_events(short const& event) {
 }
 
 void	Client::setNick(std::string nick) {
-	_nick = nick;
+	this->_nick = nick;
 }
 
 void	Client::setUsername(std::string username) {
-	_username = username;
+	this->_username = username;
 }
 
-void	Client::setStatus(int status)
-{
-	_status = status;
+void	Client::setStatus(int status) {
+	this->_status = status;
 }
 
 int&	Client::getClientSocket(void) {
@@ -94,7 +93,7 @@ std::string&	Client::getNick(void) {
 }
 
 std::string&	Client::getUsername(void) {
-	return (_username);
+	return (this->_username);
 }
 
 std::string&	Client::getBuffer(void) {
@@ -106,7 +105,7 @@ void	Client::appendBuffer(std::string const& str) {
 }
 
 int	Client::getStatus(void) {
-	return (_status);
+	return (this->_status);
 }
 
 void	Client::print(void) {

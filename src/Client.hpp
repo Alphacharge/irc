@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 09:38:50 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/05 20:15:37 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 06:17:04 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,18 +29,18 @@ class Client {
 
 	public:
 		Client(void);
-		Client(Client const&);
+		Client(Client const& src);
 		~Client(void);
-		Client&	operator=(Client const&);
+		Client&	operator=(Client const& rhs);
 
-		void	setClientSocket(int const&);
-		void	setClientAddress(struct sockaddr_in const&);
+		void	setClientSocket(int const& socket);
+		void	setClientAddress(struct sockaddr_in const& address);
 		void	setClientPollfd_fd(int const&);
 		void	setClientPollfd_events(short const&);
-		void	setNick(std::string);
-		void	setUsername(std::string);
-		void	setStatus(int);
-		void	appendBuffer(std::string const&);
+		void	setNick(std::string nick);
+		void	setUsername(std::string username);
+		void	setStatus(int status);
+		void	appendBuffer(std::string const& str);
 		void	print(void);
 
 		int&				getClientSocket(void);
