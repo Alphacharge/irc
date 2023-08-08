@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 06:11:42 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 08:22:39 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ class Channel {
 	std::map<std::string, Client>	getAllMember(void);
 	int								getAmountOfAll(void);
 	int								getLimit(void);
-	bool							isMember(Client& client);
+	bool							isMember(std::string& nick);
 
 	void							bann(Client &client);
 	bool							isBanned(Client &client);

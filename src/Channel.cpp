@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 06:13:43 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 08:23:14 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,8 +167,8 @@ int	Channel::getLimit(void) {
 	return this->_limit;
 }
 
-bool	Channel::isMember(Client& client) {
-	if (_users.find(client.getNick()) != _users.end())
+bool	Channel::isMember(std::string& nick) {
+	if (this->_users.find(nick) != this->_users.end())
 		return (true);
 	return (false);
 }
