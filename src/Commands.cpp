@@ -102,7 +102,8 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		it_join++;
 		it_joinpw++;
 	}
-	printAllChannels();
+	if (VERBOSE >= 2)
+		printAllChannels();
 }
 
 void	Server::cap(Client &client, t_ircMessage &params) {
@@ -225,11 +226,17 @@ void	Server::quit(Client &client, t_ircMessage &params) {
 void	Server::shutdown(Client &client, t_ircMessage &params) {
 	(void)params;
 	(void)client;
-	std::cout << PURPLE << "i will shutdown" << WHITE << std::endl;
+	if (VERBOSE >= 1)
+		std::cout << PURPLE << "SERVER SHUTTING DOWN in 5s..." << WHITE << std::endl;
 	std::vector<Client>::iterator it = this->_clientVector.begin();
 	while (it != this->_clientVector.end()) {
 		sendMessage(*it, "Server is shutting down. Bye\n");
 		it++;
+	}
+	for (short i = 4; i > 0; --i) {
+		sleep(1);
+		if (VERBOSE >= 1)
+			std::cout << PURPLE << i << "s..." << WHITE << std::endl;
 	}
 	exit(0);
 }
@@ -408,7 +415,8 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 		it_to_kick_from++;
 		it_to_kick_users++;
 	}
-	printAllChannels();
+	if (VERBOSE >= 2)
+		printAllChannels();
 }
 
 void	Server::invite(Client& client, t_ircMessage& params) {

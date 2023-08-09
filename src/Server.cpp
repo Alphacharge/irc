@@ -113,8 +113,8 @@ void	Server::serverSetup(void)
 
 		//setting socket to non-blocking as required in subject
 		// fcntl(_serverSocket, F_SETFL, O_NONBLOCK);
-
-		std::cout << "Server startup completed. Listening on port " << this->_serverPort << std::endl;
+		if (VERBOSE >= 1)
+			std::cout << CYAN << "Server startup completed. Listening on port " << this->_serverPort << WHITE << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -157,12 +157,14 @@ void	Server::serverStart(void)
 					{
 						for (std::vector<t_ircMessage>::iterator it = commands.begin(); it != commands.end(); ++it)
 						{
-							std::cout << "------------\n";
-							std::cout << "Status     : " << clientIterator->getStatus() << std::endl;
-							std::cout << "Prefix     : " << it->prefix << std::endl;
-							std::cout << "Command    : " << it->command << std::endl;
-							std::cout << "Parameters : " << it->parameters << std::endl;
-
+							if (VERBOSE >= 2) {
+								std::cout << CYAN << "------------------------" << std::endl;
+								std::cout << "Status     : " << clientIterator->getStatus() << std::endl;
+								std::cout << "Prefix     : " << it->prefix << std::endl;
+								std::cout << "Command    : " << it->command << std::endl;
+								std::cout << "Parameters : " << it->parameters << std::endl;
+								std::cout << CYAN << "------------------------" << WHITE << std::endl;
+							}
 							std::map<std::string, void (Server::*)(Client &, t_ircMessage &)>::iterator function = this->_commandMap.find(it->command);
 							if (function != _commandMap.end())
 								(this->*(function->second))(*clientIterator, *it);
@@ -171,7 +173,8 @@ void	Server::serverStart(void)
 					}
 					if (!this->_clientVector[i - 1].getStatus() || this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
 					{
-						std::cout << "Client disconnected" << std::endl;
+						if (VERBOSE >= 1)
+							std::cout << PURPLE << "Client disconnected" << WHITE << std::endl;
 						close(this->_fds[i].fd);
 						this->_fds.erase(this->_fds.begin() + i);
 						this->_clientVector.erase(this->_clientVector.begin() + i - 1);

@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/09 08:23:56 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 08:53:43 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 # define PURPLE		"\x01\033[1;38;2;128;0;128m\x02"
 # define LGREEN		"\x01\033[1;38;2;0;255;0m\x02"
 
-# define VERBOSE	3 //3 Constructors, 2 Infos from Commands, 1 Input from Client, 0 Zero
+# define VERBOSE	2 //3 Constructors, 2 Infos from Commands, 1 Input from Client, 0 Zero
 
 #endif
 

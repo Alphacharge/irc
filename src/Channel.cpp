@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/09 06:57:54 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 08:26:10 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,12 +126,8 @@ void	Channel::setRestrictTopic(bool yesOrNo) {
 }
 
 void	Channel::setOperatorStatus(Client &client) {
-	// if (VERBOSE >= 3)
-		// std::cout << ORANGE "xx" << WHITE << std::endl;
 	this->_operators[client.getNick()] = client;
 	this->_users.erase(client.getNick());
-	// if (VERBOSE >= 3)
-	// 	std::cout << ORANGE "yy" << WHITE << std::endl;
 }
 
 void	Channel::removeOperator(Client& client) {
