@@ -367,10 +367,8 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 		}
 		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
 		while (it_chan != this->_channel_list.end()) {
-			std::cout << PURPLE <<"KICK " << *it_to_kick_users<<" from channel "<<it_chan->getName()<<WHITE<<std::endl;
 			//client is no Member of the Channel
 			if (it_chan->getName() == *it_to_kick_from && !it_chan->isMember(client.getNick())) {
-				std::cout << it_chan->isMember(client.getNick())<<std::endl;
 				sendMessage(client, ERR_NOTONCHANNEL(it_chan->getName()));
 				return ;
 			}

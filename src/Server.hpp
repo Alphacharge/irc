@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/08 10:39:40 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 08:23:50 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@
 # include <algorithm>
 # include "Client.hpp"
 # include "Channel.hpp"
-# include "Macros.hpp"
 # include "Messages.hpp"
 # include "Colors.hpp"
 # include "OverallFunctions.hpp"

@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 09:38:50 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/08 06:17:04 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 08:23:19 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 # include <iostream>
 # include <netinet/in.h>
 # include <poll.h>
-# include "Macros.hpp"
 # include "Colors.hpp"
 
 # define DISCONNECTED	0
