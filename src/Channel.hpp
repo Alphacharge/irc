@@ -67,6 +67,7 @@ class Channel {
 	void							setPassword(std::string pw);
 	void							setLimit(int);
 	void							setLimit(std::string&);
+	void							removeLimit();
 	void							setInviteOnly(bool);
 	void							removeInvite(Client& client);
 	void							setRestrictTopic(bool);

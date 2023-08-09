@@ -230,15 +230,20 @@ int	Channel::getLimit(void) {
 }
 
 void	Channel::setLimit(int limit) {
-	_limit = limit;
+	if (limit > 0)
+		_limit = limit;
 }
 
 void	Channel::setLimit(std::string& limit) {
 	std::istringstream	iss(limit);
 	int					integer;
 
-	if (iss >> integer)
+	if (iss >> integer && integer > 0)
 		_limit = integer;
+}
+
+void	Channel::removeLimit() {
+	_limit = -1;
 }
 
 bool	Channel::isMember(std::string& nick) {
