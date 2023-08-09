@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 16:03:17 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 06:57:10 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ class Channel {
 	void							setLimit(int);
 	void							setLimit(std::string&);
 	void							setInviteOnly(bool);
+	void							removeInvite(Client& client);
 	void							setRestrictTopic(bool);
 	void							setInviteList(Client& client);
 	

@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 16:11:11 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 06:57:54 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,9 @@ void	Channel::setInviteOnly(bool yesOrNo) {
 	_inviteonly = yesOrNo;
 }
 
+void	Channel::removeInvite(Client& client) {
+	this->_inviteList.erase(client.getNick());
+}
 void	Channel::setRestrictTopic(bool yesOrNo) {
 	_restrictTopic = yesOrNo;
 }
