@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/09 18:17:12 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/09 19:09:35 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,17 +122,16 @@ void	Channel::setInviteOnly(bool yesOrNo) {
 	_inviteonly = yesOrNo;
 }
 
+void	Channel::removeInvite(Client& client) {
+	this->_inviteList.erase(client.getNick());
+}
 void	Channel::setRestrictTopic(bool yesOrNo) {
 	_restrictTopic = yesOrNo;
 }
 
 void	Channel::setOperatorStatus(Client &client) {
-	// if (VERBOSE >= 3)
-		// std::cout << ORANGE "xx" << WHITE << std::endl;
 	this->_operators[client.getNick()] = client;
 	this->_users.erase(client.getNick());
-	// if (VERBOSE >= 3)
-	// 	std::cout << ORANGE "yy" << WHITE << std::endl;
 }
 
 void	Channel::removeOperator(Client& client) {

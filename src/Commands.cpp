@@ -37,8 +37,6 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		}
 		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
 		while (it_chan != this->_channel_list.end()) {
-			if (VERBOSE >= 3)
-				std::cout << CYAN << client.getNick() << " tries to join " << *it_join << ". Testing: " << it_chan->getName() << WHITE << std::endl;
 			std::map<std::string, Client> invites = it_chan->getInviteList();
 			std::map<std::string, Client>::iterator clientinvited = invites.find(client.getNick());
 			if (it_chan->getName() == *it_join && it_chan->isInviteOnly() == true && clientinvited != invites.end()) {
@@ -51,7 +49,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 				return ;
 			}
 			//possible problem if no password exist in the command, also valid iterator of password is not secured
-			if (it_chan->getName() == *it_join && it_joinpw != tojoinpw.end() && it_chan->getPassword() != *it_joinpw) {
+			if (it_chan->getName() == *it_join && ((it_joinpw == tojoinpw.end() && it_chan->getPassword() != "") || (it_joinpw != tojoinpw.end() && it_chan->getPassword() != *it_joinpw))) {
 				sendMessage(client, ERR_BADCHANNELKEY(*it_join));
 				return ;
 			}
@@ -95,6 +93,8 @@ void	Server::join(Client &client, t_ircMessage& params) {
 			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join));
 		} else {
 			it_chan->setUser(client);
+			if (it_chan->isInviteOnly())
+				it_chan->removeInvite(client);
 			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
 			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName(), it_chan->genUserlist()));
 			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName()));
@@ -102,7 +102,8 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		it_join++;
 		it_joinpw++;
 	}
-	printAllChannels();
+	if (VERBOSE >= 2)
+		printAllChannels();
 }
 
 void	Server::cap(Client &client, t_ircMessage &params) {
@@ -225,13 +226,19 @@ void	Server::quit(Client &client, t_ircMessage &params) {
 void	Server::shutdown(Client &client, t_ircMessage &params) {
 	(void)params;
 	(void)client;
-	std::cout << PURPLE << "i will shutdown" << WHITE << std::endl;
+	if (VERBOSE >= 1)
+		std::cout << PURPLE << "SERVER SHUTTING DOWN in 5s..." << WHITE << std::endl;
 	std::vector<Client>::iterator it = this->_clientVector.begin();
 	while (it != this->_clientVector.end()) {
 		sendMessage(*it, "Server is shutting down. Bye\n");
 		it++;
 	}
-	exit(0);
+	for (short i = 4; i > 0; --i) {
+		sleep(1);
+		if (VERBOSE >= 1)
+			std::cout << PURPLE << i << "s..." << WHITE << std::endl;
+	}
+	this->_run = false;
 }
 
 void	Server::privmsg(Client &client, t_ircMessage &params) {
@@ -367,8 +374,6 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 		}
 		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
 		while (it_chan != this->_channel_list.end()) {
-			if (VERBOSE >= 3)
-				std::cout << CYAN << client.getNick() << " tries to join " << *it_to_kick_from << ". Testing: " << it_chan->getName() << WHITE << std::endl;
 			//client is no Member of the Channel
 			if (it_chan->getName() == *it_to_kick_from && !it_chan->isMember(client.getNick())) {
 				sendMessage(client, ERR_NOTONCHANNEL(it_chan->getName()));
@@ -406,23 +411,14 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 				it_chan->removeOperator(*it_client);
 			if (it_chan->isUser(*it_client))
 				it_chan->removeUser(*it_client);
-			// :6!~1@127.0.0.1 KICK &test
-			//Operator
-			// KICK #test me bye
-			// :you!~1@188.244.102.158 KICK #test me :bye
-			//Kicked Ueer
-			// :you!~1@188.244.102.158 KICK #test me :bye
-			// PING :Stopover.ky.us.starlink-irc.org
-			//3rd Party User
-			// :you!~1@188.244.102.158 KICK #test me :bye
 		}
 		it_to_kick_from++;
 		it_to_kick_users++;
 	}
-	printAllChannels();
+	if (VERBOSE >= 2)
+		printAllChannels();
 }
 
-//JOIN #test:you!~1@188.244.102.158 INVITE me :#test
 void	Server::invite(Client& client, t_ircMessage& params) {
 	// too few parameters
 	if (params.parametersList.size() < 2)

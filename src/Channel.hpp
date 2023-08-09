@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/09 17:46:07 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/09 19:09:25 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ class Channel {
 	void							setLimit(int);
 	void							setLimit(std::string&);
 	void							setInviteOnly(bool);
+	void							removeInvite(Client& client);
 	void							setRestrictTopic(bool);
 	void							setInviteList(Client& client);
 
