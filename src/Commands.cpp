@@ -44,7 +44,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 				return ;
 			}
 			//Channellimit reached
-			if (it_chan->getName() == *it_join && it_chan->getAmountOfAll() == it_chan->getLimit()) {
+			if (it_chan->getName() == *it_join && it_chan->getAmountOfAll() >= it_chan->getLimit()) {
 				sendMessage(client, ERR_CHANNELISFULL(*it_join));
 				return ;
 			}
