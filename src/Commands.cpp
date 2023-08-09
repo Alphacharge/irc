@@ -463,3 +463,46 @@ void	Server::invite(Client& client, t_ircMessage& params) {
 	sendMessage(*itClient, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), itClient->getNick(), "INVITE", textToBeSent));
 	sendMessage(client, RPL_INVITING(client.getNick(), itClient->getNick(), itChannel->getName()));
 }
+
+void	Server::topic(Client& client, t_ircMessage& params) {
+	// need more parameters
+	if (params.parametersList.empty()) {return (sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters)));}
+	std::list<std::string>::iterator itParams = params.parametersList.begin();
+	// no such channel
+	std::list<Channel>::iterator itChannel = this->getChannel(*itParams);
+	if (!isValidChannelName(*itParams) || itChannel == this->_channel_list.end())
+		return(sendMessage(client, ERR_NOSUCHCHANNEL(*itParams)));
+	//not on channel
+	if (!itChannel->isMember(client.getNick()))
+		return (sendMessage(client, ERR_NOTONCHANNEL(client.getNick())));
+	// no operator with protected channel
+	if (!itChannel->isTopicProtected() && !itChannel->isOperator(client))
+		return (sendMessage(client, ERR_CHANOPRIVSNEEDED(client)));
+	// no topic argument passed
+	if (params.parametersList.size() == 1) {
+		// no previously set topic to return
+		if(!itChannel->getTopic().empty()) {return(sendMessage(client, RPL_NOTOPIC(client.getNick(), itChannel->getName())));}
+		// return previously set topic
+		else {
+			sendMessage(client, RPL_TOPIC(client.getNick(), itChannel->getName(), itChannel->getTopic()));
+			sendMessage(client, RPL_TOPICWHOTIME(client.getNick(), itChannel->getName(), itChannel->getTopicSetby(), itChannel->getTopicSetat()));
+		}
+	}
+	// clear topic
+	else if (params.parametersList.size() >= 2 && *(++itParams) == ":") {
+		itChannel->clearTopic();
+		for (std::map<std::string, Client>::iterator it = itChannel->getAllMember().begin(); it != itChannel->getAllMember().end(); ++it) {
+			sendMessage(it->second, RPL_TOPIC(it->first, itChannel->getName(), itChannel->getTopic()));
+		}
+	}
+	// set new topic
+	else if (params.parametersList.size() >=2) {
+		itChannel->setTopic(*itParams);
+		itChannel->setTopicSetat();
+		itChannel->setTopicSetby(client.getNick());
+		for (std::map<std::string, Client>::iterator it = itChannel->getAllMember().begin(); it != itChannel->getAllMember().end(); ++it) {
+			sendMessage(it->second, RPL_TOPIC(it->first, itChannel->getName(), itChannel->getTopic()));
+			sendMessage(it->second, RPL_TOPICWHOTIME(it->first, itChannel->getName(), itChannel->getTopicSetby(), itChannel->getTopicSetat()));
+		}
+	}
+}

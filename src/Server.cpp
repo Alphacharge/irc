@@ -193,3 +193,10 @@ std::vector<Client>::iterator	Server::getClient(std::string& nick) {
 		it++;
 	return it;
 }
+
+std::list<Channel>::iterator	Server::getChannel(std::string& channelName) {
+	std::list<Channel>::iterator	it = this->_channel_list.begin();
+	while (it->getName() != channelName)
+		it++;
+	return it;
+}

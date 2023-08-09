@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 18:18:02 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/09 11:07:37 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ Channel::Channel(std::string &name) {
 	this->_name = name;
 	this->_inviteonly = false;
 	this->_limit = -1;
+	this->_topicProtected = false;
 }
 
 Channel::Channel(Channel const& other) {
@@ -50,15 +51,18 @@ Channel& Channel::operator=(Channel const& other) {
 		std::cout << BLUE << "Channel assignment operator called" << WHITE << std::endl;
 	if (this != &other)
 	{
-		this->_name		= other._name;
-		this->_topic	= other._topic;
-		this->_password	= other._password;
-		this->_inviteonly	= other._inviteonly;
-		this->_limit		= other._limit;
-		this->_mode		= other._mode;
-		this->_banns		= other._banns;
-		this->_users	= other._users;
-		this->_operators = other._operators;
+		this->_name				= other._name;
+		this->_topic			= other._topic;
+		this->_topicProtected	= other._topicProtected;
+		this->_topicSetat		= other._topicSetat;
+		this->_topicSetby		= other._topicSetby;
+		this->_password			= other._password;
+		this->_inviteonly		= other._inviteonly;
+		this->_limit			= other._limit;
+		this->_mode				= other._mode;
+		this->_banns			= other._banns;
+		this->_users			= other._users;
+		this->_operators 		= other._operators;
 	}
 	return *this;
 }
@@ -176,6 +180,37 @@ void	Channel::removeUser(Client& client) {
 	this->_users.erase(client.getNick());
 }
 
+std::string	Channel::getTopic(void) {
+	return this->_topic;
+}
+
+void		Channel::setTopic(std::string topic) {
+	this->_topic = topic;
+}
+
+std::string		Channel::getTopicSetat(void) {
+	return this->_topicSetat;
+}
+
+void			Channel::setTopicSetat(void) {
+	this->_topicSetat = currentTimeString();
+}
+
+std::string		Channel::getTopicSetby(void) {
+	return this->_topicSetby;
+}
+
+void			Channel::setTopicSetby(std::string nickName) {
+	this->_topicSetby = nickName;
+}
+
+void	Channel::clearTopic(void) {
+	this->_topic.clear();
+	this->_topicSetat.clear();
+	this->_topicSetby.clear();
+	this->_topicSetby.clear();
+}
+
 std::map<std::string, Client>	Channel::getAllMember(void) {
 	std::map<std::string, Client> copy = this->_users;
 	std::map<std::string, Client>::iterator it = this->_operators.begin();
@@ -211,6 +246,10 @@ bool	Channel::isMember(std::string& nick) {
 	if (this->_users.find(nick) != this->_users.end() || this->_operators.find(nick) != this->_operators.end())
 		return (true);
 	return (false);
+}
+
+bool	Channel::isTopicProtected(void) {
+	return this->_topicProtected;
 }
 
 void	Channel::bann(Client &client) {

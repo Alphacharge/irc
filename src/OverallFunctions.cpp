@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Validation.cpp                                     :+:      :+:    :+:   */
+/*   OverallFunctions.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 06:46:54 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 10:54:41 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,4 +38,14 @@ std::list<std::string>	splitString(std::string const&stringToBeSplit, char const
 
 	while(getline(iss, token, delimiter)) {listOfSplits.push_back(token);}
 	return listOfSplits;
+}
+
+/* returns current timestamp as std::string */
+std::string				currentTimeString(void) {
+	time_t	currentTime = time(NULL);
+
+	std::ostringstream oss;
+	oss << currentTime;
+	std::string	timeString = oss.str();
+	return timeString;
 }
