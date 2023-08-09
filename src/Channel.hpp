@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 10:40:55 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 06:57:10 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ class Channel {
 	std::set<Client*>				_banns;
 	std::map<std::string, Client>	_users;
 	std::map<std::string, Client>	_operators;
+	std::map<std::string, Client>	_inviteList;
 
 	public:
 	/*---------------	Exceptions		---------------*/
@@ -53,36 +54,40 @@ class Channel {
 	/*---------------	Methods			---------------*/
 	void							print(void);
 
-	std::string	getName(void) const;
-	std::string	getPassword(void) const;
-	void		setPassword(std::string pw);
-	bool		isInviteOnly(void) const;
-	void		setInviteOnly(bool);
-	void		setRestrictTopic(bool);
-	void		setLimit(int);
-	void		setLimit(std::string&);
-	void		removeLimit();
-	int			getLimit(void);
+	std::string						getName(void) const;
+	std::string						getPassword(void) const;
+	int								getLimit(void);
+	std::map<std::string, Client>	getInviteList(void);
+	int								getAmountOfAll(void);
+
+	void							setPassword(std::string pw);
+	void							setLimit(int);
+	void							setLimit(std::string&);
+	void							removeLimit();
+	void							setInviteOnly(bool);
+	void							removeInvite(Client& client);
+	void							setRestrictTopic(bool);
+	void							setInviteList(Client& client);
+
+	std::map<std::string, Client>	getOperators(void);
+	void							setOperator(Client &client);
+	void							removeOperator(Client& client);
+	void							setOperatorStatus(Client &client);
+	void							removeOperatorStatus(Client& client);
+
+	std::map<std::string, Client>	getUsers(void);
+	void							setUser(Client &client);
+	void							removeUser(Client& client);
+
+	bool							isOperator(Client& client);
+	bool							isInviteOnly(void) const;
+	bool							isUser(Client& client);
+	bool							isMember(std::string& nick);
 
 	std::map<std::string, Client>	getAllMember(void);
-	std::map<std::string, Client>	getOperators(void);
-	std::map<std::string, Client>	getUsers(void);
 	std::string						genUserlist(void);
 
-	bool	isMember(std::string& nick);
-
-	void	setOperatorStatus(Client &client);
-	void	removeOperator(Client& client);
-	void	removeOperatorStatus(Client& client);
-	bool	isOperator(Client& client);
-
-	void	setUser(Client &client);
-	bool	isUser(Client& client);
-	void	removeUser(Client& client);
-
-	void	bann(Client &client);
-	bool	isBanned(Client &client);
-
-	int		getAmountOfAll(void);
+	void							bann(Client &client);
+	bool							isBanned(Client &client);
 };
 #endif

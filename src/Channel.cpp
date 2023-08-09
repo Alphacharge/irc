@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 09:31:01 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 08:26:10 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,21 +118,24 @@ void	Channel::setInviteOnly(bool yesOrNo) {
 	_inviteonly = yesOrNo;
 }
 
+void	Channel::removeInvite(Client& client) {
+	this->_inviteList.erase(client.getNick());
+}
 void	Channel::setRestrictTopic(bool yesOrNo) {
 	_restrictTopic = yesOrNo;
 }
 
 void	Channel::setOperatorStatus(Client &client) {
-	// if (VERBOSE >= 3)
-		// std::cout << ORANGE "xx" << WHITE << std::endl;
 	this->_operators[client.getNick()] = client;
 	this->_users.erase(client.getNick());
-	// if (VERBOSE >= 3)
-	// 	std::cout << ORANGE "yy" << WHITE << std::endl;
 }
 
 void	Channel::removeOperator(Client& client) {
 	this->_operators.erase(client.getNick());
+}
+
+void	Channel::setOperator(Client& client) {
+	this->_operators[client.getNick()] = client;
 }
 
 void	Channel::removeOperatorStatus(Client& client) {
@@ -249,4 +252,12 @@ std::string	Channel::genUserlist(void) {
 		it++;
 	}
 	return userlist;
+}
+
+std::map<std::string, Client>	Channel::getInviteList(void) {
+	return this->_inviteList;
+}
+
+void	Channel::setInviteList(Client& client) {
+	this->_inviteList[client.getNick()] = client;
 }

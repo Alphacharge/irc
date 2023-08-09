@@ -37,10 +37,9 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		}
 		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
 		while (it_chan != this->_channel_list.end()) {
-			if (VERBOSE >= 3)
-				std::cout << CYAN << client.getNick() << " tries to join " << *it_join << ". Testing: " << it_chan->getName() << WHITE << std::endl;
-			// Missing check if client is not invited
-			if (it_chan->getName() == *it_join && it_chan->isInviteOnly() == true) {
+			std::map<std::string, Client> invites = it_chan->getInviteList();
+			std::map<std::string, Client>::iterator clientinvited = invites.find(client.getNick());
+			if (it_chan->getName() == *it_join && it_chan->isInviteOnly() == true && clientinvited != invites.end()) {
 				sendMessage(client, ERR_INVITEONLYCHAN(*it_join));
 				return ;
 			}
@@ -50,7 +49,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 				return ;
 			}
 			//possible problem if no password exist in the command, also valid iterator of password is not secured
-			if (it_chan->getName() == *it_join && it_joinpw != tojoinpw.end() && it_chan->getPassword() != *it_joinpw) {
+			if (it_chan->getName() == *it_join && ((it_joinpw == tojoinpw.end() && it_chan->getPassword() != "") || (it_joinpw != tojoinpw.end() && it_chan->getPassword() != *it_joinpw))) {
 				sendMessage(client, ERR_BADCHANNELKEY(*it_join));
 				return ;
 			}
@@ -85,8 +84,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		if (it_chan == this->_channel_list.end())
 		{
 			Channel newCH(*it_join);
-			newCH.setOperatorStatus(client);
-				// std::cout << RED << *it_joinpw << WHITE << std::endl;
+			newCH.setOperator(client);
 			if (it_joinpw != tojoinpw.end())
 				newCH.setPassword(*it_joinpw);
 			this->_channel_list.push_back(newCH);
@@ -95,6 +93,8 @@ void	Server::join(Client &client, t_ircMessage& params) {
 			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join));
 		} else {
 			it_chan->setUser(client);
+			if (it_chan->isInviteOnly())
+				it_chan->removeInvite(client);
 			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
 			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName(), it_chan->genUserlist()));
 			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName()));
@@ -102,7 +102,8 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		it_join++;
 		it_joinpw++;
 	}
-	printAllChannels();
+	if (VERBOSE >= 2)
+		printAllChannels();
 }
 
 void	Server::cap(Client &client, t_ircMessage &params) {
@@ -213,25 +214,33 @@ void	Server::user(Client& client, t_ircMessage& params) {
 
 void	Server::quit(Client &client, t_ircMessage &params) {
 	(void)params;
-	sendMessage(client, ERROR(params.parameters));
-	client.setStatus(DISCONNECTED);
+
 	//broadcast to all relevant channels
 	for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++) {
 		if (it->isMember(client.getNick()))
 			broadcastMessage(it->getAllMember(), ":" + client.getNick() + "@irc42 QUIT :Client Quit");
 	}
+
+	sendMessage(client, ERROR(params.parameters));
+	client.setStatus(DISCONNECTED);
 }
 
 void	Server::shutdown(Client &client, t_ircMessage &params) {
 	(void)params;
 	(void)client;
-	std::cout << PURPLE << "i will shutdown" << WHITE << std::endl;
+	if (VERBOSE >= 1)
+		std::cout << PURPLE << "SERVER SHUTTING DOWN in 5s..." << WHITE << std::endl;
 	std::vector<Client>::iterator it = this->_clientVector.begin();
 	while (it != this->_clientVector.end()) {
 		sendMessage(*it, "Server is shutting down. Bye\n");
 		it++;
 	}
-	exit(0);
+	for (short i = 4; i > 0; --i) {
+		sleep(1);
+		if (VERBOSE >= 1)
+			std::cout << PURPLE << i << "s..." << WHITE << std::endl;
+	}
+	this->_run = false;
 }
 
 void	Server::privmsg(Client &client, t_ircMessage &params) {
@@ -241,38 +250,38 @@ void	Server::privmsg(Client &client, t_ircMessage &params) {
 	}
 	std::string	textToBeSent;
 	size_t	spacePos = params.parameters.find(" ");
+	// no text to be sent
 	if (spacePos != std::string::npos)
 		textToBeSent = params.parameters.substr(spacePos + 1, params.parameters.size());
-	if (spacePos == std::string::npos || textToBeSent.empty()) {
-		sendMessage(client, ERR_NOTEXTTOSEND(client.getNick()));
-		return;}
+	if (spacePos == std::string::npos || textToBeSent.empty()) {return(sendMessage(client, ERR_NOTEXTTOSEND(client.getNick())));}
 	std::list<std::string>	targetList = splitString(params.parameters.substr(0, spacePos), ',');
 	for (std::list<std::string>::iterator itTarget = targetList.begin(); itTarget != targetList.end(); ++itTarget) {
+		// no valid channel name
 		if (isValidChannelName(*itTarget)) {
 			std::list<Channel>::iterator itChannel = this->_channel_list.begin();
 			while (itChannel != this->_channel_list.end()) {
 				if (itChannel->getName() == *itTarget) {
-					broadcastMessage(itChannel->getAllMember(), client, itChannel->getName(), "PRIVMSG", textToBeSent);
-					break;
+					if (!itChannel->isMember(client.getNick())) { return(sendMessage(client, ERR_CANNOTSENDTOCHAN(client.getNick(),itChannel->getName())));}
+					return(broadcastMessage(itChannel->getAllMember(), client, itChannel->getName(), "PRIVMSG", textToBeSent));
 				}
 				itChannel++;
 			}
-			if (itChannel == this->_channel_list.end()) {
-				sendMessage(client, ERR_NOSUCHCHANNEL(*itTarget));
-			}
-		} else {
+			// no existing channel name
+			if (itChannel == this->_channel_list.end()) {return (sendMessage(client, ERR_NOSUCHCHANNEL(*itTarget)));}
+		}
+		else {
+			// send message to user
 			std::vector<Client>::iterator itClient = this->_clientVector.begin();
 			while(itClient != this->_clientVector.end()) {
 				if(itClient->getNick() == *itTarget) {
 					std::map<std::string, Client> target;
 					target[itClient->getNick()] =  *itClient;
-					broadcastMessage(target, client, "", "PRIVMSG", textToBeSent);
-					break;
+					return(broadcastMessage(target, client, "", "PRIVMSG", textToBeSent));
 				}
 				itClient++;
 			}
-			if (itClient == this->_clientVector.end())
-				sendMessage(client, ERR_NOSUCHNICK(*itTarget));
+			// nickname not found
+			if (itClient == this->_clientVector.end()) {return(sendMessage(client, ERR_NOSUCHNICK(*itTarget)));}
 		}
 	}
 }
@@ -302,7 +311,7 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 	}
 	std::list<Channel>::iterator channel = this->_channel_list.begin();
 	while (channel->getName() != channelname)
-		if (channel++ == this->_channel_list.end()) {
+		if (++channel == this->_channel_list.end()) {
 			sendMessage(client, ERR_NOSUCHCHANNEL(channelname));
 			return;
 		}
@@ -435,20 +444,18 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 		}
 		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
 		while (it_chan != this->_channel_list.end()) {
-			if (VERBOSE >= 3)
-				std::cout << CYAN << client.getNick() << " tries to join " << *it_to_kick_from << ". Testing: " << it_chan->getName() << WHITE << std::endl;
 			//client is no Member of the Channel
-			if (it_chan->getName() == *it_to_kick_from && it_chan->isMember(client.getNick())) {
+			if (it_chan->getName() == *it_to_kick_from && !it_chan->isMember(client.getNick())) {
 				sendMessage(client, ERR_NOTONCHANNEL(it_chan->getName()));
 				return ;
 			}
 			//Kicking Member is no Operator
-			if (it_chan->getName() == *it_to_kick_from && it_chan->isOperator(client)) {
+			if (it_chan->getName() == *it_to_kick_from && !it_chan->isOperator(client)) {
 				sendMessage(client, ERR_CHANOPRIVSNEEDED(client));
 				return ;
 			}
 			//To be kicked User is no Member of the Channel
-			if (it_chan->getName() == *it_to_kick_from && it_chan->isMember(*it_to_kick_users)) {
+			if (it_chan->getName() == *it_to_kick_from && !it_chan->isMember(*it_to_kick_users)) {
 				sendMessage(client, ERR_USERNOTINCHANNEL(*it_to_kick_users, it_chan));
 				return ;
 			}
@@ -469,17 +476,17 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 			return ;
 		} else {
 			std::vector<Client>::iterator it_client = getClient(*it_to_kick_users);
+			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "KICK", textToBeSent);
 			if (it_chan->isOperator(*it_client))
 				it_chan->removeOperator(*it_client);
 			if (it_chan->isUser(*it_client))
 				it_chan->removeUser(*it_client);
-			// sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName(), it_chan->genUserlist()));
-			// broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
 		}
 		it_to_kick_from++;
 		it_to_kick_users++;
 	}
-	printAllChannels();
+	if (VERBOSE >= 2)
+		printAllChannels();
 }
 
 void	Server::invite(Client& client, t_ircMessage& params) {

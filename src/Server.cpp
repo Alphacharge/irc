@@ -21,6 +21,7 @@ Server::Server(void) {
 Server::Server(int port, std::string password) : _serverPort(port), _serverPassword(password) {
 	if (VERBOSE >= 3)
 		std::cout << DGREEN << "Server parametric constructor called" << WHITE << std::endl;
+	this->_run = true;
 	this->_commandMap["JOIN"] = &Server::join;
 	this->_commandMap["CAP"] = &Server::cap;
 	this->_commandMap["PING"] = &Server::pong;
@@ -31,7 +32,6 @@ Server::Server(int port, std::string password) : _serverPort(port), _serverPassw
 	this->_commandMap["PRIVMSG"] = &Server::privmsg;
 	this->_commandMap["SHUTDOWN"] = &Server::shutdown;
 	this->_commandMap["MODE"] = &Server::mode;
-	this->_commandMap["INVITE"] = &Server::invite;
 	this->_commandMap["KICK"] = &Server::kick;
 }
 
@@ -114,8 +114,8 @@ void	Server::serverSetup(void)
 
 		//setting socket to non-blocking as required in subject
 		// fcntl(_serverSocket, F_SETFL, O_NONBLOCK);
-
-		std::cout << "Server startup completed. Listening on port " << this->_serverPort << std::endl;
+		if (VERBOSE >= 1)
+			std::cout << CYAN << "Server startup completed. Listening on port " << this->_serverPort << WHITE << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -132,7 +132,7 @@ void	Server::serverStart(void)
 	try
 	{
 		serverSetup();
-		while (true)
+		while (this->_run)
 		{
 			ret = poll(this->_fds.data(), this->_fds.size(), -1);
 			if (ret == -1)
@@ -158,12 +158,14 @@ void	Server::serverStart(void)
 					{
 						for (std::vector<t_ircMessage>::iterator it = commands.begin(); it != commands.end(); ++it)
 						{
-							std::cout << "------------\n";
-							std::cout << "Status     : " << clientIterator->getStatus() << std::endl;
-							std::cout << "Prefix     : " << it->prefix << std::endl;
-							std::cout << "Command    : " << it->command << std::endl;
-							std::cout << "Parameters : " << it->parameters << std::endl;
-
+							if (VERBOSE >= 2) {
+								std::cout << CYAN << "------------------------" << std::endl;
+								std::cout << "Status     : " << clientIterator->getStatus() << std::endl;
+								std::cout << "Prefix     : " << it->prefix << std::endl;
+								std::cout << "Command    : " << it->command << std::endl;
+								std::cout << "Parameters : " << it->parameters << std::endl;
+								std::cout << CYAN << "------------------------" << WHITE << std::endl;
+							}
 							std::map<std::string, void (Server::*)(Client &, t_ircMessage &)>::iterator function = this->_commandMap.find(it->command);
 							if (function != _commandMap.end())
 								(this->*(function->second))(*clientIterator, *it);
@@ -172,7 +174,8 @@ void	Server::serverStart(void)
 					}
 					if (!this->_clientVector[i - 1].getStatus() || this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
 					{
-						std::cout << "Client disconnected" << std::endl;
+						if (VERBOSE >= 1)
+							std::cout << PURPLE << "Client disconnected" << WHITE << std::endl;
 						close(this->_fds[i].fd);
 						this->_fds.erase(this->_fds.begin() + i);
 						this->_clientVector.erase(this->_clientVector.begin() + i - 1);
@@ -190,7 +193,7 @@ void	Server::serverStart(void)
 
 std::vector<Client>::iterator	Server::getClient(std::string& nick) {
 	std::vector<Client>::iterator	it = this->_clientVector.begin();
-	while (it->getNick() != nick && it != _clientVector.end())
+	while (it->getNick() != nick)
 		it++;
 	return it;
 }

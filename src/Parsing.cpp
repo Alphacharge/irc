@@ -21,8 +21,8 @@ void	Server::addClient(void) {
 	{
 		throw AcceptException();
 	}
-
-	std::cout << "New client connected : " << inet_ntoa(newClient.getClientAddress().sin_addr) << ":" << ntohs(newClient.getClientAddress().sin_port) << std::endl;
+	if (VERBOSE >= 1)
+		std::cout << ORANGE << "New client connected : " << inet_ntoa(newClient.getClientAddress().sin_addr) << ":" << ntohs(newClient.getClientAddress().sin_port) << WHITE << std::endl;
 	newClient.setClientPollfd_fd(newClient.getClientSocket());
 	newClient.setClientPollfd_events(POLLIN);
 	newClient.setStatus(CONNECTED);

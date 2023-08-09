@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 10:35:08 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/08 16:22:39 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -287,7 +287,7 @@
 # define ERR_NOSUCHNICK(params) (std::string (params + " :No such nick/channel\n"))
 // # define ERR_NOSUCHSERVER() ()
 # define ERR_NOSUCHCHANNEL(params) (std::string(params + " :No such channel\n"))
-// # define ERR_CANNOTSENDTOCHAN() ()
+# define ERR_CANNOTSENDTOCHAN(nickname, channelname) (std::string(":irc42 404 : " + nickname + " " + channelname + " :Cannot send to channel"))
 // # define ERR_TOOMANYCHANNELS(params) (std::string(params + " :You have joined too many channels"))
 // # define ERR_WASNOSUCHNICK() ()
 // # define ERR_TOOMANYTARGETS() ()			//We don't support shortnames for channel names
