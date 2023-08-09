@@ -6,7 +6,7 @@
 #    By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/02 16:33:15 by rbetz             #+#    #+#              #
-#    Updated: 2023/08/09 09:23:40 by rbetz            ###   ########.fr        #
+#    Updated: 2023/08/09 15:46:21 by rbetz            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,6 +46,8 @@ LSAN_D	:=	./lib/LeakSanitizer
 LSAN_F	:=	$(LSAN_D)/liblsan.a
 LSAN_U	:=	https://www.github.com/mhahnFr/LeakSanitizer
 
+KVIRC	:=	~/Desktop/KVIrc-5.0.0.dmg
+
 LIB		:=
 
 #Linux/Mac Compability for Leaksanitizer
@@ -67,7 +69,7 @@ endif
 #make lsan is downloading lsan if its not.
 #every make will be with lsan until a clean occurs.
 
-all: message
+all: message 
 	@$(MAKE) -j $(NAME)
 
 run:
@@ -77,8 +79,13 @@ run:
 lsan: clean_lsan $(OBJ_D) $(LSAN_F)
 	@$(MAKE) -j $(NAME)
 
+kvirc:
+	@echo "$(GREEN)Download $(KVIRC) ...$(WHITE)"
+	@/usr/bin/curl -O "ftp://ftp.kvirc.net/pub/kvirc/5.0.0/binary/macosx/KVIrc-5.0.0.dmg" --output $(KVIRC)
+
 $(NAME): $(OBJ_D) $(OBJ_F)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ_F) $(LIB)
+	@echo "$(RED)--->$(BLUE)ircserv $(GREEN)is now compiled .....$(WHITE)"
 
 $(OBJ_D)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -125,28 +132,6 @@ message:
 	@echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@$(BLUE)#####$(WHITE)@$(BLUE)######$(WHITE)@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 	@echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 	@echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-#	@echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-#	@echo "@                                                            @"
-#	@echo "@    ___   _   _   _    ___   _   _   _   _    ___   _   _   @"
-#	@echo "@   /   \ ( ) ( ) ( )  /   \ ( ) ( ) ( ) ( )  /   \ ( ) ( )  @"
-#	@echo "@  (  ___ ) $(YELL)\_/ \_/$(WHITE) /  (  ___ ) $(YELL)\_/ \_/ \_/$(WHITE) /  (  ___ ) $(YELL)\_/$(WHITE)  @"
-#	@echo "@   )|   |)   _   (    )|   |)   _   _   (    )|   |)   _    @"
-#	@echo "@  ( )___(  /   \  )  ( )___(  /   ) (   )  ( )___(  /   )   @"
-#	@echo "@   )|   | (  _  ) (   )|   | (   ( )   ) (   )|   | (   (   @"
-#	@echo "@  ( )___(  )/ \(   ( )___(  )   (   ) (   ( )___(  )   )    @"
-#	@echo "@$(BLUE)     ___  $(WHITE)  $(YELL)\_/$(WHITE) $(GREEN)    ___  $(WHITE)  \ ) ( ) ( ) (   $(RED)  ___   $(WHITE) $(YELL)\ /$(WHITE)     @"
-#	@echo "@$(BLUE)    / _ \       $(GREEN)   / _ \  $(WHITE)  $(YELL)\ / \ / \ /$(WHITE)    $(RED) / _ \  $(WHITE)  $(YELL)V$(WHITE)      @"
-#	@echo "@$(BLUE)   / /_\ \      $(GREEN)  / /_\ \\ $(WHITE)   $(YELL)V   V   V$(WHITE)     $(RED)/ /_\ \\ $(WHITE)         @"
-#	@echo "@$(BLUE)   |  _  |      $(GREEN)  |  _  | $(WHITE)  ______ ______  $(RED)|  _  | $(WHITE)         @"
-#	@echo "@$(BLUE)   | | | |      $(GREEN)  | | | | $(WHITE) |  __  |  __  | $(RED)| | | | $(WHITE)         @"
-#	@echo "@$(BLUE)   | | | |      $(GREEN)  | | | | $(WHITE) | |  | | |  | | $(RED)| | | | $(WHITE)         @"
-#	@echo "@$(BLUE)   | |/  |      $(GREEN)  | |/  | $(WHITE) | |  | | |  | | $(RED)| |/  | $(WHITE)         @"
-#	@echo "@$(BLUE)   \_____/      $(GREEN)  \_____/ $(WHITE) |_|  |_| |_|  |_$(RED)| \___/ $(WHITE)         @"
-#	@echo "@                                                            @"
-#	@echo "@                                                            @"
-#	@echo "@                 $(YELL)by$(WHITE): $(BLUE)fkernbac$(WHITE), $(GREEN)rbetz$(WHITE), $(RED)lsordo$(WHITE)                @"
-#	@echo "@                                                            @"
-#	@echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 
 clean_lsan:
 	@rm -rf $(OBJ_D)
@@ -158,7 +143,9 @@ clean:
 
 fclean: clean
 	@rm -f $(NAME)
+	@rm -f $(KVIRC)
 	@echo "$(BLUE)--->$(GREEN)Cleaning $(NAME) .....$(WHITE)"
+	@echo "$(BLUE)--->$(GREEN)Cleaning $(KVIRC) .....$(WHITE)"
 	@echo "$(RED)All is cleaned$(WHITE)"
 
 re: fclean all
