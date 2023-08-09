@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/09 11:04:11 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/09 17:46:07 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ class Channel {
 	/*---------------	Variables		---------------*/
 	std::string						_name; //begin with & or #, max 200 chars, not contain any spaces (' '), a control G (^G or ASCII 7), or a comma (',' which is used as a list item)
 	std::string						_topic;
-	bool							_topicProtected;
+
 	std::string						_topicSetat;
 	std::string						_topicSetby;
 	std::string						_password;
@@ -93,7 +93,7 @@ class Channel {
 	bool							isInviteOnly(void) const;
 	bool							isUser(Client& client);
 	bool							isMember(std::string& nick);
-	bool							isTopicProtected(void);
+	bool							isTopicRestricted(void);
 
 	std::map<std::string, Client>	getAllMember(void);
 	std::string						genUserlist(void);

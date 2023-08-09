@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/09 11:07:37 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/09 18:17:12 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ Channel::Channel(std::string &name) {
 	this->_name = name;
 	this->_inviteonly = false;
 	this->_limit = -1;
-	this->_topicProtected = false;
 }
 
 Channel::Channel(Channel const& other) {
@@ -53,7 +52,7 @@ Channel& Channel::operator=(Channel const& other) {
 	{
 		this->_name				= other._name;
 		this->_topic			= other._topic;
-		this->_topicProtected	= other._topicProtected;
+		this->_restrictTopic	= other._restrictTopic;
 		this->_topicSetat		= other._topicSetat;
 		this->_topicSetby		= other._topicSetby;
 		this->_password			= other._password;
@@ -74,6 +73,7 @@ void	Channel::print(void) {
 	std::cout << "|topic:\t\t|" << WHITE << this->_topic <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|password:\t|" << WHITE << this->_password <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|inviteonly:\t|" << WHITE << this->_inviteonly <<  MAGENTA <<"|" << std::endl;
+	std::cout << "|topic restricted:\t|" << WHITE << this->_restrictTopic << MAGENTA << "|" <<std::endl;
 	std::cout << "|limit:\t|" << WHITE << this->_limit <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|modes:\t\t|" << WHITE;
 	std::set<t_chmode>::const_iterator it = this->_mode.begin();
@@ -248,8 +248,8 @@ bool	Channel::isMember(std::string& nick) {
 	return (false);
 }
 
-bool	Channel::isTopicProtected(void) {
-	return this->_topicProtected;
+bool	Channel::isTopicRestricted(void) {
+	return this->_restrictTopic;
 }
 
 void	Channel::bann(Client &client) {

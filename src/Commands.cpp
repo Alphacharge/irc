@@ -476,12 +476,12 @@ void	Server::topic(Client& client, t_ircMessage& params) {
 	if (!itChannel->isMember(client.getNick()))
 		return (sendMessage(client, ERR_NOTONCHANNEL(client.getNick())));
 	// no operator with protected channel
-	if (!itChannel->isTopicProtected() && !itChannel->isOperator(client))
+	if (!itChannel->isTopicRestricted() && !itChannel->isOperator(client) && params.parametersList.size() > 1)
 		return (sendMessage(client, ERR_CHANOPRIVSNEEDED(client)));
 	// no topic argument passed
 	if (params.parametersList.size() == 1) {
 		// no previously set topic to return
-		if(!itChannel->getTopic().empty()) {return(sendMessage(client, RPL_NOTOPIC(client.getNick(), itChannel->getName())));}
+		if(itChannel->getTopic().empty()) {return(sendMessage(client, RPL_NOTOPIC(client.getNick(), itChannel->getName())));}
 		// return previously set topic
 		else {
 			sendMessage(client, RPL_TOPIC(client.getNick(), itChannel->getName(), itChannel->getTopic()));
@@ -491,16 +491,25 @@ void	Server::topic(Client& client, t_ircMessage& params) {
 	// clear topic
 	else if (params.parametersList.size() >= 2 && *(++itParams) == ":") {
 		itChannel->clearTopic();
-		for (std::map<std::string, Client>::iterator it = itChannel->getAllMember().begin(); it != itChannel->getAllMember().end(); ++it) {
+		std::map<std::string, Client> members;
+		std::map<std::string, Client>::iterator it = members.begin();
+		for (; it != members.end(); ++it) {
 			sendMessage(it->second, RPL_TOPIC(it->first, itChannel->getName(), itChannel->getTopic()));
 		}
 	}
 	// set new topic
 	else if (params.parametersList.size() >=2) {
-		itChannel->setTopic(*itParams);
+		size_t pos = 0;
+		std::string	topic;
+		pos = params.parameters.find(' ', pos);
+		if (pos != std::string::npos)
+			topic = params.parameters.substr(pos + 1, params.parameters.size());
+		itChannel->setTopic(topic);
 		itChannel->setTopicSetat();
 		itChannel->setTopicSetby(client.getNick());
-		for (std::map<std::string, Client>::iterator it = itChannel->getAllMember().begin(); it != itChannel->getAllMember().end(); ++it) {
+		std::map<std::string, Client> members = itChannel->getAllMember();
+		std::map<std::string, Client>::iterator it = members.begin();
+		for (; it != members.end(); ++it) {
 			sendMessage(it->second, RPL_TOPIC(it->first, itChannel->getName(), itChannel->getTopic()));
 			sendMessage(it->second, RPL_TOPICWHOTIME(it->first, itChannel->getName(), itChannel->getTopicSetby(), itChannel->getTopicSetat()));
 		}

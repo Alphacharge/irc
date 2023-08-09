@@ -1,0 +1,8 @@
+PASS pw
+USER 1 2 3 4 5
+NICK testuser
+JOIN #test
+TOPIC #test "New topic for the channel"
+TOPIC #test
+TOPIC #invalid
+
