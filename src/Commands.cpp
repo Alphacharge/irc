@@ -37,8 +37,6 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		}
 		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
 		while (it_chan != this->_channel_list.end()) {
-			if (VERBOSE >= 3)
-				std::cout << CYAN << client.getNick() << " tries to join " << *it_join << ". Testing: " << it_chan->getName() << WHITE << std::endl;
 			std::map<std::string, Client> invites = it_chan->getInviteList();
 			std::map<std::string, Client>::iterator clientinvited = invites.find(client.getNick());
 			if (it_chan->getName() == *it_join && it_chan->isInviteOnly() == true && clientinvited != invites.end()) {
@@ -51,7 +49,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 				return ;
 			}
 			//possible problem if no password exist in the command, also valid iterator of password is not secured
-			if (it_chan->getName() == *it_join && it_joinpw != tojoinpw.end() && it_chan->getPassword() != *it_joinpw) {
+			if (it_chan->getName() == *it_join && ((it_joinpw == tojoinpw.end() && it_chan->getPassword() != "") || (it_joinpw != tojoinpw.end() && it_chan->getPassword() != *it_joinpw))) {
 				sendMessage(client, ERR_BADCHANNELKEY(*it_join));
 				return ;
 			}
@@ -369,10 +367,10 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 		}
 		std::list<Channel>::iterator it_chan = this->_channel_list.begin();
 		while (it_chan != this->_channel_list.end()) {
-			if (VERBOSE >= 3)
-				std::cout << CYAN << client.getNick() << " tries to join " << *it_to_kick_from << ". Testing: " << it_chan->getName() << WHITE << std::endl;
+			std::cout << PURPLE <<"KICK " << *it_to_kick_users<<" from channel "<<it_chan->getName()<<WHITE<<std::endl;
 			//client is no Member of the Channel
 			if (it_chan->getName() == *it_to_kick_from && !it_chan->isMember(client.getNick())) {
+				std::cout << it_chan->isMember(client.getNick())<<std::endl;
 				sendMessage(client, ERR_NOTONCHANNEL(it_chan->getName()));
 				return ;
 			}
@@ -408,15 +406,6 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 				it_chan->removeOperator(*it_client);
 			if (it_chan->isUser(*it_client))
 				it_chan->removeUser(*it_client);
-			// :6!~1@127.0.0.1 KICK &test
-			//Operator
-			// KICK #test me bye
-			// :you!~1@188.244.102.158 KICK #test me :bye
-			//Kicked Ueer
-			// :you!~1@188.244.102.158 KICK #test me :bye
-			// PING :Stopover.ky.us.starlink-irc.org
-			//3rd Party User
-			// :you!~1@188.244.102.158 KICK #test me :bye
 		}
 		it_to_kick_from++;
 		it_to_kick_users++;
@@ -424,7 +413,6 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 	printAllChannels();
 }
 
-//JOIN #test:you!~1@188.244.102.158 INVITE me :#test
 void	Server::invite(Client& client, t_ircMessage& params) {
 	// too few parameters
 	if (params.parametersList.size() < 2)
