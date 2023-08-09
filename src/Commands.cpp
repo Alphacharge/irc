@@ -238,7 +238,7 @@ void	Server::shutdown(Client &client, t_ircMessage &params) {
 		if (VERBOSE >= 1)
 			std::cout << PURPLE << i << "s..." << WHITE << std::endl;
 	}
-	exit(0);
+	this->_run = false;
 }
 
 void	Server::privmsg(Client &client, t_ircMessage &params) {

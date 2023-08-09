@@ -6,7 +6,7 @@
 #    By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/02 16:33:15 by rbetz             #+#    #+#              #
-#    Updated: 2023/08/08 06:50:02 by rbetz            ###   ########.fr        #
+#    Updated: 2023/08/09 09:23:40 by rbetz            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -72,7 +72,7 @@ all: message
 
 run:
 	@$(MAKE) -j $(NAME)
-	./ircserv 8080 pw
+	./ircserv 6667 pw
 
 lsan: clean_lsan $(OBJ_D) $(LSAN_F)
 	@$(MAKE) -j $(NAME)

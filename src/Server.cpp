@@ -21,6 +21,7 @@ Server::Server(void) {
 Server::Server(int port, std::string password) : _serverPort(port), _serverPassword(password) {
 	if (VERBOSE >= 3)
 		std::cout << DGREEN << "Server parametric constructor called" << WHITE << std::endl;
+	this->_run = true;
 	this->_commandMap["JOIN"] = &Server::join;
 	this->_commandMap["CAP"] = &Server::cap;
 	this->_commandMap["PING"] = &Server::pong;
@@ -131,7 +132,7 @@ void	Server::serverStart(void)
 	try
 	{
 		serverSetup();
-		while (true)
+		while (this->_run)
 		{
 			ret = poll(this->_fds.data(), this->_fds.size(), -1);
 			if (ret == -1)
