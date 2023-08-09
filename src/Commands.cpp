@@ -213,12 +213,12 @@ void	Server::user(Client& client, t_ircMessage& params) {
 
 void	Server::quit(Client &client, t_ircMessage &params) {
 	(void)params;
-	sendMessage(client, ERROR((std::string) "Connection closed."));
+	sendMessage(client, ERROR(params.parameters));
 	client.setStatus(DISCONNECTED);
 	//broadcast to all relevant channels
 	for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++) {
 		if (it->isMember(client.getNick()))
-			broadcastMessage(it->getAllMember(), ":" + client.getNick() + "@irc42" + params.parameters + "; User left the irc network.");
+			broadcastMessage(it->getAllMember(), ":" + client.getNick() + "@irc42 QUIT :Client Quit");
 	}
 }
 
@@ -278,15 +278,24 @@ void	Server::privmsg(Client &client, t_ircMessage &params) {
 }
 
 void	Server::mode(Client& client, t_ircMessage& params) {
-	std::list<std::string>::iterator	parameter = params.parametersList.begin();
-	std::string							channelname = params.parametersList.front();
 
-	//check if a channel mode is given
-	if (params.parametersList.size() < 2) {
-		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
+
+	if (client.getStatus() < REGISTERED) {
+		sendMessage(client, ERR_NOTREGISTERED);
 		return;
 	}
-	//check if channel exists
+
+	//check if a channel mode is given
+	if (params.parametersVector.size() < 1) {
+		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
+		return;
+	} else if (params.parametersVector.size() == 1)
+	//MISING: add MODE #channel command here if you like
+		return;
+
+	std::string	channelname = params.parametersVector[0];
+
+	//search channel
 	if (isValidChannelName(channelname) == false) {
 		sendMessage(client, ERR_BADCHANMASK(channelname));
 		return;
@@ -297,36 +306,59 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 			sendMessage(client, ERR_NOSUCHCHANNEL(channelname));
 			return;
 		}
+
 	//check if client is channel operator
 	if (channel->isOperator(client) == false) {
 		sendMessage(client, ERR_CHANOPRIVSNEEDED(client));
 		return;
 	}
-	
-	bool	add = true;
-	std::string	mode = *++parameter;
+
+	//check number of parameters
+	if (enoughModeParameters(params) == false) {
+		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
+		return;
+	}
+
+	//DEBUG
+	channel->print();
+
+	std::string	mode = params.parametersVector[1];
+	bool		add = true;
+	size_t		parameter = 2;
 	//MISSING: check if there is no sign
+
 	for (std::string::iterator s = mode.begin(); s != mode.end(); s++) {
-		if (*s == '+')
-			add = true;
-		else if (*s == '-')
-			add = false;
-		else if (*s == 'i')
-			channel->setInviteOnly(add);
-		else if (*s == 't')
-			channel->setRestrictTopic(add);
-		else if (*s == 'k')
-			modeK(client, *channel, add, *++parameter);
-		else if (*s == 'o')
-			modeO(client, *channel, add, *++parameter);
-		else if (*s == 'l') {
-			if (add == true)
-				channel->setLimit(*++parameter);
-			else
-				channel->setLimit(-1);
+		if (VERBOSE >= 2)
+			std::cout << "DEBUG: mode " << *s << ", param " << parameter << "\n";
+		switch (*s) {
+			case '+':
+				add = true;
+				break;
+			case '-':
+				add = false;
+				break;
+			case 'i':
+				channel->setInviteOnly(add);
+				break;
+			case 't':
+				channel->setRestrictTopic(add);
+				break;
+			case 'k':
+				modeK(client, *channel, add, params.parametersVector[parameter++]);
+				break;
+			case 'o':
+				modeO(client, *channel, add, params.parametersVector[parameter++]);
+				break;
+			case 'l':
+				if (add == true)
+					channel->setLimit(params.parametersVector[parameter++]);
+				else
+					channel->removeLimit();
+				break;
+			default:
+				sendMessage(client, ERR_UNKNOWNMODE(mode, channel->getName()));
+				return;
 		}
-		else
-			sendMessage(client, ERR_UNKNOWNMODE(mode, channel->getName()));
 	}
 }
 
@@ -355,6 +387,31 @@ void	Server::modeK(Client& client, Channel& channel, bool add, std::string& pass
 		else
 			channel.setPassword("");
 	}
+}
+
+bool	Server::enoughModeParameters(t_ircMessage& params) {
+
+	size_t		parameter = 2;
+	std::string	mode = params.parametersVector[1];
+	bool		add = true;
+
+	for (std::string::iterator	c = mode.begin(); c != mode.end(); c++) {
+		if (*c == 'l' && add == false)
+			continue;
+		switch (*c)
+		{
+			case 'l':
+			case 'k':
+			case 'o':
+				if (parameter >= params.parametersVector.size())
+					return (false);
+				parameter++;
+				break;
+			default:
+				break;
+		}
+	}
+	return (true);
 }
 
 void	Server::kick(Client &client, t_ircMessage& params) {
@@ -426,6 +483,11 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 }
 
 void	Server::invite(Client& client, t_ircMessage& params) {
+	if (client.getStatus() < REGISTERED) {
+		sendMessage(client, ERR_NOTREGISTERED);
+		return;
+	}
+
 	// too few parameters
 	if (params.parametersList.size() < 2)
 		return (sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters)));

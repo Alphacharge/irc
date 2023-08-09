@@ -39,6 +39,7 @@ typedef struct s_irc {
 	std::string				command;
 	std::string				parameters;
 	std::list<std::string>	parametersList;
+	std::vector<std::string>	parametersVector;
 }		t_ircMessage;
 
 class Client;
@@ -124,9 +125,12 @@ class	Server {
 		void	shutdown(Client&, t_ircMessage&);
 
 		//SendMessages
-		void		sendMessage(Client&, std::string);
-		void		broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent);
-		void		broadcastMessage(std::map<std::string, Client>, std::string);
-		void		printAllClients(void);
-		void		printAllChannels(void);
+		void	sendMessage(Client&, std::string);
+		void	broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent);
+		void	broadcastMessage(std::map<std::string, Client>, std::string);
+		void	printAllClients(void);
+		void	printAllChannels(void);
+
+		//Utility
+		bool	enoughModeParameters(t_ircMessage&);
 };

@@ -86,6 +86,8 @@ bool	Server::handleClient(char *buffer, std::vector<Client>::iterator &clientIte
 		else {
 			clientIterator->appendBuffer(tmpBuffer);
 			if (inputParse(clientIterator->getBuffer(), clientCommand)) {
+				std::vector<std::string>	copy(clientCommand.parametersList.begin(), clientCommand.parametersList.end());
+				clientCommand.parametersVector = copy;
 				commands.push_back(clientCommand);
 			}
 			tmpBuffer.clear();

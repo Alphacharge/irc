@@ -61,6 +61,7 @@ class Channel {
 	void		setRestrictTopic(bool);
 	void		setLimit(int);
 	void		setLimit(std::string&);
+	void		removeLimit();
 	int			getLimit(void);
 
 	std::map<std::string, Client>	getAllMember(void);

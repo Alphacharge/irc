@@ -517,8 +517,8 @@
 // # define ERR_NUMERIC_ERR() ()
 # define RPL_CAP				(std::string("CAP * LS :\n"))
 
-# define ERROR(message)			(std::string(":irc42 ERROR :" + message + "\n"))
-# define PONG(params)			(std::string(":irc42 PONG irc42 " + params + "\n"))
+# define ERROR(message)			(std::string("ERROR :Closing Link: " + message))
+# define PONG(params)			(std::string(":irc42 PONG irc42 " + params))
 # define NICK(oldNick, client)	(std::string(":" + oldNick + "NICK " + client.getNick() + " ; " + oldNick + " changed nickname to " + client.getNick() + ".\n"))
 
 # define GENMESSAGE(client, address, target, type, textToBeSent)	(std::string(":" + client.getNick() + "!~" + client.getUsername() + "@" + address + " " + type + " " + target + " " + textToBeSent + "\n"))
