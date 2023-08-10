@@ -17,15 +17,7 @@ void	Server::sendMessage(Client &client, std::string message) {
 
 	if (!message.empty() && message[message.size() - 1] != '\n')
 		message += '\n';
-	// while (bytesSent < message.length())
-	// We should found the reason why we should need it
-	// ==62812== Process terminating with default action of signal 13 (SIGPIPE)
-	// ==62812==    at 0x4B9B859: send (send.c:28)
-	// ==62812==    by 0x10D83C: Server::sendMessage(Client&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (Server.cpp:287)
-	// ==62812==    by 0x10EC21: Server::join(Client&, s_irc&) (Server.cpp:379)
-	// ==62812==    by 0x10D4F2: Server::serverStart() (Server.cpp:256)
-	// ==62812==    by 0x10B707: main (ircserv.cpp:24)
-		bytesSent += send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
+	bytesSent += send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
 }
 
 void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent) {

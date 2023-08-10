@@ -44,7 +44,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 				return ;
 			}
 			//Channellimit reached
-			if (it_chan->getName() == *it_join && it_chan->getAmountOfAll() >= it_chan->getLimit()) {
+			if (it_chan->getName() == *it_join && it_chan->getLimit() > 0 && it_chan->getAmountOfAll() >= it_chan->getLimit()) {
 				sendMessage(client, ERR_CHANNELISFULL(*it_join));
 				return ;
 			}
@@ -96,6 +96,10 @@ void	Server::join(Client &client, t_ircMessage& params) {
 			if (it_chan->isInviteOnly())
 				it_chan->removeInvite(client);
 			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
+			if (it_chan->getTopic().empty())
+				sendMessage(client, RPL_NOTOPIC(client.getNick(), it_chan->getName()));
+			else
+				sendMessage(client, RPL_TOPIC(client.getNick(), it_chan->getName(), it_chan->getTopic()));
 			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName(), it_chan->genUserlist()));
 			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName()));
 		}
