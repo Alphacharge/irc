@@ -1,0 +1,9 @@
+PASS pw
+NICK test
+USER test
+JOIN #channel
+MODE #channel
+MODE #channel +ik-t+l password 1
+MODE #channel -k password
+MODE #channel -i
+MODE #channel -ilto fkernbac
