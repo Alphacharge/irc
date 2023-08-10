@@ -16,11 +16,11 @@
 
 void	Server::join(Client &client, t_ircMessage& params) {
 	if (client.getStatus() < REGISTERED) {
-		sendMessage(client, ERR_NOTREGISTERED);
+		sendMessage(client, ERR_NOTREGISTERED(client.getNick()));
 		return;
 	}
 	if (params.parameters.empty()) {
-		sendMessage(client, ERR_NEEDMOREPARAMS(params.command));
+		sendMessage(client, ERR_NEEDMOREPARAMS(client.getNick() + " " + params.command));
 		return ;
 	}
 	if (params.parametersList.size() == 1)
@@ -39,7 +39,9 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		while (it_chan != this->_channel_list.end()) {
 			std::map<std::string, Client> invites = it_chan->getInviteList();
 			std::map<std::string, Client>::iterator clientinvited = invites.find(client.getNick());
-			if (it_chan->getName() == *it_join && it_chan->isInviteOnly() == true && clientinvited != invites.end()) {
+			if (it_chan->getName() == *it_join && it_chan->isMember(client.getNick()))
+				return ;
+			if (it_chan->getName() == *it_join && it_chan->isInviteOnly() == true && clientinvited == invites.end()) {
 				sendMessage(client, ERR_INVITEONLYCHAN(*it_join));
 				return ;
 			}
@@ -93,7 +95,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join));
 		} else {
 			it_chan->setUser(client);
-			if (it_chan->isInviteOnly())
+			// if ( it_chan->isInviteOnly())
 				it_chan->removeInvite(client);
 			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
 			sendMessage(client, USERLIST(inet_ntoa(this->_serverAddress.sin_addr), client, it_chan->getName(), it_chan->genUserlist()));
@@ -124,11 +126,9 @@ void	Server::pong(Client &client, t_ircMessage &params) {
 
 void	Server::pass(Client &client, t_ircMessage &params) {
 	if (client.getStatus() >= AUTHENTICATED)
-		return;
-	if (params.parameters.empty())
-		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
-	else if (client.getStatus() >= AUTHENTICATED)
-		sendMessage(client, ERR_ALREADYREGISTERED);
+		sendMessage(client, ERR_ALREADYREGISTERED(client.getNick()));
+	else if (params.parameters.empty())
+		sendMessage(client, ERR_NEEDMOREPARAMS(client.getNick() + " " + params.command));
 	else if (this->_serverPassword == params.parameters)
 	{
 		client.setStatus(AUTHENTICATED);
@@ -142,7 +142,7 @@ void	Server::pass(Client &client, t_ircMessage &params) {
 void	Server::nick(Client &client, t_ircMessage &params) {
 	// check if a password was supplied
 	if (client.getStatus() < AUTHENTICATED) {
-		sendMessage(client, ERR_NOTREGISTERED);
+		sendMessage(client, ERR_NOTREGISTERED(client.getNick()));
 		return;
 	}
 	// check if there is a name
@@ -184,13 +184,11 @@ void	Server::nick(Client &client, t_ircMessage &params) {
 
 void	Server::user(Client& client, t_ircMessage& params) {
 	//check if a password was supplied
-	if (client.getStatus() < AUTHENTICATED) {
-		sendMessage(client, ERR_NOTREGISTERED);
-		return;
-	}
+	if (client.getStatus() < AUTHENTICATED)
+		return sendMessage(client, ERR_NOTREGISTERED(client.getNick()));
 	// set username
-	if (client.getStatus() == REGISTERED)
-		sendMessage(client, ERR_ALREADYREGISTERED);
+	if (client.getStatus() >= REGISTERED)
+		sendMessage(client, ERR_ALREADYREGISTERED(client.getNick()));
 	else if (params.parametersList.size() == 0)
 		client.setUsername("unknown");
 	else
@@ -216,10 +214,9 @@ void	Server::quit(Client &client, t_ircMessage &params) {
 	(void)params;
 
 	//broadcast to all relevant channels
-	for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++) {
+	for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++)
 		if (it->isMember(client.getNick()))
-			broadcastMessage(it->getAllMember(), ":" + client.getNick() + "@irc42 QUIT :Client Quit");
-	}
+			broadcastMessage(it->getAllMember(), ":" + client.getNick() + "!~" + client.getUsername() + " QUIT :Client Quit");
 
 	sendMessage(client, ERROR(params.parameters));
 	client.setStatus(DISCONNECTED);
@@ -245,7 +242,7 @@ void	Server::shutdown(Client &client, t_ircMessage &params) {
 
 void	Server::privmsg(Client &client, t_ircMessage &params) {
 	if (client.getStatus() < REGISTERED) {
-		sendMessage(client, ERR_NOTREGISTERED);
+		sendMessage(client, ERR_NOTREGISTERED(client.getNick()));
 		return;
 	}
 	std::string	textToBeSent;
@@ -287,49 +284,36 @@ void	Server::privmsg(Client &client, t_ircMessage &params) {
 }
 
 void	Server::mode(Client& client, t_ircMessage& params) {
-
-
-	if (client.getStatus() < REGISTERED) {
-		sendMessage(client, ERR_NOTREGISTERED);
-		return;
-	}
+	if (client.getStatus() < REGISTERED)
+		return sendMessage(client, ERR_NOTREGISTERED(client.getNick()));
 
 	//check if a channel mode is given
-	if (params.parametersVector.size() < 1) {
-		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
-		return;
-	} else if (params.parametersVector.size() == 1)
-	//MISING: add MODE #channel command here if you like
+	if (params.parametersVector.size() < 1)
+		return sendMessage(client, ERR_NEEDMOREPARAMS(client.getNick() + " " + params.command));
+	else if (params.parametersVector.size() == 1)
+	//MISSING: add MODE #channel command here if you like
 		return;
 
 	std::string	channelname = params.parametersVector[0];
-
 	//search channel
-	if (isValidChannelName(channelname) == false) {
-		sendMessage(client, ERR_BADCHANMASK(channelname));
-		return;
-	}
+	if (isValidChannelName(channelname) == false)
+		return sendMessage(client, ERR_BADCHANMASK(client.getNick() + " " + channelname));
+
 	std::list<Channel>::iterator channel = this->_channel_list.begin();
 	while (channel->getName() != channelname)
-		if (++channel == this->_channel_list.end()) {
-			sendMessage(client, ERR_NOSUCHCHANNEL(channelname));
-			return;
-		}
+		if (++channel == this->_channel_list.end())
+			return sendMessage(client, ERR_NOSUCHCHANNEL(client.getNick() + " " + channelname));
 
 	//check if client is channel operator
-	if (channel->isOperator(client) == false) {
-		sendMessage(client, ERR_CHANOPRIVSNEEDED(client));
-		return;
-	}
+	if (channel->isOperator(client) == false)
+		return sendMessage(client, ERR_CHANOPRIVSNEEDED(client));
 
 	//check number of parameters
-	if (enoughModeParameters(params) == false) {
-		sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters));
-		return;
-	}
+	if (enoughModeParameters(params) == false)
+		return sendMessage(client, ERR_NEEDMOREPARAMS(client.getNick() + " " + params.command));
 
-	//DEBUG
-	channel->print();
+	if (VERBOSE >= 2)
+		channel->print();
 
 	std::string	mode = params.parametersVector[1];
 	bool		add = true;
@@ -337,8 +321,6 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 	//MISSING: check if there is no sign
 
 	for (std::string::iterator s = mode.begin(); s != mode.end(); s++) {
-		if (VERBOSE >= 2)
-			std::cout << "DEBUG: mode " << *s << ", param " << parameter << "\n";
 		switch (*s) {
 			case '+':
 				add = true;
@@ -365,7 +347,7 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 					channel->removeLimit();
 				break;
 			default:
-				sendMessage(client, ERR_UNKNOWNMODE(mode, channel->getName()));
+				sendMessage(client, ERR_UNKNOWNMODE(client.getNick() + " " + mode, channel->getName()));
 				return;
 		}
 	}
@@ -374,7 +356,7 @@ void	Server::mode(Client& client, t_ircMessage& params) {
 void	Server::modeO(Client& client, Channel& channel, bool add, std::string& target) {
 	std::vector<Client>::iterator	it = getClient(target);
 	if (it == this->_clientVector.end()) {
-			sendMessage(client, ERR_NOSUCHNICK(target));
+			sendMessage(client, ERR_NOSUCHNICK(client.getNick() + " " + target));
 			return;
 	}
 
@@ -405,11 +387,19 @@ bool	Server::enoughModeParameters(t_ircMessage& params) {
 	bool		add = true;
 
 	for (std::string::iterator	c = mode.begin(); c != mode.end(); c++) {
-		if (*c == 'l' && add == false)
-			continue;
+		if (VERBOSE >= 2)
+			std::cout << "DEBUG: add " << add << " mode " << *c << " parameter " << params.parametersVector[parameter] << std::endl;
 		switch (*c)
 		{
+			case '+':
+				add = true;
+				break;
+			case '-':
+				add = false;
+				break;
 			case 'l':
+				if (add == false)
+					continue;
 			case 'k':
 			case 'o':
 				if (parameter >= params.parametersVector.size())
@@ -425,11 +415,11 @@ bool	Server::enoughModeParameters(t_ircMessage& params) {
 
 void	Server::kick(Client &client, t_ircMessage& params) {
 	if (client.getStatus() < REGISTERED) {
-		sendMessage(client, ERR_NOTREGISTERED);
+		sendMessage(client, ERR_NOTREGISTERED(client.getNick()));
 		return;
 	}
 	if (params.parameters.size() < 2) {
-		sendMessage(client, ERR_NEEDMOREPARAMS(params.command));
+		sendMessage(client, ERR_NEEDMOREPARAMS(client.getNick() + " " + params.command));
 		return ;
 	}
 	std::list<std::string> to_kick_from = splitString(params.parametersList.front(), ',');
@@ -491,46 +481,104 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 
 void	Server::invite(Client& client, t_ircMessage& params) {
 	if (client.getStatus() < REGISTERED) {
-		sendMessage(client, ERR_NOTREGISTERED);
+		sendMessage(client, ERR_NOTREGISTERED(client.getNick()));
 		return;
 	}
-
 	// too few parameters
 	if (params.parametersList.size() < 2)
-		return (sendMessage(client, ERR_NEEDMOREPARAMS(params.parameters)));
-	std::list<std::string>::iterator itParams = params.parametersList.begin();
-	std::list<Channel>::iterator itChannel = this->_channel_list.begin();
-	std::vector<Client>::iterator itClient = this->_clientVector.begin();
-	while (itClient != this->_clientVector.end()) {
-		if (*itParams == itClient->getNick())
+		return (sendMessage(client, ERR_NEEDMOREPARAMS(client.getNick() + " " + params.command)));
+
+	// search invited user
+	std::list<Channel>::iterator		itChannel = this->_channel_list.begin();
+	std::vector<Client>::iterator		itClient = _clientVector.begin();
+	std::string							channelName = params.parametersVector[0];
+	std::string							clientName = params.parametersVector[1];
+	for (; itClient != _clientVector.end(); itClient++)
+		if (itClient->getNick() == clientName)
 			break;
-		itClient++;
-	}
 	// invited nickname does not exist
 	if (itClient == this->_clientVector.end())
-		return(sendMessage(client, ERR_NOSUCHNICK(*itParams)));
-	itParams++;
+		return(sendMessage(client, ERR_NOSUCHNICK(clientName)));
+
 	// channel name is not valid
-	if(!isValidChannelName(*itParams))
-		return (sendMessage(client, ERR_NOSUCHCHANNEL(*itParams)));
-	while(itChannel != this->_channel_list.end()) {
-		if (*itParams == itChannel->getName())
+	if(!isValidChannelName(channelName))
+		return (sendMessage(client, ERR_NOSUCHCHANNEL(channelName)));
+	//search channel
+	for (; itChannel != _channel_list.end(); itChannel++)
+		if (itChannel->getName() == channelName)
 			break;
-		itChannel++;
-	}
 	// channel does not exist
-	if (itChannel == this->_channel_list.end())
-		return (sendMessage(client, ERR_NOSUCHCHANNEL(*itParams)));
+	if (itChannel == _channel_list.end())
+		return (sendMessage(client, ERR_NOSUCHCHANNEL(channelName)));
+
 	// channel is invite only and issuer is not operator
 	if (itChannel->isInviteOnly() && !itChannel->isOperator(client))
 		return (sendMessage(client, ERR_CHANOPRIVSNEEDED(client)));
 	// channel is not invite only and issuer is not a channel opertator and is not a channel member
-	else if(!itChannel->isInviteOnly() && !itChannel->isMember(client.getNick()))
-		return (sendMessage(client, ERR_NOTONCHANNEL(client.getNick())));
+	else if(!itChannel->isInviteOnly() && !itChannel->isMember(clientName))
+		return (sendMessage(client, ERR_NOTONCHANNEL(clientName)));
 	// invited nickname is already on channel
-	if (itChannel->isMember((*itClient).getNick()))
-		return (sendMessage(client, ERR_USERONCHANNEL((*itClient).getNick())));
-	std::string	textToBeSent = ":" + itChannel->getName();
+	if (itChannel->isMember(clientName))
+		return (sendMessage(client, ERR_USERONCHANNEL(clientName)));
+
+	itChannel->setInviteList(*itClient);
+
+	std::string	textToBeSent = ":" + channelName;
 	sendMessage(*itClient, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), itClient->getNick(), "INVITE", textToBeSent));
 	sendMessage(client, RPL_INVITING(client.getNick(), itClient->getNick(), itChannel->getName()));
+}
+
+void	Server::topic(Client& client, t_ircMessage& params) {
+	if (client.getStatus() < REGISTERED)
+		return sendMessage(client, ERR_NOTREGISTERED(client.getNick()));
+
+	// need more parameters
+	if (params.parametersList.empty()) {return (sendMessage(client, ERR_NEEDMOREPARAMS(client.getNick() + " " + params.command)));}
+	std::list<std::string>::iterator itParams = params.parametersList.begin();
+	// no such channel
+	std::list<Channel>::iterator itChannel = this->getChannel(*itParams);
+	if (!isValidChannelName(*itParams) || itChannel == this->_channel_list.end())
+		return(sendMessage(client, ERR_NOSUCHCHANNEL(*itParams)));
+	//not on channel
+	if (!itChannel->isMember(client.getNick()))
+		return (sendMessage(client, ERR_NOTONCHANNEL(client.getNick())));
+	// no operator with protected channel
+	if (itChannel->isTopicRestricted() && !itChannel->isOperator(client) && params.parametersList.size() > 1)
+		return (sendMessage(client, ERR_CHANOPRIVSNEEDED(client)));
+	// no topic argument passed
+	if (params.parametersList.size() == 1) {
+		// no previously set topic to return
+		if(itChannel->getTopic().empty()) {return(sendMessage(client, RPL_NOTOPIC(client.getNick(), itChannel->getName())));}
+		// return previously set topic
+		else {
+			sendMessage(client, RPL_TOPIC(client.getNick(), itChannel->getName(), itChannel->getTopic()));
+			sendMessage(client, RPL_TOPICWHOTIME(client.getNick(), itChannel->getName(), itChannel->getTopicSetby(), itChannel->getTopicSetat()));
+		}
+	}
+	// clear topic
+	else if (params.parametersList.size() >= 2 && *(++itParams) == ":") {
+		itChannel->clearTopic();
+		std::map<std::string, Client> members;
+		std::map<std::string, Client>::iterator it = members.begin();
+		for (; it != members.end(); ++it) {
+			sendMessage(it->second, RPL_TOPIC(it->first, itChannel->getName(), itChannel->getTopic()));
+		}
+	}
+	// set new topic
+	else if (params.parametersList.size() >=2) {
+		size_t pos = 0;
+		std::string	topic;
+		pos = params.parameters.find(' ', pos);
+		if (pos != std::string::npos)
+			topic = params.parameters.substr(pos + 1, params.parameters.size());
+		itChannel->setTopic(topic);
+		itChannel->setTopicSetat();
+		itChannel->setTopicSetby(client.getNick());
+		std::map<std::string, Client> members = itChannel->getAllMember();
+		std::map<std::string, Client>::iterator it = members.begin();
+		for (; it != members.end(); ++it) {
+			sendMessage(it->second, RPL_TOPIC(it->first, itChannel->getName(), itChannel->getTopic()));
+			sendMessage(it->second, RPL_TOPICWHOTIME(it->first, itChannel->getName(), itChannel->getTopicSetby(), itChannel->getTopicSetat()));
+		}
+	}
 }

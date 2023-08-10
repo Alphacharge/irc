@@ -172,13 +172,22 @@ void	Server::serverStart(void)
 						}
 						commands.clear();
 					}
-					if (!this->_clientVector[i - 1].getStatus() || this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
+					if (!clientIterator->getStatus() || this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
 					{
 						if (VERBOSE >= 1)
 							std::cout << PURPLE << "Client disconnected" << WHITE << std::endl;
+
+						for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++) {
+							if (it->isMember(clientIterator->getNick())) {
+								it->removeInvite(*clientIterator);
+								it->removeUser(*clientIterator);
+								it->removeOperator(*clientIterator);
+std::cout << "DEBUG: removing client in all channels";
+							}
+						}
 						close(this->_fds[i].fd);
 						this->_fds.erase(this->_fds.begin() + i);
-						this->_clientVector.erase(this->_clientVector.begin() + i - 1);
+						_clientVector.erase(clientIterator);
 						--i;
 					}
 				}
