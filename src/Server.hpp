@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/09 09:16:03 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/10 13:57:55 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@ class	Server {
 		/*---------------	Methods			---------------*/
 		void							serverStart(void);
 		std::vector<Client>::iterator	getClient(std::string& nick);
+		std::list<Channel>::iterator	getChannel(std::string& channelName);
 
 		private:
 		void		serverSetup(void);
@@ -119,6 +120,8 @@ class	Server {
 		void	mode(Client&, t_ircMessage&);
 		void	invite(Client&, t_ircMessage&);
 		void	kick(Client& , t_ircMessage&);
+		void	topic(Client&, t_ircMessage&);
+
 		//Mode Commands
 		void	modeO(Client&, Channel&, bool, std::string&);
 		void	modeK(Client&, Channel&, bool, std::string&);

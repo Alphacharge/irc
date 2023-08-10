@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/09 08:26:10 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 19:09:35 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,15 +50,18 @@ Channel& Channel::operator=(Channel const& other) {
 		std::cout << BLUE << "Channel assignment operator called" << WHITE << std::endl;
 	if (this != &other)
 	{
-		this->_name		= other._name;
-		this->_topic	= other._topic;
-		this->_password	= other._password;
-		this->_inviteonly	= other._inviteonly;
-		this->_limit		= other._limit;
-		this->_mode		= other._mode;
-		this->_banns		= other._banns;
-		this->_users	= other._users;
-		this->_operators = other._operators;
+		this->_name				= other._name;
+		this->_topic			= other._topic;
+		this->_restrictTopic	= other._restrictTopic;
+		this->_topicSetat		= other._topicSetat;
+		this->_topicSetby		= other._topicSetby;
+		this->_password			= other._password;
+		this->_inviteonly		= other._inviteonly;
+		this->_limit			= other._limit;
+		this->_mode				= other._mode;
+		this->_banns			= other._banns;
+		this->_users			= other._users;
+		this->_operators 		= other._operators;
 	}
 	return *this;
 }
@@ -70,6 +73,7 @@ void	Channel::print(void) {
 	std::cout << "|topic:\t\t|" << WHITE << this->_topic <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|password:\t|" << WHITE << this->_password <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|inviteonly:\t|" << WHITE << this->_inviteonly <<  MAGENTA <<"|" << std::endl;
+	std::cout << "|topic restricted:\t|" << WHITE << this->_restrictTopic << MAGENTA << "|" <<std::endl;
 	std::cout << "|limit:\t|" << WHITE << this->_limit <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|modes:\t\t|" << WHITE;
 	std::set<t_chmode>::const_iterator it = this->_mode.begin();
@@ -175,6 +179,37 @@ void	Channel::removeUser(Client& client) {
 	this->_users.erase(client.getNick());
 }
 
+std::string	Channel::getTopic(void) {
+	return this->_topic;
+}
+
+void		Channel::setTopic(std::string topic) {
+	this->_topic = topic;
+}
+
+std::string		Channel::getTopicSetat(void) {
+	return this->_topicSetat;
+}
+
+void			Channel::setTopicSetat(void) {
+	this->_topicSetat = currentTimeString();
+}
+
+std::string		Channel::getTopicSetby(void) {
+	return this->_topicSetby;
+}
+
+void			Channel::setTopicSetby(std::string nickName) {
+	this->_topicSetby = nickName;
+}
+
+void	Channel::clearTopic(void) {
+	this->_topic.clear();
+	this->_topicSetat.clear();
+	this->_topicSetby.clear();
+	this->_topicSetby.clear();
+}
+
 std::map<std::string, Client>	Channel::getAllMember(void) {
 	std::map<std::string, Client> copy = this->_users;
 	std::map<std::string, Client>::iterator it = this->_operators.begin();
@@ -215,6 +250,10 @@ bool	Channel::isMember(std::string& nick) {
 	if (this->_users.find(nick) != this->_users.end() || this->_operators.find(nick) != this->_operators.end())
 		return (true);
 	return (false);
+}
+
+bool	Channel::isTopicRestricted(void) {
+	return this->_restrictTopic;
 }
 
 void	Channel::bann(Client &client) {

@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 16:22:39 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/09 10:36:27 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,9 +213,9 @@
 // # define RPL_CREATIONTIME() ()
 // # define RPL_WHOWAS_TIME() ()
 // # define RPL_WHOISACCOUNT() ()
-// # define RPL_NOTOPIC() ()
-// # define RPL_TOPIC() ()
-// # define RPL_TOPICWHOTIME() ()
+# define RPL_NOTOPIC(nickName, channelName) (std::string(":irc42 331 " + nickName + " " + channelName + " :No topic is set"))
+# define RPL_TOPIC(nickName, channelName, topic) (std::string(":irc42 332 " + nickName + " " + channelName + " :" + topic))
+# define RPL_TOPICWHOTIME(nickName, channelName, setbyNickname, setat) (std::string(":irc42 333 " + nickName + " " + channelName + " " + setbyNickname + " " + setat))
 // # define RPL_LISTUSAGE() ()
 // # define RPL_COMMANDSYNTAX() ()
 // # define RPL_LISTSYNTAX() ()
@@ -343,7 +343,7 @@
 # define ERR_NEEDMOREPARAMS(params)		(std::string(":irc42 461 " + params + " :Not enough parameters"))
 # define ERR_ALREADYREGISTERED(params)	(std::string(":irc42 462 " + params + " :Already registered"))
 // # define ERR_NOPERMFORHOST() ()
-# define ERR_PASSWDMISMATCH			(std::string(":irc42 464 :Wrong password."))
+# define ERR_PASSWDMISMATCH			(std::string(":irc42 464 :Password required"))
 // # define ERR_YOUREBANNEDCREEP() ()
 // # define ERR_YOUWILLBEBANNED() ()
 # define ERR_KEYSET					(std::string(":irc42 467 :Channel key already set"))

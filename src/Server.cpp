@@ -33,6 +33,8 @@ Server::Server(int port, std::string password) : _serverPort(port), _serverPassw
 	this->_commandMap["SHUTDOWN"] = &Server::shutdown;
 	this->_commandMap["MODE"] = &Server::mode;
 	this->_commandMap["KICK"] = &Server::kick;
+	this->_commandMap["TOPIC"] = &Server::topic;
+	this->_commandMap["INVITE"] = &Server::invite;
 }
 
 Server::Server(Server const &src) {
@@ -202,7 +204,14 @@ std::cout << "DEBUG: removing client in all channels";
 
 std::vector<Client>::iterator	Server::getClient(std::string& nick) {
 	std::vector<Client>::iterator	it = this->_clientVector.begin();
-	while (it->getNick() != nick)
+	while (it != this->_clientVector.end() && it->getNick() != nick)
 		it++;
+	return it;
+}
+
+std::list<Channel>::iterator	Server::getChannel(std::string& channelName) {
+	std::list<Channel>::iterator	it = this->_channel_list.begin();
+	while (it != this->_channel_list.end() && it->getName() != channelName)
+ 		it++;
 	return it;
 }

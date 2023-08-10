@@ -132,7 +132,7 @@ void	Server::pass(Client &client, t_ircMessage &params) {
 	else if (this->_serverPassword == params.parameters)
 	{
 		client.setStatus(AUTHENTICATED);
-		if (VERBOSE >= 3)
+		if (VERBOSE >= 2)
 			std::cout << ORANGE << "DEBUG: Password accepted.\n" << WHITE;
 	}
 	else
@@ -162,23 +162,25 @@ void	Server::nick(Client &client, t_ircMessage &params) {
 	// set nickname
 	std::string	oldNick = client.getNick();
 	client.setNick(params.parametersList.front());
-	if (VERBOSE >= 3)
+
+	if (VERBOSE >= 2)
 		std::cout << ORANGE << "DEBUG: set nick " << client.getNick() << WHITE << std::endl;
+
 	// check registration status
 	switch (client.getStatus())
 	{
-	case AUTHENTICATED:
-		client.setStatus(NICKGIVEN);
-		break;
-	case USERGIVEN:
-		client.setStatus(REGISTERED);
-		sendMessage(client, RPL_WELCOME(client));
-		break;
-	case REGISTERED:
-		sendMessage(client, NICK(oldNick, client));
-		break;
-	default:
-		break;
+		case AUTHENTICATED:
+			client.setStatus(NICKGIVEN);
+			break;
+		case USERGIVEN:
+			client.setStatus(REGISTERED);
+			sendMessage(client, RPL_WELCOME(client));
+			break;
+		case REGISTERED:
+			sendMessage(client, NICK(oldNick, client));
+			break;
+		default:
+			break;
 	}
 }
 
@@ -193,7 +195,7 @@ void	Server::user(Client& client, t_ircMessage& params) {
 		client.setUsername("unknown");
 	else
 		client.setUsername(params.parametersList.front());
-	if (VERBOSE >= 3)
+	if (VERBOSE >= 2)
 		std::cout << ORANGE << "DEBUG: set username " << client.getUsername() << WHITE << std::endl;
 	// check registration status
 	switch (client.getStatus())
