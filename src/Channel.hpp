@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/09 06:57:10 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 19:09:25 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include "Colors.hpp"
 # include "Client.hpp"
 # include "ChannelModes.hpp"
+# include "OverallFunctions.hpp"
 
 class Client;
 
@@ -29,6 +30,9 @@ class Channel {
 	/*---------------	Variables		---------------*/
 	std::string						_name; //begin with & or #, max 200 chars, not contain any spaces (' '), a control G (^G or ASCII 7), or a comma (',' which is used as a list item)
 	std::string						_topic;
+
+	std::string						_topicSetat;
+	std::string						_topicSetby;
 	std::string						_password;
 	bool							_inviteonly;
 	bool							_restrictTopic;
@@ -59,15 +63,16 @@ class Channel {
 	int								getLimit(void);
 	std::map<std::string, Client>	getInviteList(void);
 	int								getAmountOfAll(void);
-	
+
 	void							setPassword(std::string pw);
 	void							setLimit(int);
 	void							setLimit(std::string&);
+	void							removeLimit();
 	void							setInviteOnly(bool);
 	void							removeInvite(Client& client);
 	void							setRestrictTopic(bool);
 	void							setInviteList(Client& client);
-	
+
 	std::map<std::string, Client>	getOperators(void);
 	void							setOperator(Client &client);
 	void							removeOperator(Client& client);
@@ -78,10 +83,19 @@ class Channel {
 	void							setUser(Client &client);
 	void							removeUser(Client& client);
 
+	std::string						getTopic(void);
+	void							setTopic(std::string topic);
+	std::string						getTopicSetat(void);
+	void							setTopicSetat(void);
+	std::string						getTopicSetby(void);
+	void							setTopicSetby(std::string nickName);
+	void							clearTopic(void);
+
 	bool							isOperator(Client& client);
 	bool							isInviteOnly(void) const;
 	bool							isUser(Client& client);
 	bool							isMember(std::string& nick);
+	bool							isTopicRestricted(void);
 
 	std::map<std::string, Client>	getAllMember(void);
 	std::string						genUserlist(void);

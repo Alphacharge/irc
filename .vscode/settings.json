@@ -74,6 +74,7 @@
 		"random": "cpp",
 		"fstream": "cpp",
 		"iomanip": "cpp",
-		"numbers": "cpp"
+		"numbers": "cpp",
+		"cinttypes": "cpp"
 	}
 }

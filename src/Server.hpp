@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/09 09:16:03 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/09 19:09:16 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct s_irc {
 	std::string				command;
 	std::string				parameters;
 	std::list<std::string>	parametersList;
+	std::vector<std::string>	parametersVector;
 }		t_ircMessage;
 
 class Client;
@@ -97,6 +98,7 @@ class	Server {
 		/*---------------	Methods			---------------*/
 		void							serverStart(void);
 		std::vector<Client>::iterator	getClient(std::string& nick);
+		std::list<Channel>::iterator	getChannel(std::string& channelName);
 
 		private:
 		void		serverSetup(void);
@@ -118,15 +120,20 @@ class	Server {
 		void	mode(Client&, t_ircMessage&);
 		void	invite(Client&, t_ircMessage&);
 		void	kick(Client& , t_ircMessage&);
+		void	topic(Client&, t_ircMessage&);
+
 		//Mode Commands
 		void	modeO(Client&, Channel&, bool, std::string&);
 		void	modeK(Client&, Channel&, bool, std::string&);
 		void	shutdown(Client&, t_ircMessage&);
 
 		//SendMessages
-		void		sendMessage(Client&, std::string);
-		void		broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent);
-		void		broadcastMessage(std::map<std::string, Client>, std::string);
-		void		printAllClients(void);
-		void		printAllChannels(void);
+		void	sendMessage(Client&, std::string);
+		void	broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent);
+		void	broadcastMessage(std::map<std::string, Client>, std::string);
+		void	printAllClients(void);
+		void	printAllChannels(void);
+
+		//Utility
+		bool	enoughModeParameters(t_ircMessage&);
 };

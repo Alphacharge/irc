@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/08 16:22:39 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/09 10:36:27 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,9 +213,9 @@
 // # define RPL_CREATIONTIME() ()
 // # define RPL_WHOWAS_TIME() ()
 // # define RPL_WHOISACCOUNT() ()
-// # define RPL_NOTOPIC() ()
-// # define RPL_TOPIC() ()
-// # define RPL_TOPICWHOTIME() ()
+# define RPL_NOTOPIC(nickName, channelName) (std::string(":irc42 331 " + nickName + " " + channelName + " :No topic is set"))
+# define RPL_TOPIC(nickName, channelName, topic) (std::string(":irc42 332 " + nickName + " " + channelName + " :" + topic))
+# define RPL_TOPICWHOTIME(nickName, channelName, setbyNickname, setat) (std::string(":irc42 333 " + nickName + " " + channelName + " " + setbyNickname + " " + setat))
 // # define RPL_LISTUSAGE() ()
 // # define RPL_COMMANDSYNTAX() ()
 // # define RPL_LISTSYNTAX() ()
@@ -341,19 +341,19 @@
 // # define ERR_NOHIDING() ()
 // # define ERR_NOTFORHALFOPS() ()
 # define ERR_NEEDMOREPARAMS(params)	(std::string(":irc42 461 " + params + " :Not enough parameters\n"))
-# define ERR_ALREADYREGISTERED		(std::string(":irc42 462 :Already registered\n"))
+# define ERR_ALREADYREGISTERED		(std::string(":irc42 462 :Already registered"))
 // # define ERR_NOPERMFORHOST() ()
-# define ERR_PASSWDMISMATCH			(std::string(":irc42 464 :Wrong password.\n"))
+# define ERR_PASSWDMISMATCH			(std::string(":irc42 464 :Password required"))
 // # define ERR_YOUREBANNEDCREEP() ()
 // # define ERR_YOUWILLBEBANNED() ()
-// # define ERR_KEYSET() ()
+# define ERR_KEYSET					(std::string("irc42 467 :Channel key already set"))
 // # define ERR_INVALIDUSERNAME() ()
 // # define ERR_ONLYSERVERSCANCHANGE() ()
 // # define ERR_LINKSET() ()
 // # define ERR_LINKCHANNEL() ()
 // # define ERR_KICKEDFROMCHAN() ()
 # define ERR_CHANNELISFULL(params)		(std::string(params + " :Cannot join channel (+l)\n"))
-# define ERR_UNKNOWNMODE(mode, channel)	(std::string(":irc42 472 :" + mode + ":is unknown mode char for " + channel))
+# define ERR_UNKNOWNMODE(mode, channel)	(std::string(":irc42 472 :" + mode + " :unknown mode char for " + channel))
 # define ERR_INVITEONLYCHAN(params)		(std::string(params + " :Cannot join channel (+i)\n"))
 # define ERR_BANNEDFROMCHAN(params)		(std::string(params + " :Cannot join channel (+b)\n"))
 # define ERR_BADCHANNELKEY(params)		(std::string(params + " :Cannot join channel (+k)\n"))
@@ -517,8 +517,8 @@
 // # define ERR_NUMERIC_ERR() ()
 # define RPL_CAP				(std::string("CAP * LS :\n"))
 
-# define ERROR(message)			(std::string(":irc42 ERROR :" + message + "\n"))
-# define PONG(params)			(std::string(":irc42 PONG irc42 " + params + "\n"))
+# define ERROR(message)			(std::string("ERROR :Closing Link: " + message))
+# define PONG(params)			(std::string(":irc42 PONG irc42 " + params))
 # define NICK(oldNick, client)	(std::string(":" + oldNick + "NICK " + client.getNick() + " ; " + oldNick + " changed nickname to " + client.getNick() + ".\n"))
 
 # define GENMESSAGE(client, address, target, type, textToBeSent)	(std::string(":" + client.getNick() + "!~" + client.getUsername() + "@" + address + " " + type + " " + target + " " + textToBeSent + "\n"))
