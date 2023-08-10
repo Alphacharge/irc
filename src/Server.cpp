@@ -34,6 +34,7 @@ Server::Server(int port, std::string password) : _serverPort(port), _serverPassw
 	this->_commandMap["MODE"] = &Server::mode;
 	this->_commandMap["KICK"] = &Server::kick;
 	this->_commandMap["TOPIC"] = &Server::topic;
+	this->_commandMap["INVITE"] = &Server::invite;
 }
 
 Server::Server(Server const &src) {
