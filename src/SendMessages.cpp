@@ -27,6 +27,13 @@ void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client,
 	}
 }
 
+void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client, std::string type, std::string textToBeSent) {
+	for (std::map<std::string, Client>::iterator it = map.begin(); it != map.end(); it++) {
+		if(it->second.getNick() != client.getNick() || type != "PRIVMSG")
+			sendMessage(it->second, GENUSERMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), type, textToBeSent));
+	}
+}
+
 void	Server::broadcastMessage(std::map<std::string, Client> map, std::string message) {
 	for (std::map<std::string, Client>::iterator it = map.begin(); it != map.end(); it++)
 			sendMessage(it->second, message);
