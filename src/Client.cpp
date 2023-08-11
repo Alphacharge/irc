@@ -18,6 +18,8 @@ Client::Client(void) {
 	if (VERBOSE >= 3)
 		std::cout << DGREEN << "Client default constructor called" << WHITE << std::endl;
 	_status = CONNECTED;
+	_nick = "*";
+	_username = "*";
 }
 
 Client::Client(Client const& src) {

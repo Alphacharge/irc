@@ -117,7 +117,7 @@ void	Server::serverSetup(void)
 		//setting socket to non-blocking as required in subject
 		// fcntl(_serverSocket, F_SETFL, O_NONBLOCK);
 		if (VERBOSE >= 1)
-			std::cout << CYAN << "Server startup completed. Listening on port " << this->_serverPort << WHITE << std::endl;
+			std::cout << CYAN << "Server startup completed. Listening on port " << inet_ntoa(_serverAddress.sin_addr) << ":" << this->_serverPort << WHITE << std::endl;
 	}
 	catch (std::exception &e)
 	{
