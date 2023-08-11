@@ -408,6 +408,7 @@ bool	Server::enoughModeParameters(t_ircMessage& params) {
 			case 'l':
 				if (add == false)
 					continue;
+					//fallthrough
 			case 'k':
 			case 'o':
 				if (parameter >= params.parametersVector.size())
