@@ -6,7 +6,7 @@
 /*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/10 07:45:04 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/11 08:09:35 by rbetz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,13 @@ Channel::Channel(std::string &name) {
 		std::cout << DGREEN << "Channel argument constructor called" << WHITE << std::endl;
 	this->_name = name;
 	this->_inviteonly = false;
+	this->_restrictTopic = false;
 	this->_limit = -1;
+	this->_topic = "";
+	this->_topicSetat = "";
+	this->_topicSetby = "";
+	this->_password = "";
+	this->_restrictTopic = false;
 }
 
 Channel::Channel(Channel const& other) {
