@@ -497,11 +497,13 @@ void	Server::invite(Client& client, t_ircMessage& params) {
 	// search invited user
 	std::list<Channel>::iterator		itChannel = this->_channel_list.begin();
 	std::vector<Client>::iterator		itClient = _clientVector.begin();
-	std::string							channelName = params.parametersVector[0];
-	std::string							clientName = params.parametersVector[1];
-	for (; itClient != _clientVector.end(); itClient++)
-		if (itClient->getNick() == clientName)
+	std::string							channelName = params.parametersVector[1];
+	std::string							clientName = params.parametersVector[0];
+	for (; itClient != _clientVector.end(); itClient++) {
+		if (itClient->getNick() == clientName) {
 			break;
+		}
+	}
 	// invited nickname does not exist
 	if (itClient == this->_clientVector.end())
 		return(sendMessage(client, ERR_NOSUCHNICK(clientName)));
@@ -521,8 +523,8 @@ void	Server::invite(Client& client, t_ircMessage& params) {
 	if (itChannel->isInviteOnly() && !itChannel->isOperator(client))
 		return (sendMessage(client, ERR_CHANOPRIVSNEEDED(client)));
 	// channel is not invite only and issuer is not a channel opertator and is not a channel member
-	else if(!itChannel->isInviteOnly() && !itChannel->isMember(clientName))
-		return (sendMessage(client, ERR_NOTONCHANNEL(clientName)));
+	else if(!itChannel->isInviteOnly() && !itChannel->isMember(client.getNick()))
+		return (sendMessage(client, ERR_NOTONCHANNEL(client.getNick())));
 	// invited nickname is already on channel
 	if (itChannel->isMember(clientName))
 		return (sendMessage(client, ERR_USERONCHANNEL(clientName)));
