@@ -95,8 +95,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join));
 		} else {
 			it_chan->setUser(client);
-			// if ( it_chan->isInviteOnly())
-				it_chan->removeInvite(client);
+			it_chan->removeInvite(client);
 			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
 			if (it_chan->getTopic().empty())
 				sendMessage(client, RPL_NOTOPIC(client.getNick(), it_chan->getName()));
@@ -426,7 +425,7 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 		return ;
 	}
 	std::list<std::string> to_kick_from = splitString(params.parametersList.front(), ',');
-	std::list<std::string> to_kick_users = splitString(params.parametersList.back(), ',');
+	std::list<std::string> to_kick_users = splitString(params.parametersVector[1], ',');
 	std::list<std::string>::iterator it_to_kick_from = to_kick_from.begin();
 	std::list<std::string>::iterator it_to_kick_users = to_kick_users.begin();
 	while (it_to_kick_from != to_kick_from.end()) {
@@ -457,12 +456,12 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 			else
 				break;
 		}
-		std::string	textToBeSent;
+		std::string	textToBeSent = *it_to_kick_users + " :" + *it_to_kick_users;
 		//extract message
 		if (params.parameters.size() > 2) {
 			size_t	spacePos = params.parameters.find(" ", params.parameters.find(" ") + 1);
 			if (spacePos != std::string::npos)
-				textToBeSent = params.parameters.substr(spacePos + 1, params.parameters.size());
+				textToBeSent = *it_to_kick_users + " :" + params.parameters.substr(spacePos + 1, params.parameters.size());
 		}
 		if (it_chan == this->_channel_list.end()) {
 			sendMessage(client, ERR_NOSUCHCHANNEL(*it_to_kick_from));
