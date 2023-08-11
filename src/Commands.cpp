@@ -257,6 +257,7 @@ void	Server::privmsg(Client &client, t_ircMessage &params) {
 	if (spacePos != std::string::npos)
 		textToBeSent = params.parameters.substr(spacePos + 1, params.parameters.size());
 	if (spacePos == std::string::npos || textToBeSent.empty()) {return(sendMessage(client, ERR_NOTEXTTOSEND(client.getNick())));}
+	std::cerr << "DEBUG : " << params.parameters.substr(0, spacePos)<< std::endl;
 	std::list<std::string>	targetList = splitString(params.parameters.substr(0, spacePos), ',');
 	for (std::list<std::string>::iterator itTarget = targetList.begin(); itTarget != targetList.end(); ++itTarget) {
 		// no valid channel name
@@ -265,7 +266,8 @@ void	Server::privmsg(Client &client, t_ircMessage &params) {
 			while (itChannel != this->_channel_list.end()) {
 				if (itChannel->getName() == *itTarget) {
 					if (!itChannel->isMember(client.getNick())) { return(sendMessage(client, ERR_CANNOTSENDTOCHAN(client.getNick(),itChannel->getName())));}
-					return(broadcastMessage(itChannel->getAllMember(), client, itChannel->getName(), "PRIVMSG", textToBeSent));
+					broadcastMessage(itChannel->getAllMember(), client, itChannel->getName(), "PRIVMSG", textToBeSent);
+					break;
 				}
 				itChannel++;
 			}
@@ -279,7 +281,8 @@ void	Server::privmsg(Client &client, t_ircMessage &params) {
 				if(itClient->getNick() == *itTarget) {
 					std::map<std::string, Client> target;
 					target[itClient->getNick()] =  *itClient;
-					return(broadcastMessage(target, client, "", "PRIVMSG", textToBeSent));
+					broadcastMessage(target, client, "", "PRIVMSG", textToBeSent);
+					break;
 				}
 				itClient++;
 			}
