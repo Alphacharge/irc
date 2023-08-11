@@ -93,8 +93,7 @@ void	Server::join(Client &client, t_ircMessage& params) {
 			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join));
 		} else {
 			it_chan->setUser(client);
-			if (it_chan->isInviteOnly())
-				it_chan->removeInvite(client);
+			it_chan->removeInvite(client);
 			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
 			if (it_chan->getTopic().empty())
 				sendMessage(client, RPL_NOTOPIC(client.getNick(), it_chan->getName()));
@@ -437,7 +436,7 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 		return ;
 	}
 	std::list<std::string> to_kick_from = splitString(params.parametersList.front(), ',');
-	std::list<std::string> to_kick_users = splitString(params.parametersList.back(), ',');
+	std::list<std::string> to_kick_users = splitString(params.parametersVector[1], ',');
 	std::list<std::string>::iterator it_to_kick_from = to_kick_from.begin();
 	std::list<std::string>::iterator it_to_kick_users = to_kick_users.begin();
 	while (it_to_kick_from != to_kick_from.end()) {
@@ -468,17 +467,22 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 			else
 				break;
 		}
-		std::string	textToBeSent;
+		std::string	textToBeSent = *it_to_kick_users;
 		//extract message
 		if (params.parameters.size() > 2) {
 			size_t	spacePos = params.parameters.find(" ", params.parameters.find(" ") + 1);
 			if (spacePos != std::string::npos)
-				textToBeSent = params.parameters.substr(spacePos + 1, params.parameters.size());
+				textToBeSent += params.parameters.substr(spacePos + 1, params.parameters.size());
 		}
 		if (it_chan == this->_channel_list.end()) {
 			sendMessage(client, ERR_NOSUCHCHANNEL(*it_to_kick_from));
 			return ;
 		} else {
+			//[10:40:47] BYE [*@*] has been kicked from #test by u1 [~ls@127.0.0.1]: BYE
+			//[10:40:47] BYE [*@*] has been kicked from #test by u1 [~ls@127.0.0.1]: BYE
+			//[10:15:38] doush|2 [~kvirc@188.244.102.158] has been kicked from #mio by doush [~kvirc@188.244.102.158]: doush|2		//Sender without message
+			//[10:48:10] doush|2 [~kvirc@188.244.102.158] has been kicked from #mio by doush [~kvirc@188.244.102.158]: BYE			//Sender with message
+			//[10:15:38] You have been kicked from #mio by doush [~kvirc@188.244.102.158]: doush|2									//Reciever
 			std::vector<Client>::iterator it_client = getClient(*it_to_kick_users);
 			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "KICK", textToBeSent);
 			if (it_chan->isOperator(*it_client))
