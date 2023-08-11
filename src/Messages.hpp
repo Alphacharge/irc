@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/11 14:52:13 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/11 16:33:57 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,7 +214,6 @@
 // # define RPL_WHOWAS_TIME() ()
 // # define RPL_WHOISACCOUNT() ()
 # define RPL_NOTOPIC(nickName, channelName) (std::string(":irc42 331 " + nickName + " " + channelName + " :No topic is set"))
-// # define RPL_TOPIC(nickName, channelName, topic) (std::string(":irc42 332 " + nickName + " " + channelName + " :" + topic))
 # define RPL_TOPIC(nickName, channelName, topic) (std::string(":irc42 332 " + nickName + " " + channelName + " " + topic))
 # define RPL_TOPICWHOTIME(nickName, channelName, setbyNickname, setat) (std::string(":irc42 333 " + nickName + " " + channelName + " " + setbyNickname + " " + setat))
 // # define RPL_LISTUSAGE() ()
