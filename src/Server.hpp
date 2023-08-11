@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/10 13:57:55 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/11 14:27:08 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,9 +104,10 @@ class	Server {
 		void		serverSetup(void);
 
 		//Parsing
-		void		addClient(void);
-		bool		inputParse(std::string const&, t_ircMessage&);
-		bool		handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
+		void	addClient(void);
+		void	removeClient(Client&);
+		bool	inputParse(std::string const&, t_ircMessage&);
+		bool	handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
 
 		//Commands
 		void	join(Client& , t_ircMessage&);
@@ -130,6 +131,7 @@ class	Server {
 		//SendMessages
 		void	sendMessage(Client&, std::string);
 		void	broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent);
+		void	broadcastMessage(std::map<std::string, Client> map, Client& client, std::string type, std::string textToBeSent);
 		void	broadcastMessage(std::map<std::string, Client>, std::string);
 		void	printAllClients(void);
 		void	printAllChannels(void);

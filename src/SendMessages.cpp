@@ -13,11 +13,9 @@
 #include "Server.hpp"
 
 void	Server::sendMessage(Client &client, std::string message) {
-	size_t bytesSent = 0;
-
 	if (!message.empty() && message[message.size() - 1] != '\n')
 		message += '\n';
-	bytesSent += send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
+	send(client.getClientPollfd().fd, message.c_str(), message.length(), 0);
 }
 
 void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client, std::string channelName, std::string type, std::string textToBeSent) {
@@ -27,6 +25,13 @@ void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client,
 			sendMessage(it->second, GENMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), channelName, type, textToBeSent));
 		}
 		it++;
+	}
+}
+
+void	Server::broadcastMessage(std::map<std::string, Client> map, Client& client, std::string type, std::string textToBeSent) {
+	for (std::map<std::string, Client>::iterator it = map.begin(); it != map.end(); it++) {
+		if(it->second.getNick() != client.getNick() || type != "PRIVMSG")
+			sendMessage(it->second, GENUSERMESSAGE(client, inet_ntoa(client.getClientAddress().sin_addr), type, textToBeSent));
 	}
 }
 

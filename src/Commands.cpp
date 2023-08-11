@@ -217,12 +217,6 @@ void	Server::user(Client& client, t_ircMessage& params) {
 
 void	Server::quit(Client &client, t_ircMessage &params) {
 	(void)params;
-
-	//broadcast to all relevant channels
-	for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++)
-		if (it->isMember(client.getNick()))
-			broadcastMessage(it->getAllMember(), ":" + client.getNick() + "!~" + client.getUsername() + " QUIT :Client Quit");
-
 	sendMessage(client, ERROR(params.parameters));
 	client.setStatus(DISCONNECTED);
 }
@@ -256,7 +250,6 @@ void	Server::privmsg(Client &client, t_ircMessage &params) {
 	if (spacePos != std::string::npos)
 		textToBeSent = params.parameters.substr(spacePos + 1, params.parameters.size());
 	if (spacePos == std::string::npos || textToBeSent.empty()) {return(sendMessage(client, ERR_NOTEXTTOSEND(client.getNick())));}
-	std::cerr << "DEBUG : " << params.parameters.substr(0, spacePos)<< std::endl;
 	std::list<std::string>	targetList = splitString(params.parameters.substr(0, spacePos), ',');
 	for (std::list<std::string>::iterator itTarget = targetList.begin(); itTarget != targetList.end(); ++itTarget) {
 		// no valid channel name
@@ -280,7 +273,7 @@ void	Server::privmsg(Client &client, t_ircMessage &params) {
 				if(itClient->getNick() == *itTarget) {
 					std::map<std::string, Client> target;
 					target[itClient->getNick()] =  *itClient;
-					broadcastMessage(target, client, "", "PRIVMSG", textToBeSent);
+					broadcastMessage(target, client, "PRIVMSG", textToBeSent);
 					break;
 				}
 				itClient++;
@@ -389,14 +382,14 @@ void	Server::modeK(Client& client, Channel& channel, bool add, std::string& pass
 }
 
 bool	Server::enoughModeParameters(t_ircMessage& params) {
-
 	size_t		parameter = 2;
 	std::string	mode = params.parametersVector[1];
 	bool		add = true;
 
 	for (std::string::iterator	c = mode.begin(); c != mode.end(); c++) {
 		if (VERBOSE >= 2)
-			std::cout << "DEBUG: add " << add << " mode " << *c << " parameter " << params.parametersVector[parameter] << std::endl;
+			if (parameter < params.parametersVector.size())
+				std::cout << "DEBUG: add " << add << " mode " << *c << " parameter " << params.parametersVector[parameter] << std::endl;
 		switch (*c)
 		{
 			case '+':
@@ -408,7 +401,7 @@ bool	Server::enoughModeParameters(t_ircMessage& params) {
 			case 'l':
 				if (add == false)
 					continue;
-					//fallthrough
+				//fallthrough
 			case 'k':
 			case 'o':
 				if (parameter >= params.parametersVector.size())

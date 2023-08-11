@@ -178,18 +178,10 @@ void	Server::serverStart(void)
 					{
 						if (VERBOSE >= 1)
 							std::cout << PURPLE << "Client disconnected" << WHITE << std::endl;
-
-						for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++) {
-							if (it->isMember(clientIterator->getNick())) {
-								it->removeInvite(*clientIterator);
-								it->removeUser(*clientIterator);
-								it->removeOperator(*clientIterator);
-std::cout << "DEBUG: removing client in all channels";
-							}
-						}
+						removeClient(*clientIterator);
+						_clientVector.erase(clientIterator);
 						close(this->_fds[i].fd);
 						this->_fds.erase(this->_fds.begin() + i);
-						_clientVector.erase(clientIterator);
 						--i;
 					}
 				}
@@ -200,6 +192,18 @@ std::cout << "DEBUG: removing client in all channels";
 	{
 		std::cerr << e.what() << std::endl;
 	}
+}
+
+void	Server::removeClient(Client& client) {
+	for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++)
+		if (it->isMember(client.getNick())) {
+			// remove client from channel
+			it->removeInvite(client);
+			it->removeUser(client);
+			it->removeOperator(client);
+			// broadcast to all relevant channels
+			broadcastMessage(it->getAllMember(), ":" + client.getNick() + "!~" + client.getUsername() + "@irc42" + " QUIT :Client Quit");
+		}
 }
 
 std::vector<Client>::iterator	Server::getClient(std::string& nick) {
