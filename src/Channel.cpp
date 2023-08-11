@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/11 08:09:35 by rbetz            ###   ########.fr       */
+/*   Updated: 2023/08/11 14:08:00 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,14 @@ void	Channel::print(void) {
 	std::cout << "|inviteonly:\t|" << WHITE << this->_inviteonly <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|topic restricted:\t|" << WHITE << this->_restrictTopic << MAGENTA << "|" <<std::endl;
 	std::cout << "|limit:\t|" << WHITE << this->_limit <<  MAGENTA <<"|" << std::endl;
+	std::cout << "|invited\t|" << WHITE;
+	std::map<std::string, Client>::iterator it5 = this->_inviteList.begin();
+	while (it5 != this->_inviteList.end())
+	{
+		std::cout << it5->second.getNick() << ",";
+		it5++;
+	}
+	std::cout <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|modes:\t\t|" << WHITE;
 	std::set<t_chmode>::const_iterator it = this->_mode.begin();
 	while (it != this->_mode.end())

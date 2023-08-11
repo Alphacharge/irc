@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/02 08:37:46 by rbetz             #+#    #+#             */
-/*   Updated: 2023/08/09 10:36:27 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/11 14:31:38 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -522,6 +522,7 @@
 # define NICK(oldNick, client)	(std::string(":" + oldNick + "NICK " + client.getNick() + " ; " + oldNick + " changed nickname to " + client.getNick() + ".\n"))
 
 # define GENMESSAGE(client, address, target, type, textToBeSent)	(std::string(":" + client.getNick() + "!~" + client.getUsername() + "@" + address + " " + type + " " + target + " " + textToBeSent + "\n"))
+# define GENUSERMESSAGE(client, address, type, textToBeSent)	(std::string(":" + client.getNick() + "!~" + client.getUsername() + "@" + address + " " + type + " " + textToBeSent + "\n"))
 # define USERLIST(host, client, channel, clients)	(std::string(std::string(":") + host + " 353 " + client.getNick() + " = " + channel + " :" + clients + "\n"))
 # define USERLISTEND(host, client, channel)	(std::string(std::string(":") + host + " 366 " + client.getNick() + " " + channel + " :End of /NAMES list.\n"))
 
