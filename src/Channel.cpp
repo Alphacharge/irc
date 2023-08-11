@@ -217,13 +217,14 @@ void	Channel::clearTopic(void) {
 }
 
 std::map<std::string, Client>	Channel::getAllMember(void) {
-	std::map<std::string, Client> copy = this->_users;
-	std::map<std::string, Client>::iterator it = this->_operators.begin();
+	std::map<std::string, Client>			copy = this->_users;
+	std::map<std::string, Client>::iterator	it = this->_operators.begin();
 	while (it != this->_operators.end())
 	{
 		copy[it->first] = it->second;
 		it++;
 	}
+
 	return copy;
 }
 

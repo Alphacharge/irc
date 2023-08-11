@@ -2,6 +2,7 @@ PASS pw
 NICK test
 USER test
 JOIN #channel
+MODE
 MODE #channel
 MODE #channel +ik-t+l password 1
 MODE #channel -k password

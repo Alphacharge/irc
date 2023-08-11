@@ -218,12 +218,6 @@ void	Server::user(Client& client, t_ircMessage& params) {
 
 void	Server::quit(Client &client, t_ircMessage &params) {
 	(void)params;
-
-	//broadcast to all relevant channels
-	for (std::list<Channel>::iterator it = _channel_list.begin(); it != _channel_list.end(); it++)
-		if (it->isMember(client.getNick()))
-			broadcastMessage(it->getAllMember(), ":" + client.getNick() + "!~" + client.getUsername() + " QUIT :Client Quit");
-
 	sendMessage(client, ERROR(params.parameters));
 	client.setStatus(DISCONNECTED);
 }
@@ -390,14 +384,14 @@ void	Server::modeK(Client& client, Channel& channel, bool add, std::string& pass
 }
 
 bool	Server::enoughModeParameters(t_ircMessage& params) {
-
 	size_t		parameter = 2;
 	std::string	mode = params.parametersVector[1];
 	bool		add = true;
 
 	for (std::string::iterator	c = mode.begin(); c != mode.end(); c++) {
 		if (VERBOSE >= 2)
-			std::cout << "DEBUG: add " << add << " mode " << *c << " parameter " << params.parametersVector[parameter] << std::endl;
+			if (parameter < params.parametersVector.size())
+				std::cout << "DEBUG: add " << add << " mode " << *c << " parameter " << params.parametersVector[parameter] << std::endl;
 		switch (*c)
 		{
 			case '+':
@@ -409,6 +403,7 @@ bool	Server::enoughModeParameters(t_ircMessage& params) {
 			case 'l':
 				if (add == false)
 					continue;
+				//fallthrough
 			case 'k':
 			case 'o':
 				if (parameter >= params.parametersVector.size())

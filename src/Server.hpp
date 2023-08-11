@@ -104,9 +104,10 @@ class	Server {
 		void		serverSetup(void);
 
 		//Parsing
-		void		addClient(void);
-		bool		inputParse(std::string const&, t_ircMessage&);
-		bool		handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
+		void	addClient(void);
+		void	removeClient(Client&);
+		bool	inputParse(std::string const&, t_ircMessage&);
+		bool	handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
 
 		//Commands
 		void	join(Client& , t_ircMessage&);
