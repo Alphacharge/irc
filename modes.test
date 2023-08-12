@@ -8,3 +8,7 @@ MODE #channel +ik-t+l password 1
 MODE #channel -k password
 MODE #channel -i
 MODE #channel -ilto fkernbac
+MODE #channel -ilt+o fkernbac
+MODE #channel -l 50
+MODE #channel +l
+MODE #channel +l 2

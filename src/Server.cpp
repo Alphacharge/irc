@@ -117,7 +117,7 @@ void	Server::serverSetup(void)
 		//setting socket to non-blocking as required in subject
 		// fcntl(_serverSocket, F_SETFL, O_NONBLOCK);
 		if (VERBOSE >= 1)
-			std::cout << CYAN << "Server startup completed. Listening on port " << inet_ntoa(_serverAddress.sin_addr) << ":" << this->_serverPort << WHITE << std::endl;
+			std::cout << CYAN << "Server startup completed. Listening on port:" << this->_serverPort << WHITE << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -139,7 +139,6 @@ void	Server::serverStart(void)
 			ret = poll(this->_fds.data(), this->_fds.size(), -1);
 			if (ret == -1)
 				throw PollException();
-
 			// check server
 			if (this->_fds[0].revents & POLLIN)
 				addClient();
@@ -150,10 +149,8 @@ void	Server::serverStart(void)
 				std::vector<t_ircMessage> commands; // contains all valid client messages
 				std::vector<Client>::iterator clientIterator = this->_clientVector.begin() + i - 1;
 
-				if ((this->_fds[i].revents & POLLIN))
-				{
+				if ((this->_fds[i].revents & POLLIN)) {
 					bzero(buffer, sizeof(buffer));
-
 					recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
 
 					if (ret > 0 && handleClient(buffer, clientIterator, commands))
@@ -174,7 +171,7 @@ void	Server::serverStart(void)
 						}
 						commands.clear();
 					}
-					if (!clientIterator->getStatus() || this->_fds[i].revents & (POLLERR | POLLHUP) || ret < 0)
+					if (!clientIterator->getStatus() || this->_fds[i].revents & (POLLERR | POLLHUP) || ret <= 0)
 					{
 						if (VERBOSE >= 1)
 							std::cout << PURPLE << "Client disconnected" << WHITE << std::endl;

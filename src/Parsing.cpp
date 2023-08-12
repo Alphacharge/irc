@@ -44,25 +44,22 @@ bool	Server::inputParse(std::string const &message, t_ircMessage &clientCommand)
 		clientCommand.prefix = message.substr(pos, prefixEnd - pos);
 		pos = prefixEnd + 1;
 	}
+
 	size_t commandEnd = message.find(' ', pos);
-	if (commandEnd == std::string::npos) {
-		clientCommand.command = message.substr(pos, commandEnd);
-		return true;
-	}
+	// if (commandEnd == std::string::npos) {
+	// 	clientCommand.command = message.substr(pos, commandEnd);
+	// 	return true;
+	// }
 	clientCommand.command = message.substr(pos, commandEnd - pos);
 	pos = commandEnd + 1;
 	clientCommand.parameters = message.substr(pos, message.size() - 2);
+
 	/* trim final CR-LF */
-	if (!clientCommand.parameters.empty())
-	{
-		if (clientCommand.parameters[clientCommand.parameters.size() - 1] == '\r')
-			clientCommand.parameters = clientCommand.parameters.substr(0, clientCommand.parameters.size() - 1);
-	}
-	else
-	{
-		if (clientCommand.command[clientCommand.command.size() - 1] == '\r')
+	if (!clientCommand.parameters.empty() && clientCommand.parameters[clientCommand.parameters.size() - 1] == '\r')
+		clientCommand.parameters = clientCommand.parameters.substr(0, clientCommand.parameters.size() - 1);
+	else if (!clientCommand.parameters.empty() && clientCommand.command[clientCommand.command.size() - 1] == '\r')
 			clientCommand.command = clientCommand.command.substr(0, clientCommand.command.size() - 1);
-	}
+
 	/* remove initial ':' if present, e.g. KVirc PASS :pw */
 	if (!clientCommand.parameters.empty() && clientCommand.parameters.size() > 1 && clientCommand.parameters[0] == ':')
 		clientCommand.parameters = clientCommand.parameters.substr(1, clientCommand.parameters.size());
@@ -80,6 +77,8 @@ bool	Server::handleClient(char *buffer, std::vector<Client>::iterator &clientIte
 
 	while (getline(iss, tmpBuffer)) {
 		if (iss.eof()) {
+			if (VERBOSE >= 2)
+				std::cout << "DEBUG: found EoF\n";
 			clientIterator->appendBuffer(tmpBuffer);
 			executable = false;
 		}

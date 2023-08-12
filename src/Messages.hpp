@@ -369,7 +369,7 @@
 // # define ERR_NOULINE() ()
 // # define ERR_CANNOTKNOCK() ()
 // # define ERR_NOPRIVILEGES(client)		(std::string("irc42 481 " + client.getNick() + " :Permission Denied- You're not an IRC operator"))
-# define ERR_CHANOPRIVSNEEDED(nick, channel)	(std::string(":irc42 482 " + nick + " " + channel + ": You're not channel operator"))
+# define ERR_CHANOPRIVSNEEDED(nick, channel)	(std::string(":irc42 482 " + nick + " " + channel + " :You're not channel operator"))
 // # define ERR_CANTKILLSERVER() ()
 // # define ERR_RESTRICTED() ()
 // # define ERR_ISCHANSERVICE() ()

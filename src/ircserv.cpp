@@ -13,20 +13,13 @@
 #include "Server.hpp"
 #include <stdlib.h>
 
-int	ft_strisdigit(char *str)
-{
-	int	i;
-
-	i = 0;
-	if (str == NULL)
-		return (0);
-	while (str[i] != '\0')
-	{
-		if (str[i] < '0' || str[i] > '9')
-			return (0);
-		i++;
+int	strisdigit(const std::string& str) {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (!std::isdigit(*it)) {
+			return false;
+		}
 	}
-	return (1);
+	return true;
 }
 
 int	main(int argc, char** argv) {
@@ -34,7 +27,7 @@ int	main(int argc, char** argv) {
 		std::cerr << "Usage : ./ircserv <port> <password>" << std::endl;
 		return 1;
 	}
-	if (!ft_strisdigit(argv[1])) {
+	if (!strisdigit(argv[1])) {
 		std::cerr << "No valid Port!" << std::endl;
 		return 1;
 	}
