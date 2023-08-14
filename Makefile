@@ -6,7 +6,7 @@
 #    By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/02 16:33:15 by rbetz             #+#    #+#              #
-#    Updated: 2023/08/14 12:54:44 by rbetz            ###   ########.fr        #
+#    Updated: 2023/08/14 13:00:36 by rbetz            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ CXX		:=	c++
 CXXFLAGS	:=	-Wall -Wextra -Werror
 CXXFLAGS	+=	-MMD --std=c++98
 CXXFLAGS	+=	-Wunused -Wunreachable-code -Wshadow -pedantic -Wno-conversion
-CXXFLAGS	+=	-g #-fsanitize=address
+# CXXFLAGS	+=	-g #-fsanitize=address
 
 ###			###			SOURCES			###			###
 VPATH	:=	src/
