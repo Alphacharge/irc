@@ -6,7 +6,7 @@
 #    By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/02 16:33:15 by rbetz             #+#    #+#              #
-#    Updated: 2023/08/14 08:58:43 by rbetz            ###   ########.fr        #
+#    Updated: 2023/08/14 12:54:44 by rbetz            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,6 +14,7 @@ NAME	:=	ircserv
 
 ###			###			COMPABILITY		###			###
 OS		:=	$(shell uname)
+SHELL	:=	/bin/bash
 
 ###			###			COMPILER		###			###
 CXX		:=	c++
