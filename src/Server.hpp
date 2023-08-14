@@ -6,7 +6,7 @@
 /*   By: lsordo <lsordo@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 14:39:17 by lsordo            #+#    #+#             */
-/*   Updated: 2023/08/11 14:27:08 by lsordo           ###   ########.fr       */
+/*   Updated: 2023/08/14 14:57:04 by lsordo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ class	Server {
 		//Parsing
 		void	addClient(void);
 		void	removeClient(Client&);
-		bool	inputParse(std::string const&, t_ircMessage&);
+		bool	inputParse(std::string&, t_ircMessage&);
 		bool	handleClient(char*, std::vector<Client>::iterator&, std::vector<t_ircMessage>&);
 
 		//Commands

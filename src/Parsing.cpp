@@ -33,8 +33,10 @@ void	Server::addClient(void) {
 	// fcntl(newClient.getClientSocket(), F_SETFL, O_NONBLOCK);
 }
 
-bool	Server::inputParse(std::string const &message, t_ircMessage &clientCommand) {
+bool	Server::inputParse(std::string& message, t_ircMessage &clientCommand) {
 	size_t pos = 0;
+	if (!message.empty() && message[message.size() - 1] == '\r')
+		message = message.substr(0, message.size() - 1);
 	if (!message.empty() && message[pos] == ':')
 	{
 		pos++;
@@ -46,19 +48,19 @@ bool	Server::inputParse(std::string const &message, t_ircMessage &clientCommand)
 	}
 
 	size_t commandEnd = message.find(' ', pos);
-	// if (commandEnd == std::string::npos) {
-	// 	clientCommand.command = message.substr(pos, commandEnd);
-	// 	return true;
-	// }
+	if (commandEnd == std::string::npos) {
+		clientCommand.command = message.substr(pos, commandEnd);
+		return true;
+	}
 	clientCommand.command = message.substr(pos, commandEnd - pos);
 	pos = commandEnd + 1;
 	clientCommand.parameters = message.substr(pos, message.size() - 2);
 
-	/* trim final CR-LF */
-	if (!clientCommand.parameters.empty() && clientCommand.parameters[clientCommand.parameters.size() - 1] == '\r')
-		clientCommand.parameters = clientCommand.parameters.substr(0, clientCommand.parameters.size() - 1);
-	else if (!clientCommand.parameters.empty() && clientCommand.command[clientCommand.command.size() - 1] == '\r')
-			clientCommand.command = clientCommand.command.substr(0, clientCommand.command.size() - 1);
+	// /* trim final CR-LF */
+	// if (!clientCommand.parameters.empty() && clientCommand.parameters[clientCommand.parameters.size() - 1] == '\r')
+	// 	clientCommand.parameters = clientCommand.parameters.substr(0, clientCommand.parameters.size() - 1);
+	// else if (!clientCommand.parameters.empty() && clientCommand.command[clientCommand.command.size() - 1] == '\r')
+	// 		clientCommand.command = clientCommand.command.substr(0, clientCommand.command.size() - 1);
 
 	/* remove initial ':' if present, e.g. KVirc PASS :pw */
 	if (!clientCommand.parameters.empty() && clientCommand.parameters.size() > 1 && clientCommand.parameters[0] == ':')

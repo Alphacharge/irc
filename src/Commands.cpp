@@ -559,7 +559,7 @@ void	Server::topic(Client& client, t_ircMessage& params) {
 		}
 	}
 	// clear topic
-	else if (params.parametersList.size() >= 2 && *(++itParams) == ":") {
+	else if (params.parametersList.size() == 2 && *(++itParams) == ":") {
 		itChannel->clearTopic();
 		std::map<std::string, Client> members;
 		std::map<std::string, Client>::iterator it = members.begin();
