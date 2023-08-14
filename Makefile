@@ -6,7 +6,7 @@
 #    By: rbetz <rbetz@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/02 16:33:15 by rbetz             #+#    #+#              #
-#    Updated: 2023/08/14 13:00:36 by rbetz            ###   ########.fr        #
+#    Updated: 2023/08/14 13:02:13 by rbetz            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -81,12 +81,12 @@ lsan: clean_lsan $(OBJ_D) $(LSAN_F)
 	@$(MAKE) -j $(NAME)
 
 kvirc:
-	@echo "$(GREEN)Download $(KVIRC) ...$(WHITE)"
+	@echo -e "$(GREEN)Download $(KVIRC) ...$(WHITE)"
 	@/usr/bin/curl -O "ftp://ftp.kvirc.net/pub/kvirc/5.0.0/binary/macosx/KVIrc-5.0.0.dmg" --output $(KVIRC)
 
 $(NAME): $(OBJ_D) $(OBJ_F)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ_F) $(LIB)
-	@echo "$(RED)--->$(BLUE)ircserv $(GREEN)is now compiled .....$(WHITE)"
+	@echo -e "$(RED)--->$(BLUE)ircserv $(GREEN)is now compiled .....$(WHITE)"
 
 $(OBJ_D)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -99,7 +99,7 @@ $(OBJ_D):
 
 $(LSAN_F):
 ifneq ($(shell test -d $(LSAN_D) && echo exists), exists)
-	@echo "$(GREEN)Clone LeakSanitizer ...$(WHITE)"
+	@echo -e "$(GREEN)Clone LeakSanitizer ...$(WHITE)"
 	@git clone -q --branch v1.4 --recursive $(LSAN_U) $(LSAN_D)
 endif
 	@echo "$(GREEN)Make LeakSanitizer ...$(WHITE)"
@@ -140,14 +140,14 @@ clean_lsan:
 clean:
 	@rm -rf $(OBJ_D)
 	@rm -f $(LSAN_F)
-	@echo "$(RED)Objects cleaned.$(WHITE)"
+	@echo -e "$(RED)Objects cleaned.$(WHITE)"
 
 fclean: clean
 	@rm -f $(NAME)
 	@rm -f $(KVIRC)
-	@echo "$(BLUE)--->$(GREEN)Cleaning $(NAME) .....$(WHITE)"
-	@echo "$(BLUE)--->$(GREEN)Cleaning $(KVIRC) .....$(WHITE)"
-	@echo "$(RED)All is cleaned$(WHITE)"
+	@echo -e "$(BLUE)--->$(GREEN)Cleaning $(NAME) .....$(WHITE)"
+	@echo -e "$(BLUE)--->$(GREEN)Cleaning $(KVIRC) .....$(WHITE)"
+	@echo -e "$(RED)All is cleaned$(WHITE)"
 
 re: fclean all
 
