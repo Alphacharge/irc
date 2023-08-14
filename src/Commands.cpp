@@ -23,10 +23,10 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		sendMessage(client, ERR_NEEDMOREPARAMS(client.getNick(), params.command));
 		return ;
 	}
-	if (params.parametersList.size() == 1)
-		params.parametersList.push_back("");
-	std::list<std::string> tojoin = splitString(params.parametersList.front(), ',');
-	std::list<std::string> tojoinpw = splitString(params.parametersList.back(), ',');
+	if (params.parametersVector.size() == 1)
+		params.parametersVector.push_back("");
+	std::list<std::string> tojoin = splitString(params.parametersVector[0], ',');
+	std::list<std::string> tojoinpw = splitString(params.parametersVector[1], ',');
 	std::list<std::string>::iterator it_join = tojoin.begin();
 	std::list<std::string>::iterator it_joinpw = tojoinpw.begin();
 	while (it_join != tojoin.end()) {
@@ -421,8 +421,8 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 		sendMessage(client, ERR_NEEDMOREPARAMS(client.getNick(), params.command));
 		return ;
 	}
-	std::list<std::string>				to_kick_from = splitString(params.parametersList.front(), ',');
-	std::list<std::string>				to_kick_users = splitString(params.parametersList.back(), ',');
+	std::list<std::string>				to_kick_from = splitString(params.parametersVector[0], ',');
+	std::list<std::string>				to_kick_users = splitString(params.parametersVector[1], ',');
 	std::list<std::string>::iterator	it_to_kick_from = to_kick_from.begin();
 	std::list<std::string>::iterator	it_to_kick_users = to_kick_users.begin();
 	while (it_to_kick_from != to_kick_from.end()) {
