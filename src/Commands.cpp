@@ -23,10 +23,10 @@ void	Server::join(Client &client, t_ircMessage& params) {
 		sendMessage(client, ERR_NEEDMOREPARAMS(client.getNick(), params.command));
 		return ;
 	}
-	if (params.parametersVector.size() == 1)
-		params.parametersVector.push_back("");
-	std::list<std::string> tojoin = splitString(params.parametersVector[0], ',');
-	std::list<std::string> tojoinpw = splitString(params.parametersVector[1], ',');
+	if (params.parametersList.size() == 1)
+		params.parametersList.push_back("");
+	std::list<std::string> tojoin = splitString(params.parametersList.front(), ',');
+	std::list<std::string> tojoinpw = splitString(params.parametersList.back(), ',');
 	std::list<std::string>::iterator it_join = tojoin.begin();
 	std::list<std::string>::iterator it_joinpw = tojoinpw.begin();
 	while (it_join != tojoin.end()) {
@@ -95,7 +95,8 @@ void	Server::join(Client &client, t_ircMessage& params) {
 			sendMessage(client, USERLISTEND(inet_ntoa(this->_serverAddress.sin_addr), client, *it_join));
 		} else {
 			it_chan->setUser(client);
-			it_chan->removeInvite(client);
+			// if ( it_chan->isInviteOnly())
+				it_chan->removeInvite(client);
 			broadcastMessage(it_chan->getAllMember(), client, it_chan->getName(), "JOIN", "");
 			if (it_chan->getTopic().empty())
 				sendMessage(client, RPL_NOTOPIC(client.getNick(), it_chan->getName()));
@@ -384,9 +385,6 @@ bool	Server::enoughModeParameters(t_ircMessage& params) {
 	bool		add = true;
 
 	for (std::string::iterator	c = mode.begin(); c != mode.end(); c++) {
-		if (VERBOSE >= 2)
-			if (parameter < params.parametersVector.size())
-				std::cout << "DEBUG: add " << add << " mode " << *c << " parameter " << params.parametersVector[parameter] << std::endl;
 		switch (*c)
 		{
 			case '+':
@@ -446,7 +444,7 @@ void	Server::kick(Client &client, t_ircMessage& params) {
 				}
 				//To be kicked User is no Member of the Channel
 				if (it_chan->getName() == *it_to_kick_from && !it_chan->isMember(*it_to_kick_users)) {
-					sendMessage(client, ERR_USERNOTINCHANNEL(*it_to_kick_users, it_chan->getName()));
+					sendMessage(client, ERR_USERNOTINCHANNEL(client.getNick(), *it_to_kick_users, it_chan->getName()));
 					return ;
 				}
 				if (*it_to_kick_from != it_chan->getName())

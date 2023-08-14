@@ -44,7 +44,6 @@ Channel::Channel(Channel const& other) {
 Channel::~Channel(void) {
 	if (VERBOSE >= 3)
 		std::cout << RED << "Channel destructor called" << WHITE << std::endl;
-	this->_mode.clear();
 	this->_banns.clear();
 	this->_users.clear();
 	this->_operators.clear();
@@ -64,7 +63,6 @@ Channel& Channel::operator=(Channel const& other) {
 		this->_password			= other._password;
 		this->_inviteonly		= other._inviteonly;
 		this->_limit			= other._limit;
-		this->_mode				= other._mode;
 		this->_banns			= other._banns;
 		this->_users			= other._users;
 		this->_operators 		= other._operators;
@@ -87,14 +85,6 @@ void	Channel::print(void) {
 	{
 		std::cout << it5->second.getNick() << ",";
 		it5++;
-	}
-	std::cout <<  MAGENTA <<"|" << std::endl;
-	std::cout << "|modes:\t\t|" << WHITE;
-	std::set<t_chmode>::const_iterator it = this->_mode.begin();
-	while (it != this->_mode.end())
-	{
-		std::cout << *it << ",";
-		it++;
 	}
 	std::cout <<  MAGENTA <<"|" << std::endl;
 	std::cout << "|users:\t\t|" << WHITE;

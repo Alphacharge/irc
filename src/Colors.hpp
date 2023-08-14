@@ -28,22 +28,3 @@
 # define VERBOSE	1 //3 Constructors, 2 Infos from Commands, 1 Input from Client, 0 Zero
 
 #endif
-
-/*---------------	Constructors	---------------*/
-/*---------------	Destructor		---------------*/
-/*---------------	Operators		---------------*/
-/*---------------	Getters/Setters	---------------*/
-/*---------------	Methods			---------------*/
-/*---------------	Variables		---------------*/
-/*---------------	Exceptions		---------------*/
-
-/*
-if (VERBOSE)
-		std::cout << DGREEN << "xx default constructor called" << WHITE << std::endl;
-if (VERBOSE)
-		std::cout << YELLOW << "xx copy constructor called" << WHITE << std::endl;
-if (VERBOSE)
-		std::cout << RED << "xx destructor called" << WHITE << std::endl;
-if (VERBOSE)
-		std::cout << BLUE << "xx assignment operator called" << WHITE << std::endl;
-*/

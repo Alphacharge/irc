@@ -28,9 +28,6 @@ void	Server::addClient(void) {
 	newClient.setStatus(CONNECTED);
 	this->_clientVector.push_back(newClient);
 	this->_fds.push_back(newClient.getClientPollfd());
-
-	//setting socket to non-blocking as required in subject
-	// fcntl(newClient.getClientSocket(), F_SETFL, O_NONBLOCK);
 }
 
 bool	Server::inputParse(std::string& message, t_ircMessage &clientCommand) {
@@ -55,12 +52,6 @@ bool	Server::inputParse(std::string& message, t_ircMessage &clientCommand) {
 	clientCommand.command = message.substr(pos, commandEnd - pos);
 	pos = commandEnd + 1;
 	clientCommand.parameters = message.substr(pos, message.size() - 2);
-
-	// /* trim final CR-LF */
-	// if (!clientCommand.parameters.empty() && clientCommand.parameters[clientCommand.parameters.size() - 1] == '\r')
-	// 	clientCommand.parameters = clientCommand.parameters.substr(0, clientCommand.parameters.size() - 1);
-	// else if (!clientCommand.parameters.empty() && clientCommand.command[clientCommand.command.size() - 1] == '\r')
-	// 		clientCommand.command = clientCommand.command.substr(0, clientCommand.command.size() - 1);
 
 	/* remove initial ':' if present, e.g. KVirc PASS :pw */
 	if (!clientCommand.parameters.empty() && clientCommand.parameters.size() > 1 && clientCommand.parameters[0] == ':')

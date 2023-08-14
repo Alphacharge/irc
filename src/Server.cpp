@@ -114,8 +114,6 @@ void	Server::serverSetup(void)
 		this->_serverPollfd.events = POLLIN;
 		this->_fds.push_back(this->_serverPollfd);
 
-		//setting socket to non-blocking as required in subject
-		// fcntl(_serverSocket, F_SETFL, O_NONBLOCK);
 		if (VERBOSE >= 1)
 			std::cout << CYAN << "Server startup completed. Listening on port:" << this->_serverPort << WHITE << std::endl;
 	}

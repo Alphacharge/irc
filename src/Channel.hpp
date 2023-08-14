@@ -19,7 +19,6 @@
 # include <set>
 # include "Colors.hpp"
 # include "Client.hpp"
-# include "ChannelModes.hpp"
 # include "OverallFunctions.hpp"
 
 class Client;
@@ -37,7 +36,6 @@ class Channel {
 	bool							_inviteonly;
 	bool							_restrictTopic;
 	int								_limit;
-	std::set<t_chmode>				_mode;
 	std::set<Client*>				_banns;
 	std::map<std::string, Client>	_users;
 	std::map<std::string, Client>	_operators;
